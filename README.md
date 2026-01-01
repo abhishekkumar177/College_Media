@@ -1,13 +1,15 @@
-# React + Vite
+# College Media
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Project Status](https://img.shields.io/badge/Status-Development-green)
+![React](https://img.shields.io/badge/React-19-blue)
+![Vite](https://img.shields.io/badge/Vite-7-purple)
+![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS-38bdf8)
 
-Currently, two official plugins are available:
+A modern, responsive social media dashboard built with React and Vite. This application features a familiar interface with stories, a scrolling feed, suggested accounts, and real-time interaction simulations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📱 Overview
 
-## Expanding the ESLint configuration
+InstaClone is a frontend application designed to replicate the core user experience of popular social media platforms. It features a clean, gradient-themed UI with a focus on visual media, user interactions, and responsive design.
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
