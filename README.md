@@ -11,97 +11,44 @@ A modern, responsive social media dashboard built with React and Vite. This appl
 
 InstaClone is a frontend application designed to replicate the core user experience of popular social media platforms. It features a clean, gradient-themed UI with a focus on visual media, user interactions, and responsive design.
 
-## ✨ Key Features
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
-* **Interactive Story Carousel**:
-    * Auto-scrolling functionality.
-    * Visual indicators for active stories.
-    * User avatars with gradient borders.
-* **Dynamic Feed**:
-    * Post rendering with headers, media, and captions.
-    * **Like Interaction**: Toggle heart animations with instant count updates.
-    * Comment counters and "View all" placeholders.
-* **Responsive Navigation**:
-    * Top sticky navigation bar with search functionality.
-    * Sidebar navigation for larger screens (Home, Explore, Reels, etc.).
-* **Sidebar Widgets**:
-    * **Suggested Accounts**: "Follow" functionality recommendations.
-    * **Trending Hashtags**: visual tags for trending topics.
-    * **Online Friends**: Quick-view status indicators.
-* **Modern UI/UX**:
-    * Glassmorphism effects and gradient backgrounds.
-    * Smooth transitions and hover effects.
-    * Fully responsive grid layout.
 
-## 🛠️ Tech Stack
+## 💬 Connect with the Maintainer
 
-* **Framework**: [React](https://react.dev/) (v19)
-* **Build Tool**: [Vite](https://vitejs.dev/)
-* **Styling**: Tailwind CSS (Utility classes) & Custom CSS animations.
-* **Icons**: SVG Icons (Heroicons style).
-* **Linting**: ESLint.
+👩‍💻 **Maintainer:** [@janavipandole](https://github.com/janavipandole)
+📧 **Contact:** Open an issue or connect via GitHub.
 
-## 🚀 Getting Started
+<img src="https://github.com/Mayur-Pagote/README_Design_Kit/blob/730d340c8008758ac291ebc555f818f851feda0f/Assets/RGB%20Line%20Thick.gif" width="100%" />
 
-Follow these steps to set up the project locally.
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=90&section=header" width="100%"/>
 
-### Prerequisites
+## Contributors
 
-* Node.js (v18 or higher recommended)
-* npm or yarn
+<img src="https://contributors-img.web.app/image?repo=abhishekkumar177/College_Media"/>
 
-### Installation
+<img src="https://github.com/Mayur-Pagote/README_Design_Kit/blob/45123f007c79aa8d0c8d9b11b3ff72d6bf4744c7/Assets/Star%20Light%20Line.gif" width="100%">
 
-1.  **Clone the repository**
-    ```bash
-    git clone https://github.com/abhishekkumar177/college_media.git
-    cd college_media
-    ```
+## Stargazers
 
-2.  **Install dependencies**
-    ```bash
-    npm install
-    ```
+<img src="https://reporoster.com/stars/dark/abhishekkumar177/College_Mediae"/>
 
-    *> **Note**: The project relies on Tailwind CSS classes. Ensure your environment is set up to process Tailwind utilities if you modify the styling.*
+<img src="https://github.com/Mayur-Pagote/README_Design_Kit/blob/45123f007c79aa8d0c8d9b11b3ff72d6bf4744c7/Assets/Star%20Light%20Line.gif" width="100%">
 
-3.  **Run the development server**
-    ```bash
-    npm run dev
-    ```
+## Forkers
 
-4.  **Open your browser**
-    Navigate to `http://localhost:5173` to view the app.
+<img src="https://reporoster.com/forks/dark/abhishekkumar177/College_Media"/>
 
-## 📂 Project Structure
 
-```text
-src/
-├── assets/          # Static assets (logos, images)
-├── App.jsx          # Main application logic and layout
-├── App.css          # Custom animations and scrollbar styles
-├── index.css        # Global styles and resets
-└── main.jsx         # Application entry point
-public/          # Public assets
-```
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient"/>
 
-## 🎨 Customization
 
-#### Modifying Data
-The application currently uses mock data arrays located inside `src/App.jsx`. You can modify these arrays to change the content:
-- `stories`: Update story avatars and usernames.
-- `posts`: Change feed content, likes, and captions.
-- `suggestedAccounts`: Update sidebar recommendations.
+## 🌟 Support the Project
 
-#### Styling
-- **Tailwind**: Most styling is handled via utility classes in `App.jsx`.
-- **Custom CSS**: specialized animations (like the like button bounce) are defined in `src/App.css`.
+If you found this helpful:
+⭐ **Star** the repository
+🍴 **Fork** it to contribute
+📢 **Share** it with others
 
-## 🔮 Future Improvements
-- [ ] Backend integration for real authentication.
-- [ ] Image upload functionality for creating new posts.
-- [ ] Dark mode toggle.
-- [ ] Real-time chat implementation in the Messages tab.
-
-## 📄 License
-This project is open source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
+> “Good food brings people together — so does open source.” 🍕💻
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&height=100&section=footer" width="100%"/>
