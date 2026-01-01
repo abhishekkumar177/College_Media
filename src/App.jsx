@@ -1,14 +1,25 @@
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import React, { useState, useEffect } from "react";
+import SkeletonPost from "./components/SkeletonPost";
+
 
 const App = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Home");
+  const [loading, setLoading] = useState(true);
+
+  // 🔹 ADD THIS RIGHT HERE 👇
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Mock data
   const stories = [
@@ -186,7 +197,15 @@ const App = () => {
             </div>
 
             {/* Posts Feed */}
-            {posts.map((post) => (
+            {loading ? (
+              <>
+                <SkeletonPost />
+                <SkeletonPost />
+                <SkeletonPost />
+              </>
+
+            ) : (
+            posts.map((post) => (
               <div key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                 {/* Post Header */}
                 <div className="flex items-center p-4 border-b border-gray-100">
@@ -202,6 +221,8 @@ const App = () => {
                     </svg>
                   </div>
                 </div>
+              
+            
 
                 {/* Post Media */}
                 <div className="w-full cursor-pointer">
@@ -211,6 +232,8 @@ const App = () => {
                     className="w-full object-cover hover:opacity-95 transition-opacity duration-300"
                   />
                 </div>
+            
+          
 
                 {/* Post Actions */}
                 <div className="p-4">
@@ -264,7 +287,8 @@ const App = () => {
                   </button>
                 </div>
               </div>
-            ))}
+            ))
+          )}
           </div>
 
           {/* Right Sidebar */}
