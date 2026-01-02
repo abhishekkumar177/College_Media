@@ -1,0 +1,59 @@
+name: 🐛 Bug Report
+description: Report a reproducible bug or error.
+title: "bug: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below carefully.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: Clearly describe the bug.
+      placeholder: What went wrong?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🚀 Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: Add screenshots or screen recordings if applicable.
+      placeholder: Drag and drop images here
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 💻 Environment
+      description: Please provide environment details.
+      placeholder: |
+        OS: Windows / macOS / Linux
+        Browser: Chrome / Firefox / Edge
+    validations:
+      required: true
+
+  - type: textarea
+    id: possible_fix
+    attributes:
+      label: 💡 Possible Fix
+      description: Suggest a fix if you have one.
+      placeholder: Optional

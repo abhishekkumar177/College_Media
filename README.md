@@ -484,10 +484,28 @@ npm install
 ## 📈 Future Roadmap
 
 ### Phase 1 - Backend Integration (Q1 2026)
-- [ ] Backend API Integration (Node.js/Express)
-- [ ] REST API endpoint design
-- [ ] Database schema design
-- [ ] Authentication system
+
+**Planned Backend Direction (Tentative):**
+- **Backend Framework:** JavaScript-based backend (e.g., Node.js ecosystem)
+- **API Architecture:** RESTful APIs (planned)
+- **Database:** To be finalized (under evaluation)
+- **Authentication:** Planned (JWT-based approach under consideration)
+- **Hosting:** To be decided (cloud platforms such as Vercel / Render / Railway under evaluation)
+
+> ⚠️ **Important:**  
+> The backend technology stack is **not finalized**.  
+> The above items describe the *intended direction only* and may change
+> based on maintainer decisions and community discussion.
+
+> 🛠️ **Contributor Guidelines (Backend Architecture):**  
+> Contributors should not implement backend features, APIs, or database-specific
+> logic without prior discussion and approval via GitHub Issues.
+
+**Scope:**
+- [ ] Backend API setup
+- [ ] REST endpoint design
+- [ ] Database schema & models
+- [ ] Authentication & authorization
 
 ### Phase 2 - Core Features (Q2 2026)
 - [ ] User Authentication & Authorization (JWT)
