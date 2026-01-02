@@ -1,20 +1,57 @@
+
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 
 import { AuthProvider } from './context/AuthContext';
 import Home from "./pages/Home";
+
+/**
+ * College Media - Main Application Component
+ * 
+ * A comprehensive social media feed application built with React.
+ * Features include:
+ * - Stories carousel with auto-scroll functionality
+ * - Dynamic post feed with like/comment interactions
+ * - Search functionality
+ * - Navigation tabs (Home, Explore, Reels, Messages, Notifications, Settings)
+ * - Suggested accounts sidebar
+ * - Trending hashtags
+ * - Online friends display
+ * - Fully responsive gradient-themed UI
+ * 
+ * @component Main application container
+ * @returns {React.ReactElement} Main app layout with navigation and feed
+ */
+
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import "./App.css";
+
+/* ===== Pages ===== */
+
 import Landing from "./pages/Landing";
+import Home from "./pages/Home";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+
 import Layout from "./components/Layout";
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import ProfileEditForm from './components/Auth/ProfileEditForm';
 
+
+/* ===== Layout Components ===== */
+import Navbar from "./components/Navbar";
+import LeftSidebar from "./components/LeftSidebar";
+import RightSidebar from "./components/RightSidebar";
+
+
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Home");
+
 
   return (
     <AuthProvider>
@@ -88,6 +125,282 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         <Route path="edit" element={<ProfileEditForm />} />
       </Route>
     </Routes>
+  );
+  // ============= MOCK DATA - Stories =============
+  
+  /**
+   * Array of story objects with user avatars
+   * Stories are displayed in a horizontal carousel with auto-scroll
+   * In production, this would be fetched from a backend API
+   */
+  const stories = [
+    { id: 1, username: "user1", avatar: "https://placehold.co/100x100/FF6B6B/FFFFFF?text=U1" },
+    { id: 2, username: "user2", avatar: "https://placehold.co/100x100/4ECDC4/FFFFFF?text=U2" },
+    { id: 3, username: "user3", avatar: "https://placehold.co/100x100/45B7D1/FFFFFF?text=U3" },
+    { id: 4, username: "user4", avatar: "https://placehold.co/100x100/96CEB4/FFFFFF?text=U4" },
+    { id: 5, username: "user5", avatar: "https://placehold.co/100x100/FFEAA7/FFFFFF?text=U5" },
+    { id: 6, username: "user6", avatar: "https://placehold.co/100x100/DDA0DD/FFFFFF?text=U6" },
+    { id: 7, username: "user7", avatar: "https://placehold.co/100x100/FFB3BA/FFFFFF?text=U7" },
+  ];
+
+  // ============= MOCK DATA - Feed Posts =============
+  
+  /**
+   * Array of post objects representing social media posts
+   * Each post contains:
+   * - id: Unique identifier
+   * - user: Author info (username, avatar)
+   * - media: Image URL for post
+   * - caption: Text content with hashtags
+   * - likes: Like count (updated when user interacts)
+   * - comments: Comment count
+   * 
+   * In production, this would be fetched from a backend API
+   */
+  const posts = [
+    {
+      id: 1,
+      user: { username: "traveler_adventures", avatar: "https://placehold.co/40x40/FF6B6B/FFFFFF?text=TA" },
+      media: "https://placehold.co/500x600/4ECDC4/FFFFFF?text=Beautiful+Landscape",
+      caption: "Exploring the hidden gems of nature 🌿 #wanderlust #naturephotography",
+      likes: 245,
+      comments: 18,
+    },
+    {
+      id: 2,
+      user: { username: "foodie_delights", avatar: "https://placehold.co/40x40/45B7D1/FFFFFF?text=FD" },
+      media: "https://placehold.co/500x600/FFEAA7/FFFFFF?text=Delicious+Food",
+      caption: "Just tried the best pasta in town! 🍝 Tag someone who needs to try this! #foodie #pasta",
+      likes: 892,
+      comments: 43,
+    },
+    {
+      id: 3,
+      user: { username: "fitness_motivation", avatar: "https://placehold.co/40x40/96CEB4/FFFFFF?text=FM" },
+      media: "https://placehold.co/500x600/DDA0DD/FFFFFF?text=Workout+Session",
+      caption: "Consistency is key 💪 Day 45 of my fitness journey! #fitness #gymmotivation",
+      likes: 1567,
+      comments: 89,
+    },
+  ];
+
+  // ============= MOCK DATA - Suggested Accounts =============
+  
+  /**
+   * Array of recommended user accounts to follow
+   * Displayed in the right sidebar with follow button
+   * Each account has username, avatar, and follower count
+   */
+  const suggestedAccounts = [
+    { username: "tech_guru", avatar: "https://placehold.co/40x40/FF6B6B/FFFFFF?text=TG", followers: "1.2M" },
+    { username: "design_pro", avatar: "https://placehold.co/40x40/4ECDC4/FFFFFF?text=DP", followers: "890K" },
+    { username: "code_wizard", avatar: "https://placehold.co/40x40/45B7D1/FFFFFF?text=CW", followers: "650K" },
+  ];
+
+  // ============= MOCK DATA - Trending Content =============
+  
+  /** Array of popular hashtags to display in trending section */
+  const trendingHashtags = ["#photography", "#travel", "#fashion", "#food", "#art", "#fitness"];
+
+  // ============= MOCK DATA - Online Friends =============
+  
+  /**
+   * Array of friends currently online
+   * Displayed with green status indicator in right sidebar
+   */
+  const onlineFriends = [
+    { username: "friend_one", avatar: "https://placehold.co/30x30/96CEB4/FFFFFF?text=F1" },
+    { username: "friend_two", avatar: "https://placehold.co/30x30/DDA0DD/FFFFFF?text=F2" },
+    { username: "friend_three", avatar: "https://placehold.co/30x30/FFB3BA/FFFFFF?text=F3" },
+  ];
+
+  // ============= MOCK DATA - Navigation Menu =============
+  
+  /**
+   * Navigation menu items for left sidebar
+   * Each item has:
+   * - icon: Emoji icon for visual identification
+   * - label: Navigation label
+   * - active: Boolean indicating if currently selected
+   */
+  const menuItems = [
+    { icon: "🏠", label: "Home", active: activeTab === "Home" },
+    { icon: "🔍", label: "Explore", active: activeTab === "Explore" },
+    { icon: "🎬", label: "Reels", active: activeTab === "Reels" },
+    { icon: "💬", label: "Messages", active: activeTab === "Messages" },
+    { icon: "🔔", label: "Notifications", active: activeTab === "Notifications" },
+    { icon: "⚙️", label: "Settings", active: activeTab === "Settings" },
+  ];
+
+  // ============= EFFECTS & EVENT HANDLERS =============
+
+  /**
+   * Auto-scroll stories carousel every 3 seconds
+   * Cycles through stories continuously for continuous viewing experience
+   * Cleanup interval on component unmount to prevent memory leaks
+   */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStoryIndex((prev) => (prev + 1) % stories.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [stories.length]);
+
+  /**
+   * Toggle like state for a post
+   * Updates the likedPosts object and animates the heart icon
+   * 
+   * @param {number} postId - ID of the post to like/unlike
+   */
+  const toggleLike = (postId) => {
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
+
+  /**
+   * Handle navigation tab click
+   * Updates active tab to highlight current section
+   * 
+   * @param {string} tabLabel - Name of the tab (e.g., "Home", "Explore")
+   */
+  const handleTabClick = (tabLabel) => {
+    setActiveTab(tabLabel);
+  };
+
+  // ============= RENDER =============
+
+  return (
+    <Router>
+      <Routes>
+        {/* ========== LANDING PAGE ROUTE ========== */}
+        {/* 
+          Entry/landing page for non-authenticated users
+          Shows product overview and call-to-action
+        */}
+        <Route path="/" element={<Landing />} />
+        
+        {/* ========== HOME FEED ROUTE ========== */}
+        {/* 
+          Main application feed with sidebar navigation
+          Displays stories, posts, and social features
+        */}
+        <Route path="/home" element={
+          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+            {/* ========== NAVIGATION BAR ========== */}
+            {/* 
+              Sticky navbar with logo, search bar, and user menu
+              Contains:
+              - Application logo/branding
+              - Search functionality
+              - User profile button
+            */}
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {/* ========== MAIN CONTENT GRID ========== */}
+              {/* Main content grid: Sidebar | Feed | Right Sidebar */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                
+                {/* ========== LEFT SIDEBAR ========== */}
+                {/* 
+                  Navigation menu for main sections
+                  Sticky positioning for constant visibility
+                  Highlights active tab with gradient background
+                */}
+                <LeftSidebar 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab}
+                  menuItems={menuItems}
+                  handleTabClick={handleTabClick}
+                />
+                
+                {/* ========== CENTRAL FEED ========== */}
+                {/* 
+                  Main content area with stories and posts
+                  Renders Home component with all necessary data
+                */}
+                <Home 
+                  stories={stories}
+                  posts={posts}
+                  currentStoryIndex={currentStoryIndex}
+                  setCurrentStoryIndex={setCurrentStoryIndex}
+                  likedPosts={likedPosts}
+                  toggleLike={toggleLike}
+                />
+                
+                {/* ========== RIGHT SIDEBAR ========== */}
+                {/* 
+                  Additional info panels: suggested accounts, trending, online friends
+                  Displays social recommendations and engagement features
+                */}
+                <RightSidebar 
+                  suggestedAccounts={suggestedAccounts}
+                  trendingHashtags={trendingHashtags}
+                  onlineFriends={onlineFriends}
+                />
+              </div>
+            </div>
+          </div>
+        } />
+        
+        {/* ========== MESSAGES ROUTE ========== */}
+        {/* 
+          Dedicated messaging interface
+          Direct messages and conversations
+        */}
+        <Route path="/messages" element={
+          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <LeftSidebar 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab}
+                  menuItems={menuItems}
+                  handleTabClick={handleTabClick}
+                />
+                <Messages />
+                <RightSidebar 
+                  suggestedAccounts={suggestedAccounts}
+                  trendingHashtags={trendingHashtags}
+                  onlineFriends={onlineFriends}
+                />
+              </div>
+            </div>
+          </div>
+        } />
+        
+        {/* ========== PROFILE ROUTE ========== */}
+        {/* 
+          User profile page
+          Shows user posts, bio, and profile information
+        */}
+        <Route path="/profile" element={
+          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <LeftSidebar 
+                  activeTab={activeTab} 
+                  setActiveTab={setActiveTab}
+                  menuItems={menuItems}
+                  handleTabClick={handleTabClick}
+                />
+                <Profile />
+                <RightSidebar 
+                  suggestedAccounts={suggestedAccounts}
+                  trendingHashtags={trendingHashtags}
+                  onlineFriends={onlineFriends}
+                />
+              </div>
+            </div>
+          </div>
+        } />
+      </Routes>
+    </Router>
+
   );
 };
 
