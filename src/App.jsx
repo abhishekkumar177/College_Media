@@ -144,8 +144,8 @@ const App = () => {
    * Auto-scroll stories carousel every 3 seconds
    * Cycles through stories continuously for continuous viewing experience
    * Cleanup interval on component unmount to prevent memory leaks
-   */rrently online
-   * Displayed with green status indicator in right sidebar
+* Currently online
+* Displayed with green status indicator in right sidebar
   /**
    * Toggle like state for a post
    * Updates the likedPosts object and animates the heart icon
