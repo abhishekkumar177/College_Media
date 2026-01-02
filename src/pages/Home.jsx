@@ -274,33 +274,6 @@ const Home = () => {
         ))
       )}
 
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .border-gradient-to-r {
-          background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
-          border: 2px solid transparent;
-          background-clip: padding-box, border-box;
-          background-origin: padding-box, border-box;
-        }
-        @keyframes bounce {
-          0%,
-          100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.2);
-          }
-        }
-        .animate-bounce {
-          animation: bounce 0.5s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 };
