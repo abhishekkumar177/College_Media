@@ -1,10 +1,20 @@
-import React from 'react'
+import BentoGrid from '../components/BentoGrid'
+import Hero from '../components/Hero'
+import HomeCTA from '../components/HomeCTA'
+import KeyHiglight from '../components/KeyHiglight'
+import LandingNavbar from '../components/LandingNavbar'
+import Footer from '../components/Footer'
 
-function Landing() {
+const Landing = () => {
   return (
-    <div>
-      <h1>Landing page</h1>
-    </div>
+   <>
+   <LandingNavbar/>
+   <Hero/>
+   <KeyHiglight/>
+   <BentoGrid/>
+   <HomeCTA/>
+   <Footer/>
+   </>
   )
 }
 
