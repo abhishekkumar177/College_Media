@@ -221,17 +221,21 @@ College_Media/
 │   ├── App.css                 # Global application styles and animations
 │   ├── main.jsx                # React app entry point and DOM mounting
 │   ├── index.css               # Base CSS reset and CSS variables
-│   └── hooks/                  # Custom React hooks (future)
-│       ├── useFetch.js         # Data fetching hook
-│       ├── useAuth.js          # Authentication state
-│       └── ...
-├── .env.example                # Environment variables template
-├── package.json                # Project dependencies and npm scripts
-├── vite.config.js              # Vite build configuration
-├── eslint.config.js            # ESLint linting rules
-├── .gitignore                  # Git ignore patterns
-└── README.md                   # Project documentation (you are here)
-```
+│   
+├── .env.example               # Environment variables template
+├── .gitignore                 # Git ignore rules
+├── BACKEND_PROPOSAL.md        # Proposed backend architecture and plans
+├── CONTRIBUTING.md            # Contribution guidelines
+├── eslint.config.js           # ESLint configuration
+├── index.html                 # HTML entry point
+├── LICENSE                    # MIT License file
+├── package-lock.json          # Dependency lock file
+├── package.json               # Project metadata and scripts
+├── postcss.config.js          # PostCSS configuration
+├── README.md                  # Project documentation
+├── tailwind.config.js         # Tailwind CSS configuration
+└── vite.config.js             # Vite build configuration
+
 
 ---
 
