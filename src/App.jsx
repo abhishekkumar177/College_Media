@@ -56,6 +56,8 @@ const App = () => {
   /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
+}
+
   // ============= MOCK DATA - Stories =============
   
   /**
