@@ -194,18 +194,26 @@ College_Media/
 ├── public/                      # Static assets (favicon, etc)
 ├── src/
 │   ├── components/             # Reusable React components
-│   │   ├── Header.jsx          # Navigation and search bar
-│   │   ├── Footer.jsx          # Footer component
-│   │   ├── PostCard.jsx        # Individual post display
-│   │   ├── Stories.jsx         # Story carousel component
-│   │   ├── Sidebar.jsx         # Navigation sidebar
+│   │   ├── BentoGrid.jsx        # Bento-style grid layout component
+│   │   ├── Footer.jsx           # Application footer
+│   │   ├── Hero.jsx             # Landing page hero section
+│   │   ├── HomeCTA.jsx          # Call-to-action section on home page
+│   │   ├── KeyHighlight.jsx     # Key highlights / features section
+│   │   ├── LandingNavbar.jsx    # Navbar for landing page
+│   │   ├── Layout.jsx           # Common layout wrapper
+│   │   ├── LeftSidebar.jsx      # Left navigation sidebar
+│   │   ├── Navbar.jsx           # Main application navbar
+│   │   ├── ProfileMenu.jsx      # User profile dropdown/menu
+│   │   ├── RightSidebar.jsx     # Right sidebar (suggestions / activity)
+│   │   ├── SkeletonPost.jsx     # Loading skeleton for posts
+│   │   └── StackSection.jsx     # Tech stack / stack showcase section
 │   │   └── ...
 │   ├── pages/                  # Page-level components
-│   │   ├── Home.jsx            # Main feed page
+│   │   ├── Home.jsx            # Main home/feed page
+│   │   ├── Landing.jsx         # Landing / welcome page
+│   │   ├── Messages.jsx        # Messages / chat page
 │   │   ├── Profile.jsx         # User profile page
-│   │   ├── Explore.jsx         # Discover content page
-│   │   ├── Messages.jsx        # Direct messages page
-│   │   └── ...
+│   │   └── Profile.css         # Profile page specific styles
 │   ├── assets/                 # Images, icons, and media files
 │   │   ├── react.svg
 │   │   └── ...
