@@ -16,7 +16,6 @@
  * @returns {React.ReactElement} Main app layout with navigation and feed
  */
 
-import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
