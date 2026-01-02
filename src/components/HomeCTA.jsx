@@ -1,6 +1,8 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 const HomeCTA = () => {
+  const navigate = useNavigate();
   return (
     <>
     <section id="community" className="py-24 bg-slate-50 overflow-hidden">
@@ -93,7 +95,7 @@ const HomeCTA = () => {
                 <p className="text-purple-100 text-lg mb-10 max-w-xl mx-auto">Join the exclusive network for your college today. Free for all students with a valid .edu email.</p>
                 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-purple-600 font-semibold hover:bg-slate-50 transition-all shadow-xl active:scale-95">
+                    <button onClick={() => navigate('/home')} className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-purple-600 font-semibold hover:bg-slate-50 transition-all shadow-xl active:scale-95">
                         Get Started Now
                     </button>
                     <span className="text-sm font-medium text-white/80">Free • Fast • Student-first</span>
