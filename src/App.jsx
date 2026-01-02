@@ -1,16 +1,60 @@
+/**
+ * College Media - Main Application Component
+ * 
+ * A comprehensive social media feed application built with React.
+ * Features include:
+ * - Stories carousel with auto-scroll functionality
+ * - Dynamic post feed with like/comment interactions
+ * - Search functionality
+ * - Navigation tabs (Home, Explore, Reels, Messages, Notifications, Settings)
+ * - Suggested accounts sidebar
+ * - Trending hashtags
+ * - Online friends display
+ * - Fully responsive gradient-themed UI
+ * 
+ * @component Main application container
+ * @returns {React.ReactElement} Main app layout with navigation and feed
+ */
+
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import React, { useState, useEffect } from "react";
 
+/**
+ * App Component - Main container and state management
+ * 
+ * Manages:
+ * - Post likes state (object with postId as key)
+ * - Current story carousel position
+ * - Search query input
+ * - Active navigation tab
+ * 
+ * @returns {React.ReactElement} Main application layout
+ */
 const App = () => {
+  // ============= STATE MANAGEMENT =============
+  
+  /** Track liked posts with object: { postId: boolean } */
   const [likedPosts, setLikedPosts] = useState({});
+  
+  /** Current story index for carousel rotation */
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  
+  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
+  
+  /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
-  // Mock data
+  // ============= MOCK DATA - Stories =============
+  
+  /**
+   * Array of story objects with user avatars
+   * Stories are displayed in a horizontal carousel with auto-scroll
+   * In production, this would be fetched from a backend API
+   */
   const stories = [
     { id: 1, username: "user1", avatar: "https://placehold.co/100x100/FF6B6B/FFFFFF?text=U1" },
     { id: 2, username: "user2", avatar: "https://placehold.co/100x100/4ECDC4/FFFFFF?text=U2" },
@@ -21,6 +65,20 @@ const App = () => {
     { id: 7, username: "user7", avatar: "https://placehold.co/100x100/FFB3BA/FFFFFF?text=U7" },
   ];
 
+  // ============= MOCK DATA - Feed Posts =============
+  
+  /**
+   * Array of post objects representing social media posts
+   * Each post contains:
+   * - id: Unique identifier
+   * - user: Author info (username, avatar)
+   * - media: Image URL for post
+   * - caption: Text content with hashtags
+   * - likes: Like count (updated when user interacts)
+   * - comments: Comment count
+   * 
+   * In production, this would be fetched from a backend API
+   */
   const posts = [
     {
       id: 1,
@@ -48,12 +106,65 @@ const App = () => {
     },
   ];
 
-  const suggestedAccounts = [
-    { username: "design_inspiration", avatar: "https://placehold.co/30x30/FF6B6B/FFFFFF?text=DI", followers: "2.1M" },
-    { username: "tech_trends", avatar: "https://placehold.co/30x30/4ECDC4/FFFFFF?text=TT", followers: "1.8M" },
-    { username: "art_daily", avatar: "https://placehold.co/30x30/45B7D1/FFFFFF?text=AD", followers: "3.4M" },
-  ];
+  // ============= MOCK DATA - Suggested Accounts =============
+  
+  /**
+   * Array of recommended user accounts to follow
+   * Displayed in the right sidebar with follow button
+   * Each account has username, avatar, and follower count
+  // ============= MOCK DATA - Trending Content =============
+  
+  /** Array of popular hashtags to display in trending section */
+  const trendingHashtags = ["#photography", "#travel", "#fashion", "#food", "#art", "#fitness"];
 
+  // ============= MOCK DATA - Online Friends =============
+  
+  /**
+  // ============= MOCK DATA - Navigation Menu =============
+  
+  /**
+   * Navigation menu items for left sidebar
+   * Each item has:
+   * - icon: Emoji icon for visual identification
+   * - label: Navigation label
+   * - active: Boolean indicating if currently selected
+   */
+   * ============= EFFECTS & EVENT HANDLERS =============
+
+  /**
+   * Auto-scroll stories carousel every 3 seconds
+   * Cycles through stories continuously for continuous viewing experience
+   * Cleanup interval on component unmount to prevent memory leaks
+   */rrently online
+   * Displayed with green status indicator in right sidebar
+  /**
+   * Toggle like state for a post
+   * Updates the likedPosts object and animates the heart icon
+   * 
+   * @param {number} postId - ID of the post to like/unlike
+   */
+  const toggleLike = (postId) => {
+    setLikedPosts((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  // ============= RENDER =============
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+      {/* ========== NAVIGATION BAR ========== */}
+      {/* 
+        Sticky navbar with logo, search bar, and user menu
+        Contains:
+        - Application logo/branding
+        - Search functionality
+        - User profile button
+     
+   * Handle navigation tab click
+   * Updates active tab to highlight current section
+   * 
+   * @param {string} tabLabel - Name of the tab (e.g., "Home", "Explore")
+   */
   const trendingHashtags = ["#photography", "#travel", "#fashion", "#food", "#art", "#fitness"];
 
   const onlineFriends = [
@@ -78,8 +189,14 @@ const App = () => {
     }, 3000);
     return () => clearInterval(interval);
   }, [stories.length]);
-
-  const toggleLike = (postId) => {
+{/* Main content grid: Sidebar | Feed | Right Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* ========== LEFT SIDEBAR ========== */}
+          {/* 
+            Navigation menu for main sections
+            Sticky positioning for constant visibility
+            Highlights active tab with gradient background
+         Id) => {
     setLikedPosts((prev) => ({
       ...prev,
       [postId]: !prev[postId],
@@ -95,9 +212,16 @@ const App = () => {
       {/* Navigation Bar */}
       <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
+          <div========== CENTRAL FEED ========== */}
+          {/* Main content area with stories and posts */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* ========== STORIES CAROUSEL ========== */}
+            {/* 
+              Horizontal scrolling carousel of user stories
+              Auto-rotates every 3 seconds
+              Click to manually select story
+              Visual indicator shows current/unviewed stories
+           ex-shrink-0">
                 <div className="w-24 h-8 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 rounded-lg flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity duration-300">
                   <span className="text-white font-bold text-xl">InstaClone</span>
                 </div>
@@ -119,7 +243,13 @@ const App = () => {
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div========== POSTS FEED ========== */}
+            {/* 
+              Dynamic feed rendering posts from mock data
+              Each p========== POST HEADER ========== */}
+                {/* Author avatar, username, and options menus: header, media, actions (like/comment), caption
+              Hover effects and animations enhance user interaction
+           ="flex items-center space-x-4">
               <button className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300">
                 <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -131,7 +261,8 @@ const App = () => {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div classNa========== POST MEDIA ========== */}
+                {/* Main image/video content of the postrid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-24">
@@ -139,9 +270,15 @@ const App = () => {
                 {menuItems.map((item, index) => (
                   <button
                     key={index}
-                    onClick={() => handleTabClick(item.label)}
+                    ========== POST INTERACTIONS ========== */}
+                {/* Like, comment, share buttons and caption=> handleTabClick(item.label)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 ${
                       item.active 
+                      {/* LIKE BUTTON */}
+                      {/* 
+                        Toggles post like state with visual feedback
+                        Animates heart icon and updates count
+                      */}
                         ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 shadow-sm" 
                         : "text-gray-600"
                     }`}
@@ -156,35 +293,43 @@ const App = () => {
 
           {/* Central Feed */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Stories Carousel */}
+            {/* Storie{/* COMMENT BUTTON */}
+                      {/* Shows comment count, opens comment section on click */}
+                      s Carousel */}
             <div className="bg-white rounded-2xl shadow-sm p-4">
               <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
                 {stories.map((story, index) => (
                   <div 
                     key={story.id} 
+                    {/* SHARE BUTTON */}
+                    {/* Allows sharing post to other platforms */}
                     className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-transform duration-300"
                     onClick={() => setCurrentStoryIndex(index)}
                   >
                     <div className={`relative w-16 h-16 rounded-full border-2 transition-all duration-500 ${
                       index === currentStoryIndex 
-                        ? "border-gradient-to-r from-pink-500 via-purple-500 to-orange-400 animate-pulse" 
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}>
-                      <img 
-                        src={story.avatar} 
-                        alt={story.username}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                      {index === currentStoryIndex && (
+                      POST CAPTION */}
+                  {/* Author name and caption text with hashtags */}
+                  <div className="mb-3">
+                    <p className="text-gray-800">
+                      <span className="font-semibold mr-2 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</span>
+                      {post.caption}
+                    </p>
+                  </div>
+                  
+                  {/* VIEW COMMENTS */}
+                  {/* Link to expand full comments sectiontStoryIndex && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
                     <span className="text-xs text-gray-600 truncate w-16 text-center">{story.username}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-
+              ========== RIGHT SIDEBAR ========== */}
+          {/* Additional info panels: suggested accounts, trending, online friends */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* ========== SUGGESTED ACCOUNTS ========== */}
+            {/* Personalized user recommendations with follow button
             {/* Posts Feed */}
             {posts.map((post) => (
               <div key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
@@ -214,7 +359,8 @@ const App = () => {
 
                 {/* Post Actions */}
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
+                ========== TRENDING HASHTAGS ========== */}
+            {/* Popular hashtags section showing what's currently trending"flex items-center justify-between mb-3">
                     <div className="flex space-x-4">
                       <button 
                         onClick={() => toggleLike(post.id)}
@@ -228,7 +374,8 @@ const App = () => {
                           }`} 
                           fill={likedPosts[post.id] ? "currentColor" : "none"} 
                           stroke="currentColor" 
-                          viewBox="0 0 24 24"
+                ========== ONLINE FRIENDS ========== */}
+            {/* Display friends currently online with green status indicatorBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
@@ -260,6 +407,13 @@ const App = () => {
                   
                   {/* View all comments */}
                   <button className="text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors duration-300 cursor-pointer">
+      {/* ========== GLOBAL STYLES ========== */}
+      {/* 
+        Custom CSS for animations and scrollbar styling
+        - Hides scrollbar while maintaining scroll functionality
+        - Gradient border animation for active stories
+        - Bounce animation for liked heart icon
+      */}
                     View all {post.comments} comments
                   </button>
                 </div>
