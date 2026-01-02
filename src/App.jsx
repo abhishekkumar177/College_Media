@@ -21,6 +21,16 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import React, { useState, useEffect } from "react";
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import Home from "./pages/Home";
+import Landing from "./pages/Landing";
+import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
+import Navbar from "./components/Navbar";
+import LeftSidebar from "./components/LeftSidebar";
+import RightSidebar from "./components/RightSidebar";
 
 /**
  * App Component - Main container and state management
@@ -416,99 +426,30 @@ const App = () => {
       */}
                     View all {post.comments} comments
                   </button>
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/home" element={
+          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+                <div className="lg:col-span-2 space-y-6">
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/messages" element={<Messages />} />
+                    <Route path="/profile" element={<Profile />} />
+                  </Routes>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Right Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Suggested Accounts */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
-              <h3 className="font-bold text-gray-800 mb-4">Suggested for you</h3>
-              <div className="space-y-3">
-                {suggestedAccounts.map((account, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <img 
-                        src={account.avatar} 
-                        alt={account.username}
-                        className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">{account.username}</p>
-                        <p className="text-gray-500 text-xs">{account.followers} followers</p>
-                      </div>
-                    </div>
-                    <button className="px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full hover:bg-blue-600 transition-colors duration-300">
-                      Follow
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Trending Hashtags */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
-              <h3 className="font-bold text-gray-800 mb-4">Trending</h3>
-              <div className="flex flex-wrap gap-2">
-                {trendingHashtags.map((hashtag, index) => (
-                  <span 
-                    key={index} 
-                    className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm"
-                  >
-                    {hashtag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Online Friends */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
-              <h3 className="font-bold text-gray-800 mb-4">Online Friends</h3>
-              <div className="flex space-x-3">
-                {onlineFriends.map((friend, index) => (
-                  <div key={index} className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300">
-                    <div className="relative">
-                      <img 
-                        src={friend.avatar} 
-                        alt={friend.username}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                    </div>
-                    <span className="text-xs text-gray-600 mt-1 truncate w-12 text-center">{friend.username}</span>
-                  </div>
-                ))}
+                <RightSidebar />
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .border-gradient-to-r {
-          background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
-          border: 2px solid transparent;
-          background-clip: padding-box, border-box;
-          background-origin: padding-box, border-box;
-        }
-        @keyframes bounce {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.2); }
-        }
-        .animate-bounce {
-          animation: bounce 0.5s ease-in-out;
-        }
-      `}</style>
-    </div>
+        } />
+      </Routes>
+    </Router>
   );
 };
 
