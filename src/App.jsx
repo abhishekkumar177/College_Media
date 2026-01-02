@@ -139,7 +139,7 @@ const App = () => {
    * - label: Navigation label
    * - active: Boolean indicating if currently selected
    */
-   * ============= EFFECTS & EVENT HANDLERS =============
+   // ============= EFFECTS & EVENT HANDLERS =============
 
   /**
    * Auto-scroll stories carousel every 3 seconds
