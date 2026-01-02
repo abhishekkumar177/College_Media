@@ -125,6 +125,18 @@ Whether you're sharing campus moments, connecting with classmates, or building y
 
 ---
 
+## 🔐 Environment Variables
+
+This project uses environment variables for configuration and future backend integration.
+
+### Local Setup
+
+1. Create a local environment file by copying the example:
+   ```bash
+   cp .env.example .env
+
+---
+
 ## 📁 Project Structure
 
 ```
