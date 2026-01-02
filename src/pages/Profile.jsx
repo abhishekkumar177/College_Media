@@ -22,8 +22,8 @@ const Profile = () => {
     // Fetch user posts
     setUserPosts([
       // Sample data - replace with API
-      { id: 1, imageUrl: '/placeholder1.jpg', likes: 45 },
-      { id: 2, imageUrl: '/placeholder2.jpg', likes: 67 },
+      { id: 1, imageUrl: 'https://placehold.co/100x100/FF6B6B/FFFFFF?text=post 1', likes: 45 },
+      { id: 2, imageUrl: 'https://placehold.co/100x100/FF6B6B/FFFFFF?text=post 2', likes: 67 },
       // Add more posts
     ]);
   }, []);
@@ -32,7 +32,7 @@ const Profile = () => {
     <div className="profile-container">
       <div className="profile-header">
         <div className="profile-picture">
-          <img src="/default-avatar.png" alt="Profile" />
+          <img src="https://placehold.co/100x100/FF6B6B/FFFFFF?text=User" alt="Profile" />
         </div>
         
         <div className="profile-info">

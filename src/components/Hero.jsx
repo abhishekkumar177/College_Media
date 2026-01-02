@@ -1,5 +1,8 @@
 
+import { useNavigate } from 'react-router-dom';
+
 const Hero = () => {
+    const navigate = useNavigate();
     return (
         <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
             {/* <!-- Animated Background Blobs --> */}
@@ -26,7 +29,7 @@ const Hero = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-                    <button className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2">
+                    <button onClick={() => navigate('/home')} className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2">
                         Join Your Campus
                         <span>→</span>
                     </button>

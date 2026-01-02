@@ -26,34 +26,11 @@ import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
-import Navbar from "./components/Navbar";
-import LeftSidebar from "./components/LeftSidebar";
-import RightSidebar from "./components/RightSidebar";
+import Layout from "./components/Layout";
 
-/**
- * App Component - Main container and state management
- * 
- * Manages:
- * - Post likes state (object with postId as key)
- * - Current story carousel position
- * - Search query input
- * - Active navigation tab
- * 
- * @returns {React.ReactElement} Main application layout
- */
 const App = () => {
-  // ============= STATE MANAGEMENT =============
   
-  /** Track liked posts with object: { postId: boolean } */
-  const [likedPosts, setLikedPosts] = useState({});
-  
-  /** Current story index for carousel rotation */
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  
-  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
-  
-  /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
 }
@@ -161,295 +138,38 @@ const App = () => {
   // ============= RENDER =============
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-      {/* ========== NAVIGATION BAR ========== */}
-      {/* 
-        Sticky navbar with logo, search bar, and user menu
-        Contains:
-        - Application logo/branding
-        - Search functionality
-        - User profile button
-     
-   * Handle navigation tab click
-   * Updates active tab to highlight current section
-   * 
-   * @param {string} tabLabel - Name of the tab (e.g., "Home", "Explore")
-   */
-  const trendingHashtags = ["#photography", "#travel", "#fashion", "#food", "#art", "#fitness"];
-
-  const onlineFriends = [
-    { username: "friend_one", avatar: "https://placehold.co/30x30/96CEB4/FFFFFF?text=F1" },
-    { username: "friend_two", avatar: "https://placehold.co/30x30/DDA0DD/FFFFFF?text=F2" },
-    { username: "friend_three", avatar: "https://placehold.co/30x30/FFB3BA/FFFFFF?text=F3" },
-  ];
-
-  const menuItems = [
-    { icon: "🏠", label: "Home", active: activeTab === "Home" },
-    { icon: "🔍", label: "Explore", active: activeTab === "Explore" },
-    { icon: "🎬", label: "Reels", active: activeTab === "Reels" },
-    { icon: "💬", label: "Messages", active: activeTab === "Messages" },
-    { icon: "🔔", label: "Notifications", active: activeTab === "Notifications" },
-    { icon: "⚙️", label: "Settings", active: activeTab === "Settings" },
-  ];
-
-  // Auto-scroll stories
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentStoryIndex((prev) => (prev + 1) % stories.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [stories.length]);
-{/* Main content grid: Sidebar | Feed | Right Sidebar */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* ========== LEFT SIDEBAR ========== */}
-          {/* 
-            Navigation menu for main sections
-            Sticky positioning for constant visibility
-            Highlights active tab with gradient background
-         Id) => {
-    setLikedPosts((prev) => ({
-      ...prev,
-      [postId]: !prev[postId],
-    }));
-  };
-
-  const handleTabClick = (tabLabel) => {
-    setActiveTab(tabLabel);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div========== CENTRAL FEED ========== */}
-          {/* Main content area with stories and posts */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* ========== STORIES CAROUSEL ========== */}
-            {/* 
-              Horizontal scrolling carousel of user stories
-              Auto-rotates every 3 seconds
-              Click to manually select story
-              Visual indicator shows current/unviewed stories
-           ex-shrink-0">
-                <div className="w-24 h-8 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 rounded-lg flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity duration-300">
-                  <span className="text-white font-bold text-xl">InstaClone</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex-1 max-w-lg mx-8">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white transition-all duration-300"
-                />
-                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-            
-            <div========== POSTS FEED ========== */}
-            {/* 
-              Dynamic feed rendering posts from mock data
-              Each p========== POST HEADER ========== */}
-                {/* Author avatar, username, and options menus: header, media, actions (like/comment), caption
-              Hover effects and animations enhance user interaction
-           ="flex items-center space-x-4">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300">
-                <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div classNa========== POST MEDIA ========== */}
-                {/* Main image/video content of the postrid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-24">
-              <div className="space-y-4">
-                {menuItems.map((item, index) => (
-                  <button
-                    key={index}
-                    ========== POST INTERACTIONS ========== */}
-                {/* Like, comment, share buttons and caption=> handleTabClick(item.label)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 ${
-                      item.active 
-                      {/* LIKE BUTTON */}
-                      {/* 
-                        Toggles post like state with visual feedback
-                        Animates heart icon and updates count
-                      */}
-                        ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 shadow-sm" 
-                        : "text-gray-600"
-                    }`}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Central Feed */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Storie{/* COMMENT BUTTON */}
-                      {/* Shows comment count, opens comment section on click */}
-                      s Carousel */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
-              <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
-                {stories.map((story, index) => (
-                  <div 
-                    key={story.id} 
-                    {/* SHARE BUTTON */}
-                    {/* Allows sharing post to other platforms */}
-                    className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-transform duration-300"
-                    onClick={() => setCurrentStoryIndex(index)}
-                  >
-                    <div className={`relative w-16 h-16 rounded-full border-2 transition-all duration-500 ${
-                      index === currentStoryIndex 
-                      POST CAPTION */}
-                  {/* Author name and caption text with hashtags */}
-                  <div className="mb-3">
-                    <p className="text-gray-800">
-                      <span className="font-semibold mr-2 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</span>
-                      {post.caption}
-                    </p>
-                  </div>
-                  
-                  {/* VIEW COMMENTS */}
-                  {/* Link to expand full comments sectiontStoryIndex && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </div>
-                    <span className="text-xs text-gray-600 truncate w-16 text-center">{story.username}</span>
-                  </div>
-                ))}
-              ========== RIGHT SIDEBAR ========== */}
-          {/* Additional info panels: suggested accounts, trending, online friends */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* ========== SUGGESTED ACCOUNTS ========== */}
-            {/* Personalized user recommendations with follow button
-            {/* Posts Feed */}
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                {/* Post Header */}
-                <div className="flex items-center p-4 border-b border-gray-100">
-                  <img 
-                    src={post.user.avatar} 
-                    alt={post.user.username}
-                    className="w-10 h-10 rounded-full mr-3 cursor-pointer hover:scale-110 transition-transform duration-300"
-                  />
-                  <span className="font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</span>
-                  <div className="ml-auto cursor-pointer hover:text-gray-500 transition-colors duration-300">
-                    <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Post Media */}
-                <div className="w-full cursor-pointer">
-                  <img 
-                    src={post.media} 
-                    alt="Post content"
-                    className="w-full object-cover hover:opacity-95 transition-opacity duration-300"
-                  />
-                </div>
-
-                {/* Post Actions */}
-                <div className="p-4">
-                ========== TRENDING HASHTAGS ========== */}
-            {/* Popular hashtags section showing what's currently trending"flex items-center justify-between mb-3">
-                    <div className="flex space-x-4">
-                      <button 
-                        onClick={() => toggleLike(post.id)}
-                        className="flex items-center space-x-1 group"
-                      >
-                        <svg 
-                          className={`w-6 h-6 transition-all duration-300 ${
-                            likedPosts[post.id] 
-                              ? "fill-pink-500 text-pink-500 scale-110 animate-bounce" 
-                              : "text-gray-600 group-hover:text-pink-500"
-                          }`} 
-                          fill={likedPosts[post.id] ? "currentColor" : "none"} 
-                          stroke="currentColor" 
-                ========== ONLINE FRIENDS ========== */}
-            {/* Display friends currently online with green status indicatorBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="font-medium text-gray-700">{likedPosts[post.id] ? post.likes + 1 : post.likes}</span>
-                      </button>
-                      
-                      <button className="flex items-center space-x-1 group cursor-pointer">
-                        <svg className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        <span className="font-medium text-gray-700">{post.comments}</span>
-                      </button>
-                    </div>
-                    
-                    <button className="group cursor-pointer">
-                      <svg className="w-6 h-6 text-gray-600 group-hover:text-purple-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  {/* Caption */}
-                  <div className="mb-3">
-                    <p className="text-gray-800">
-                      <span className="font-semibold mr-2 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</span>
-                      {post.caption}
-                    </p>
-                  </div>
-                  
-                  {/* View all comments */}
-                  <button className="text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors duration-300 cursor-pointer">
-      {/* ========== GLOBAL STYLES ========== */}
-      {/* 
-        Custom CSS for animations and scrollbar styling
-        - Hides scrollbar while maintaining scroll functionality
-        - Gradient border animation for active stories
-        - Bounce animation for liked heart icon
-      */}
-                    View all {post.comments} comments
-                  </button>
-  return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/home" element={
-          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-                <div className="lg:col-span-2 space-y-6">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/messages" element={<Messages />} />
-                    <Route path="/profile" element={<Profile />} />
-                  </Routes>
-                </div>
-                <RightSidebar />
-              </div>
-            </div>
-          </div>
-        } />
-      </Routes>
+      <AppContent searchQuery={searchQuery} setSearchQuery={setSearchQuery} activeTab={activeTab} setActiveTab={setActiveTab} />
     </Router>
+  );
+};
+
+const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === '/home') {
+      setActiveTab('Home');
+    } else if (location.pathname === '/messages') {
+      setActiveTab('Messages');
+    } else if (location.pathname === '/profile') {
+      setActiveTab('Profile');
+    }
+  }, [location.pathname, setActiveTab]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Landing />} />
+      <Route path="/home" element={<Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} activeTab={activeTab} setActiveTab={setActiveTab} />}>
+        <Route index element={<Home />} />
+      </Route>
+      <Route path="/messages" element={<Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} activeTab={activeTab} setActiveTab={setActiveTab} />}>
+        <Route index element={<Messages />} />
+      </Route>
+      <Route path="/profile" element={<Layout searchQuery={searchQuery} setSearchQuery={setSearchQuery} activeTab={activeTab} setActiveTab={setActiveTab} />}>
+        <Route index element={<Profile />} />
+      </Route>
+    </Routes>
   );
 };
 

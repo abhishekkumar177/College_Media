@@ -1,5 +1,8 @@
 
+import { useNavigate } from 'react-router-dom';
+
 const LandingNavbar = () => {
+    const navigate = useNavigate();
     return (
         <nav className="fixed w-full z-50 transition-all duration-300 backdrop-blur-md bg-white/80 border-b border-slate-100/50">
             <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -17,8 +20,8 @@ const LandingNavbar = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors">Log in</button>
-                    <button className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95">
+                    <button onClick={() => navigate('/home')} className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors">Log in</button>
+                    <button onClick={() => navigate('/home')} className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95">
                         Join Campus
                     </button>
                 </div>
