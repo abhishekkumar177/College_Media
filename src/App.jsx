@@ -23,7 +23,6 @@ import './App.css'
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
 import Home from "./pages/Home";
 import Landing from "./pages/Landing";
 import Messages from "./pages/Messages";
