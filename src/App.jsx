@@ -25,8 +25,36 @@ import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
 
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import React, { useState, useEffect } from "react";
+
+/**
+ * App Component - Main container and state management
+ * 
+ * Manages:
+ * - Post likes state (object with postId as key)
+ * - Current story carousel position
+ * - Search query input
+ * - Active navigation tab
+ * 
+ * @returns {React.ReactElement} Main application layout
+ */
 const App = () => {
+  // ============= STATE MANAGEMENT =============
+  
+  /** Track liked posts with object: { postId: boolean } */
+  const [likedPosts, setLikedPosts] = useState({});
+  
+  /** Current story index for carousel rotation */
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  
+  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
+  
+  /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
 
