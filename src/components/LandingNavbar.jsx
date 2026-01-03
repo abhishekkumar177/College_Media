@@ -2,6 +2,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 /**
  * LandingNavbar Component
@@ -89,7 +90,7 @@ const LandingNavbar = () => {
                         <>
                             <button 
                                 onClick={() => navigate('/home')} 
-                                className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors"
+                                className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors"
                             >
                                 Dashboard
                             </button>
@@ -105,7 +106,7 @@ const LandingNavbar = () => {
                         <>
                             <button 
                                 onClick={() => navigate('/login')} 
-                                className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors"
+                                className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors"
                                 aria-label="Log in to UniHub"
                             >
                                 Log in

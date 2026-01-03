@@ -12,6 +12,8 @@ import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 
 /* ===== Auth Components ===== */
+
+import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
 import MessagesLayout from "./components/MessagesLayout";
 import LoginForm from './components/Auth/LoginForm';
@@ -49,6 +51,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
     if (location.pathname === "/" || location.pathname === "/home") setActiveTab("Home");
     else if (location.pathname === "/messages") setActiveTab("Messages");
     else if (location.pathname === "/profile") setActiveTab("Profile");
+    else if (location.pathname === "/settings") setActiveTab("Settings");
   }, [location.pathname, setActiveTab]);
 
   return (
@@ -96,6 +99,20 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       >
         <Route index element={<Profile />} />
         <Route path="edit" element={<ProfileEditForm />} />
+      </Route>
+
+      <Route
+        path="/settings"
+        element={
+          <Layout
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        }
+      >
+        <Route index element={<Settings />} />
       </Route>
     </Routes>
   );
