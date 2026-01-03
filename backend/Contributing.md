@@ -72,21 +72,23 @@ git checkout -b feature/short-description
 
 All backend code follows a strict separation of concerns.
 
-backend/
-├── src/
-│   ├── app.js                 # Express app configuration
-│   ├── server.js              # Server bootstrap
+## Project Structure
+
+```text
+src/
+├── app.js                 # Express app configuration
+├── server.js              # Server bootstrap
 │
-│   ├── routes/                # Route definitions only
-│   ├── controllers/           # Request handlers (business logic)
-│   ├── models/                # Database schemas/models
-│   ├── middlewares/           # Auth, validation, error handling
-│   ├── utils/                 # Shared helpers & utilities
-│   ├── config/                # DB, env, third-party configs
-│   └── constants/             # App-wide constants
-│
-├── .env.example
-└── package.json
+├── routes/                # Route definitions only
+├── controllers/           # Request handlers (business logic)
+├── models/                # Database schemas/models
+├── middlewares/           # Auth, validation, error handling
+├── utils/                 # Shared helpers & utilities
+├── config/                # DB, env, third-party configs
+└── constants/             # App-wide constants
+
+```
+
 
 ## Architecture Rules (MANDATORY)
 ### Routes
