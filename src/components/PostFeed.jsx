@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import CreatePost from './CreatePost';
 
 const PostFeed = () => {
-  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newPosts, setNewPosts] = useState([]);
 
   // Mock data for now - in a real app, this would come from an API
   useEffect(() => {
@@ -85,8 +84,6 @@ const PostFeed = () => {
       </div>
     );
   }
-
-  const [newPosts, setNewPosts] = useState([]);
 
   const handleNewPost = (post) => {
     setNewPosts(prev => [post, ...prev]);

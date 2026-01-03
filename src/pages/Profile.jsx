@@ -14,7 +14,7 @@ const Profile = () => {
   });
   
   const [userPosts, setUserPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -45,11 +45,7 @@ const Profile = () => {
           ]);
         } catch (error) {
           console.error('Error fetching profile data:', error);
-        } finally {
-          setLoading(false);
         }
-      } else {
-        setLoading(false);
       }
     };
     
