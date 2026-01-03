@@ -73,6 +73,14 @@ const LandingNavbar = () => {
                     >
                         Community
                     </a>
+                    <button 
+                        onClick={() => navigate('/messages')} 
+                        className="text-sm font-medium hover:text-purple-600 transition-colors"
+                        aria-label="View messages"
+                        role="menuitem"
+                    >
+                        Messages
+                    </button>
                 </div>
 
                 {/* Authentication Buttons */}
@@ -80,39 +88,37 @@ const LandingNavbar = () => {
                     {user ? (
                         <>
                             <button 
-                                onClick={() => navigate('/profile')} 
-                                className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors"
+                                onClick={() => navigate('/home')} 
+                                className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors"
                             >
-                                Profile
+                                Dashboard
                             </button>
                             <button 
                                 onClick={logout}
                                 className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95"
+                                aria-label="Logout from UniHub"
                             >
                                 Logout
                             </button>
                         </>
                     ) : (
                         <>
-                            <button onClick={() => navigate('/login')} className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors">Log in</button>
-                            <button onClick={() => navigate('/signup')} className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95">
-                                Join Campus
+                            <button 
+                                onClick={() => navigate('/login')} 
+                                className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors"
+                                aria-label="Log in to UniHub"
+                            >
+                                Log in
+                            </button>
+                            <button 
+                                onClick={() => navigate('/signup')} 
+                                className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95"
+                                aria-label="Join UniHub now"
+                            >
+                                Join UniHub
                             </button>
                         </>
                     )}
-
-                    <button 
-                        className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors"
-                        aria-label="Log in to UniHub"
-                    >
-                        Log in
-                    </button>
-                    <button 
-                        className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95"
-                        aria-label="Join UniHub now"
-                    >
-                        Join UniHub
-                    </button>
                 </div>
             </div>
         </nav>

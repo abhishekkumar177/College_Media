@@ -13,6 +13,7 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-helmet-async": "^2.0.5",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.11.0"
   },
   "devDependencies": {

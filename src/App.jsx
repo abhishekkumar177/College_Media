@@ -4,52 +4,57 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import "./App.css";
 
 import { AuthProvider } from './context/AuthContext';
-import Home from "./pages/Home";
-
-/**
- * College Media - Main Application Component
- * 
- * A comprehensive social media feed application built with React.
- * Features include:
- * - Stories carousel with auto-scroll functionality
- * - Dynamic post feed with like/comment interactions
- * - Search functionality
- * - Navigation tabs (Home, Explore, Reels, Messages, Notifications, Settings)
- * - Suggested accounts sidebar
- * - Trending hashtags
- * - Online friends display
- * - Fully responsive gradient-themed UI
- * 
- * @component Main application container
- * @returns {React.ReactElement} Main app layout with navigation and feed
- */
-
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import "./App.css";
 
 /* ===== Pages ===== */
-
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 
+/* ===== Auth Components ===== */
+
+import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
+import MessagesLayout from "./components/MessagesLayout";
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import ProfileEditForm from './components/Auth/ProfileEditForm';
-
 
 /* ===== Layout Components ===== */
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
 
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import React, { useState, useEffect } from "react";
 
+/**
+ * App Component - Main container and state management
+ * 
+ * Manages:
+ * - Post likes state (object with postId as key)
+ * - Current story carousel position
+ * - Search query input
+ * - Active navigation tab
+ * 
+ * @returns {React.ReactElement} Main application layout
+ */
 const App = () => {
+  // ============= STATE MANAGEMENT =============
+  
+  /** Track liked posts with object: { postId: boolean } */
+  const [likedPosts, setLikedPosts] = useState({});
+  
+  /** Current story index for carousel rotation */
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  
+  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
+  
+  /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
 
@@ -71,9 +76,10 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/home") setActiveTab("Home");
+    if (location.pathname === "/" || location.pathname === "/home") setActiveTab("Home");
     else if (location.pathname === "/messages") setActiveTab("Messages");
     else if (location.pathname === "/profile") setActiveTab("Profile");
+    else if (location.pathname === "/settings") setActiveTab("Settings");
   }, [location.pathname, setActiveTab]);
 
   return (
@@ -123,6 +129,20 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       >
         <Route index element={<Profile />} />
         <Route path="edit" element={<ProfileEditForm />} />
+      </Route>
+
+      <Route
+        path="/settings"
+        element={
+          <Layout
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        }
+      >
+        <Route index element={<Settings />} />
       </Route>
     </Routes>
   );
