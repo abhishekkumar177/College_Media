@@ -1,116 +1,38 @@
+
 import React, { useState, useEffect } from "react";
+import PostFeed from "../components/PostFeed";
 import SkeletonPost from "../components/SkeletonPost";
+import SEO from "../components/Seo";
 
 const Home = () => {
-  const [likedPosts, setLikedPosts] = useState({});
+  const [stories, setStories] = useState([]);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // 🔹 ADD THIS RIGHT HERE 👇
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Mock data
-  const stories = [
-    {
-      id: 1,
-      username: "user1",
-      avatar: "https://placehold.co/100x100/FF6B6B/FFFFFF?text=U1",
-    },
-    {
-      id: 2,
-      username: "user2",
-      avatar: "https://placehold.co/100x100/4ECDC4/FFFFFF?text=U2",
-    },
-    {
-      id: 3,
-      username: "user3",
-      avatar: "https://placehold.co/100x100/45B7D1/FFFFFF?text=U3",
-    },
-    {
-      id: 4,
-      username: "user4",
-      avatar: "https://placehold.co/100x100/96CEB4/FFFFFF?text=U4",
-    },
-    {
-      id: 5,
-      username: "user5",
-      avatar: "https://placehold.co/100x100/FFEAA7/FFFFFF?text=U5",
-    },
-    {
-      id: 6,
-      username: "user6",
-      avatar: "https://placehold.co/100x100/DDA0DD/FFFFFF?text=U6",
-    },
-    {
-      id: 7,
-      username: "user7",
-      avatar: "https://placehold.co/100x100/FFB3BA/FFFFFF?text=U7",
-    },
-  ];
-
-  const posts = [
-    {
-      id: 1,
-      user: {
-        username: "traveler_adventures",
-        avatar: "https://placehold.co/40x40/FF6B6B/FFFFFF?text=TA",
-      },
-      media:
-        "https://placehold.co/500x600/4ECDC4/FFFFFF?text=Beautiful+Landscape",
-      caption:
-        "Exploring the hidden gems of nature 🌿 #wanderlust #naturephotography",
-      likes: 245,
-      comments: 18,
-    },
-    {
-      id: 2,
-      user: {
-        username: "foodie_delights",
-        avatar: "https://placehold.co/40x40/45B7D1/FFFFFF?text=FD",
-      },
-      media: "https://placehold.co/500x600/FFEAA7/FFFFFF?text=Delicious+Food",
-      caption:
-        "Just tried the best pasta in town! 🍝 Tag someone who needs to try this! #foodie #pasta",
-      likes: 892,
-      comments: 43,
-    },
-    {
-      id: 3,
-      user: {
-        username: "fitness_motivation",
-        avatar: "https://placehold.co/40x40/96CEB4/FFFFFF?text=FM",
-      },
-      media: "https://placehold.co/500x600/DDA0DD/FFFFFF?text=Workout+Session",
-      caption:
-        "Consistency is key 💪 Day 45 of my fitness journey! #fitness #gymmotivation",
-      likes: 1567,
-      comments: 89,
-    },
-  ];
-
-  // Auto-scroll stories
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentStoryIndex((prev) => (prev + 1) % stories.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [stories.length]);
+  const [likedPosts, setLikedPosts] = useState({});
 
   const toggleLike = (postId) => {
-    setLikedPosts((prev) => ({
+    setLikedPosts(prev => ({
       ...prev,
-      [postId]: !prev[postId],
+      [postId]: !prev[postId]
     }));
   };
 
+  useEffect(() => {
+    // Add your data fetching logic here
+    setLoading(false);
+  }, []);
+
   return (
-    <div>
+    <>
+      {/* SEO Meta Tags */}
+      <SEO 
+        title="Home - UniHub"
+        description="Your personalized UniHub feed - stay connected with your college community, view stories, and engage with posts."
+        keywords="college feed, student posts, campus community, university social network"
+      />
+      
+      <div>
       {/* Central Feed */}
       {/* Stories Carousel */}
       <div className="bg-white rounded-2xl shadow-sm p-4">
@@ -265,15 +187,16 @@ const Home = () => {
                 </p>
               </div>
 
-              {/* View all comments */}
-              <button className="text-gray-500 text-sm font-medium hover:text-gray-700 transition-colors duration-300 cursor-pointer">
+              {/* View Comments */}
+              <p className="text-gray-500 text-sm cursor-pointer hover:text-gray-700 transition-colors duration-300">
                 View all {post.comments} comments
-              </button>
+              </p>
             </div>
           </div>
         ))
       )}
 
+      {/* Styles */}
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -301,7 +224,8 @@ const Home = () => {
           animation: bounce 0.5s ease-in-out;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 

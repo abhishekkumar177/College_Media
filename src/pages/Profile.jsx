@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '../components/Seo';
 import './Profile.css';
 
 const Profile = () => {
@@ -29,7 +30,14 @@ const Profile = () => {
   }, []);
 
   return (
-    <div className="profile-container">
+    <>
+      <SEO 
+        title="Profile - UniHub"
+        description="Manage your UniHub profile, view your posts, and connect with your college community."
+        keywords="student profile, college profile, user account, campus network profile"
+      />
+      
+      <div className="profile-container">
       <div className="profile-header">
         <div className="profile-picture">
           <img src="/default-avatar.png" alt="Profile" />
@@ -76,6 +84,7 @@ const Profile = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -175,24 +175,67 @@ VITE_LOG_LEVEL=debug
 ---
 
 ## �📁 Project Structure
+## 🔐 Environment Variables
+
+The application uses environment variables for configuration. Create a `.env.local` file in the project root by copying `.env.example`:
+
+### Available Variables
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `VITE_APP_NAME` | string | College Media | Application display name |
+| `VITE_ENV` | string | development | Environment mode (development/production) |
+| `VITE_API_BASE_URL` | string | http://localhost:3000/api | Backend API endpoint (for future use) |
+| `VITE_ENABLE_MOCK_DATA` | boolean | true | Use mock data or fetch from API |
+| `VITE_DEBUG_MODE` | boolean | false | Enable debug logging and errors |
+| `VITE_LOG_LEVEL` | string | debug | Log verbosity (debug/info/warn/error) |
+| `VITE_PORT` | number | 5173 | Development server port |
+
+### Example .env.local
+
+```env
+VITE_ENV=development
+VITE_ENABLE_MOCK_DATA=true
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+```
+
+### Important Notes
+
+- **Never commit `.env.local`** to git - it may contain sensitive information
+- Only `.env.example` should be committed
+- Environment variables must start with `VITE_` to be exposed to the client
+- Variables are processed at build time, not runtime
+
+---
+
+## �📁 Project Structure
 
 ```
 College_Media/
 ├── public/                      # Static assets (favicon, etc)
 ├── src/
 │   ├── components/             # Reusable React components
-│   │   ├── Header.jsx          # Navigation and search bar
-│   │   ├── Footer.jsx          # Footer component
-│   │   ├── PostCard.jsx        # Individual post display
-│   │   ├── Stories.jsx         # Story carousel component
-│   │   ├── Sidebar.jsx         # Navigation sidebar
+│   │   ├── BentoGrid.jsx        # Bento-style grid layout component
+│   │   ├── Footer.jsx           # Application footer
+│   │   ├── Hero.jsx             # Landing page hero section
+│   │   ├── HomeCTA.jsx          # Call-to-action section on home page
+│   │   ├── KeyHighlight.jsx     # Key highlights / features section
+│   │   ├── LandingNavbar.jsx    # Navbar for landing page
+│   │   ├── Layout.jsx           # Common layout wrapper
+│   │   ├── LeftSidebar.jsx      # Left navigation sidebar
+│   │   ├── Navbar.jsx           # Main application navbar
+│   │   ├── ProfileMenu.jsx      # User profile dropdown/menu
+│   │   ├── RightSidebar.jsx     # Right sidebar (suggestions / activity)
+│   │   ├── SkeletonPost.jsx     # Loading skeleton for posts
+│   │   └── StackSection.jsx     # Tech stack / stack showcase section
 │   │   └── ...
 │   ├── pages/                  # Page-level components
-│   │   ├── Home.jsx            # Main feed page
+│   │   ├── Home.jsx            # Main home/feed page
+│   │   ├── Landing.jsx         # Landing / welcome page
+│   │   ├── Messages.jsx        # Messages / chat page
 │   │   ├── Profile.jsx         # User profile page
-│   │   ├── Explore.jsx         # Discover content page
-│   │   ├── Messages.jsx        # Direct messages page
-│   │   └── ...
+│   │   └── Profile.css         # Profile page specific styles
 │   ├── assets/                 # Images, icons, and media files
 │   │   ├── react.svg
 │   │   └── ...
@@ -200,17 +243,21 @@ College_Media/
 │   ├── App.css                 # Global application styles and animations
 │   ├── main.jsx                # React app entry point and DOM mounting
 │   ├── index.css               # Base CSS reset and CSS variables
-│   └── hooks/                  # Custom React hooks (future)
-│       ├── useFetch.js         # Data fetching hook
-│       ├── useAuth.js          # Authentication state
-│       └── ...
-├── .env.example                # Environment variables template
-├── package.json                # Project dependencies and npm scripts
-├── vite.config.js              # Vite build configuration
-├── eslint.config.js            # ESLint linting rules
-├── .gitignore                  # Git ignore patterns
-└── README.md                   # Project documentation (you are here)
-```
+│   
+├── .env.example               # Environment variables template
+├── .gitignore                 # Git ignore rules
+├── BACKEND_PROPOSAL.md        # Proposed backend architecture and plans
+├── CONTRIBUTING.md            # Contribution guidelines
+├── eslint.config.js           # ESLint configuration
+├── index.html                 # HTML entry point
+├── LICENSE                    # MIT License file
+├── package-lock.json          # Dependency lock file
+├── package.json               # Project metadata and scripts
+├── postcss.config.js          # PostCSS configuration
+├── README.md                  # Project documentation
+├── tailwind.config.js         # Tailwind CSS configuration
+└── vite.config.js             # Vite build configuration
+
 
 ---
 
