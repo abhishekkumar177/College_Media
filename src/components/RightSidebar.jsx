@@ -46,8 +46,8 @@ function RightSidebar() {
   return (
     <div className="lg:col-span-1 space-y-6">
       {/* Suggested Accounts */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
-        <h3 className="font-bold text-gray-800 mb-4">Suggested for you</h3>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
+        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Suggested for you</h3>
         <div className="space-y-3">
           {suggestedAccounts.map((account, index) => (
             <div key={index} className="flex items-center justify-between">
@@ -58,10 +58,10 @@ function RightSidebar() {
                   className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
                 />
                 <div>
-                  <p className="font-medium text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">
+                  <p className="font-medium text-gray-800 dark:text-slate-100 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">
                     {account.username}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-gray-500 dark:text-slate-400 text-xs">
                     {account.followers} followers
                   </p>
                 </div>
@@ -75,13 +75,13 @@ function RightSidebar() {
       </div>
 
       {/* Trending Hashtags */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
-        <h3 className="font-bold text-gray-800 mb-4">Trending</h3>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
+        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Trending</h3>
         <div className="flex flex-wrap gap-2">
           {trendingHashtags.map((hashtag, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm"
+              className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm dark:from-slate-800 dark:to-slate-700 dark:text-slate-100"
             >
               {hashtag}
             </span>
@@ -90,8 +90,8 @@ function RightSidebar() {
       </div>
 
       {/* Online Friends */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
-        <h3 className="font-bold text-gray-800 mb-4">Online Friends</h3>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
+        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Online Friends</h3>
         <div className="flex space-x-3">
           {onlineFriends.map((friend, index) => (
             <div
@@ -106,7 +106,7 @@ function RightSidebar() {
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
-              <span className="text-xs text-gray-600 mt-1 truncate w-12 text-center">
+              <span className="text-xs text-gray-600 dark:text-slate-300 mt-1 truncate w-12 text-center">
                 {friend.username}
               </span>
             </div>

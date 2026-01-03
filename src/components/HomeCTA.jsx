@@ -5,18 +5,18 @@ const HomeCTA = () => {
   const navigate = useNavigate();
   return (
     <>
-    <section id="community" className="py-24 bg-slate-50 overflow-hidden">
+    <section id="community" className="py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden transition-colors">
         <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-end justify-between mb-12">
                 <div>
-                    <h2 className="text-3xl font-semibold tracking-tight text-slate-900">Loved by students</h2>
-                    <p className="mt-2 text-slate-500">Join the fastest growing network across 50+ campuses.</p>
+                    <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Loved by students</h2>
+                    <p className="mt-2 text-slate-500 dark:text-slate-300">Join the fastest growing network across 50+ campuses.</p>
                 </div>
                 <div className="flex gap-2 mt-4 md:mt-0">
-                    <button className="p-2 rounded-full border border-slate-200 hover:bg-white transition-colors">
+                    <button className="p-2 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-colors">
                         <span className="iconify" data-icon="lucide:arrow-left" data-width="20"></span>
                     </button>
-                    <button className="p-2 rounded-full border border-slate-200 hover:bg-white transition-colors">
+                    <button className="p-2 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-white dark:hover:bg-slate-800 transition-colors">
                         <span className="iconify" data-icon="lucide:arrow-right" data-width="20"></span>
                     </button>
                 </div>
@@ -24,7 +24,7 @@ const HomeCTA = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* <!-- Testimonial 1 --> */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
                     <div className="flex gap-1 text-yellow-400 mb-4">
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
@@ -32,18 +32,18 @@ const HomeCTA = () => {
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                     </div>
-                    <p className="text-slate-700 text-sm leading-relaxed mb-6">"Finally a social app that doesn't feel cluttered. I found my study group here in the first week of classNamees!"</p>
+                    <p className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed mb-6">"Finally a social app that doesn't feel cluttered. I found my study group here in the first week of classNamees!"</p>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-cyan-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">Alex Thompson</div>
-                            <div className="text-xs text-slate-400">Stanford '25</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">Alex Thompson</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">Stanford '25</div>
                         </div>
                     </div>
                 </div>
 
                 {/* <!-- Testimonial 2 --> */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
                      <div className="flex gap-1 text-yellow-400 mb-4">
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
@@ -51,18 +51,18 @@ const HomeCTA = () => {
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                     </div>
-                    <p className="text-slate-700 text-sm leading-relaxed mb-6">"The UI is gorgeous and it's so fast. I love that it's just for our campus, makes it feel much safer."</p>
+                    <p className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed mb-6">"The UI is gorgeous and it's so fast. I love that it's just for our campus, makes it feel much safer."</p>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-400 to-rose-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">Jessica Lee</div>
-                            <div className="text-xs text-slate-400">NYU '24</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">Jessica Lee</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">NYU '24</div>
                         </div>
                     </div>
                 </div>
 
                 {/* <!-- Testimonial 3 --> */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 transition-colors">
                      <div className="flex gap-1 text-yellow-400 mb-4">
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
@@ -70,12 +70,12 @@ const HomeCTA = () => {
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                         <span className="iconify" data-icon="lucide:star" data-width="16" data-fill="currentColor"></span>
                     </div>
-                    <p className="text-slate-700 text-sm leading-relaxed mb-6">"College Media changed how our clubs organize events. The notifications are super reliable."</p>
+                    <p className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed mb-6">"College Media changed how our clubs organize events. The notifications are super reliable."</p>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-indigo-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">David Chen</div>
-                            <div className="text-xs text-slate-400">MIT '26</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">David Chen</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">MIT '26</div>
                         </div>
                     </div>
                 </div>
