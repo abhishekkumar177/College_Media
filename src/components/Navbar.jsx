@@ -117,6 +117,12 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   onClick={() => setIsProfileOpen((prev) => !prev)}
                   className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-300"
                 >
+                <svg
+                  className="h-6 w-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -125,8 +131,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   />
                 </svg>
               </button>
-            )}
-
+            ):null}
             {isProfileOpen && (
               <div className="absolute top-14 right-2">
                 <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
@@ -136,8 +141,8 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
         </div>
       </div>
+      </div>
     </nav>
   );
 }
-
 export default Navbar;
