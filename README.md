@@ -94,7 +94,15 @@ Whether you're sharing campus moments, connecting with classmates, or building y
    yarn install
    ```
 
-3. **Start Development Server**
+3. **Environment Setup (Optional)**
+   ```bash
+   # Copy the environment example file
+   cp .env.example .env.local
+   ```
+   
+   Edit `.env.local` with your configuration settings. See [Environment Variables](#-environment-variables) section below for detailed documentation.
+
+4. **Start Development Server**
    ```bash
    npm run dev
    # or
@@ -102,91 +110,170 @@ Whether you're sharing campus moments, connecting with classmates, or building y
    ```
    The application will be available at `http://localhost:5173`
 
-4. **Build for Production**
+5. **Build for Production**
    ```bash
    npm run build
    # or
    yarn build
    ```
 
-5. **Preview Production Build**
+6. **Preview Production Build**
    ```bash
    npm run preview
    # or
    yarn preview
    ```
 
-6. **Run Linting & Code Quality Checks**
+7. **Run Linting & Code Quality Checks**
    ```bash
    npm run lint
    # or
    yarn lint
    ```
+   
+   To automatically fix linting errors:
+   ```bash
+   npm run lint -- --fix
+   # or
+   yarn lint --fix
+   ```
 
 ---
 
+## � Environment Variables
+
+The application uses environment variables for configuration. Create a `.env.local` file in the project root by copying `.env.example`:
+
+### Available Variables
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `VITE_APP_NAME` | string | College Media | Application display name |
+| `VITE_ENV` | string | development | Environment mode (development/production) |
+| `VITE_API_BASE_URL` | string | http://localhost:3000/api | Backend API endpoint (for future use) |
+| `VITE_ENABLE_MOCK_DATA` | boolean | true | Use mock data or fetch from API |
+| `VITE_DEBUG_MODE` | boolean | false | Enable debug logging and errors |
+| `VITE_LOG_LEVEL` | string | debug | Log verbosity (debug/info/warn/error) |
+| `VITE_PORT` | number | 5173 | Development server port |
+
+### Example .env.local
+
+```env
+VITE_ENV=development
+VITE_ENABLE_MOCK_DATA=true
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+```
+
+### Important Notes
+
+- **Never commit `.env.local`** to git - it may contain sensitive information
+- Only `.env.example` should be committed
+- Environment variables must start with `VITE_` to be exposed to the client
+- Variables are processed at build time, not runtime
+
+---
+
+## �📁 Project Structure
 ## 🔐 Environment Variables
 
-This project uses environment variables for configuration and future backend integration.
+The application uses environment variables for configuration. Create a `.env.local` file in the project root by copying `.env.example`:
 
-### Local Setup
+### Available Variables
 
-1. Create a local environment file by copying the example:
-   ```bash
-   cp .env.example .env
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `VITE_APP_NAME` | string | College Media | Application display name |
+| `VITE_ENV` | string | development | Environment mode (development/production) |
+| `VITE_API_BASE_URL` | string | http://localhost:3000/api | Backend API endpoint (for future use) |
+| `VITE_ENABLE_MOCK_DATA` | boolean | true | Use mock data or fetch from API |
+| `VITE_DEBUG_MODE` | boolean | false | Enable debug logging and errors |
+| `VITE_LOG_LEVEL` | string | debug | Log verbosity (debug/info/warn/error) |
+| `VITE_PORT` | number | 5173 | Development server port |
+
+### Example .env.local
+
+```env
+VITE_ENV=development
+VITE_ENABLE_MOCK_DATA=true
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+```
+
+### Important Notes
+
+- **Never commit `.env.local`** to git - it may contain sensitive information
+- Only `.env.example` should be committed
+- Environment variables must start with `VITE_` to be exposed to the client
+- Variables are processed at build time, not runtime
 
 ---
 
-## 📁 Project Structure
+## �📁 Project Structure
 
 ```
 College_Media/
 ├── public/                      # Static assets (favicon, etc)
 ├── src/
 │   ├── components/             # Reusable React components
-│   │   ├── Header.jsx
-│   │   ├── Footer.jsx
-│   │   ├── PostCard.jsx
+│   │   ├── BentoGrid.jsx        # Bento-style grid layout component
+│   │   ├── Footer.jsx           # Application footer
+│   │   ├── Hero.jsx             # Landing page hero section
+│   │   ├── HomeCTA.jsx          # Call-to-action section on home page
+│   │   ├── KeyHighlight.jsx     # Key highlights / features section
+│   │   ├── LandingNavbar.jsx    # Navbar for landing page
+│   │   ├── Layout.jsx           # Common layout wrapper
+│   │   ├── LeftSidebar.jsx      # Left navigation sidebar
+│   │   ├── Navbar.jsx           # Main application navbar
+│   │   ├── ProfileMenu.jsx      # User profile dropdown/menu
+│   │   ├── RightSidebar.jsx     # Right sidebar (suggestions / activity)
+│   │   ├── SkeletonPost.jsx     # Loading skeleton for posts
+│   │   └── StackSection.jsx     # Tech stack / stack showcase section
 │   │   └── ...
-│   ├── pages/                  # Page components
-│   │   ├── Home.jsx
-│   │   ├── Profile.jsx
+│   ├── pages/                  # Page-level components
+│   │   ├── Home.jsx            # Main home/feed page
+│   │   ├── Landing.jsx         # Landing / welcome page
+│   │   ├── Messages.jsx        # Messages / chat page
+│   │   ├── Profile.jsx         # User profile page
+│   │   └── Profile.css         # Profile page specific styles
+│   ├── assets/                 # Images, icons, and media files
+│   │   ├── react.svg
 │   │   └── ...
-│   ├── App.jsx                 # Main application component
-│   ├── App.css                 # Global application styles
-│   ├── main.jsx                # Application entry point
-│   ├── index.css               # Base CSS reset and variables
-│   └── assets/                 # Images, icons, and media files
-├── package.json                # Project dependencies and scripts
-├── vite.config.js              # Vite configuration
-├── eslint.config.js            # ESLint rules and configuration
-├── .gitignore                  # Git ignore patterns
-└── README.md                   # Project documentation (you are here)
-```
+│   ├── App.jsx                 # Main application component (state & layout)
+│   ├── App.css                 # Global application styles and animations
+│   ├── main.jsx                # React app entry point and DOM mounting
+│   ├── index.css               # Base CSS reset and CSS variables
+│   
+├── .env.example               # Environment variables template
+├── .gitignore                 # Git ignore rules
+├── BACKEND_PROPOSAL.md        # Proposed backend architecture and plans
+├── CONTRIBUTING.md            # Contribution guidelines
+├── eslint.config.js           # ESLint configuration
+├── index.html                 # HTML entry point
+├── LICENSE                    # MIT License file
+├── package-lock.json          # Dependency lock file
+├── package.json               # Project metadata and scripts
+├── postcss.config.js          # PostCSS configuration
+├── README.md                  # Project documentation
+├── tailwind.config.js         # Tailwind CSS configuration
+└── vite.config.js             # Vite build configuration
+
 
 ---
 
 ## 🎯 Getting Started for Developers
-
-### Development Workflow
-
-1. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make Your Changes**
-   - Follow the existing code structure and naming conventions
-   - Ensure your code follows ESLint rules
-   - Write meaningful commit messages
+ with proper prefixes
    - Keep components small and focused
+   - Add JSDoc comments to functions and components
 
 3. **Test Locally**
    ```bash
    npm run dev
    ```
-   - Test on multiple devices/screen sizes
-   - Check browser console for errors
+   - Test on multiple devices/screen sizes (desktop, tablet, mobile)
+   - Check browser console for errors and warnings
+   - Verify responsive design with DevTools device emulation
+   - Test with environment variables if applicable
 
 4. **Lint Your Code**
    ```bash
@@ -194,12 +281,15 @@ College_Media/
    ```
    - Fix any linting errors before pushing
    - Maintain code quality standards
+   - Use `npm run lint -- --fix` to auto-fix errors
 
 5. **Build & Preview**
    ```bash
    npm run build
    npm run preview
    ```
+   - Verify production build runs correctly
+   - Test all features in production mode
 
 6. **Push & Create Pull Request**
    ```bash
@@ -209,8 +299,93 @@ College_Media/
    ```
 
 ### Code Style Guidelines
-- Use **camelCase** for variables and functions
-- Use **PascalCase** for React components
+
+#### Naming Conventions
+- **camelCase** for variables and functions: `const userName = "john"`
+- **PascalCase** for React components: `function PostCard() {}`
+- **UPPER_SNAKE_CASE** for constants: `const MAX_FILE_SIZE = 5242880`
+- **kebab-case** for CSS classes: `className="post-card-header"`
+
+#### JavaScript/JSX Best Practices
+- Use **const** by default, **let** when reassignment is needed, avoid **var**
+- Add **JSDoc comments** to all exported functions and components
+- Keep functions small and single-purpose (< 50 lines ideally)
+- Use arrow functions for callbacks
+- Use destructuring for props and object properties
+- Add meaningful comments for complex logic or non-obvious code
+- Use template literals for string interpolation: `` `Hello ${name}` ``
+
+#### React Best Practices
+- One component per file
+- Use functional components with hooks
+- Keep state as local as possible
+- Extract complex logic into custom hooks
+- Use PropTypes or TypeScript for type safety (future enhancement)
+- Memoize expensive computations with `useMemo`
+- Use `useCallback` for stable function references
+
+#### Example Component with Proper Comments
+
+```jsx
+/**
+ * PostCard Component
+ * 
+ * Displays a single social media post with user info, media, caption,
+ * and interaction buttons (like, comment, share).
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {number} props.postId - Unique post identifier
+ * @param {Object} props.post - Post data object
+ * @param {Object} props.post.user - User who created the post
+ * @param {string} props.post.caption - Post caption/description
+ * @param {string} props.post.media - URL to post image/video
+ * @param {number} props.post.likes - Initial like count
+ * @param {Function} props.onLike - Callback when post is liked
+ * @returns {React.ReactElement} Rendered post card
+ */
+const PostCard = ({ postId, post, onLike }) => {
+  const [isLiked, setIsLiked] = useState(false);
+
+  // Handle like button click
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    onLike?.(postId);
+  };
+
+  return (
+    <div className="post-card">
+      {/* Post content */}
+    </div>
+  );
+
+Follow conventional commit standards for clear version history:
+
+```
+type(scope): subject
+
+body
+
+footer
+```
+
+**Types:**
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation changes (README, comments, etc.)
+- `style` - Code style changes (formatting, semicolons, etc.)
+- `refactor` - Code refactoring without feature changes
+- `perf` - Performance improvements
+- `test` - Test additions/modifications
+- `chore` - Build, dependencies, or tooling changes
+
+**Examples:**
+```
+feat(auth): Add user login functionality
+fix(posts): Correct like button animation timing
+docs(readme): Update environment setup instructions
+refactor(components): Extract PostCard to separate file
+```
 - Use **const** by default, **let** when reassignment is needed
 - Add meaningful comments for complex logic
 - Keep functions small and single-purpose
@@ -273,36 +448,86 @@ footer
 
 **Types:** feat, fix, docs, style, refactor, perf, test, chore
 
----
+--- & Solutions
 
-## 📊 Project Statistics
+#### Port 5173 already in use
+```bash
+# Use a different port
+npm run dev -- --port 3000
 
-### Contributors
-<img src="https://contributors-img.web.app/image?repo=abhishekkumar177/College_Media" alt="Contributors" />
+# Or kill the process using port 5173 (Windows)
+netstat -ano | findstr :5173
+taskkill /PID <PID> /F
+```
 
-### Stargazers
-<img src="https://reporoster.com/stars/dark/abhishekkumar177/College_Media"/>
+#### Dependencies not installing
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
 
-### Forkers  
-<img src="https://reporoster.com/forks/dark/abhishekkumar177/College_Media"/>
+# Or use npm ci for exact dependency versions
+npm ci
+```
 
----
+#### Linting errors prevent development
+```bash
+# Let ESLint fix automatically fixable issues
+npm run lint -- --fix
 
-## 🐛 Reporting Issues
+# Check which files have linting errors
+npm run lint
+```
 
-Found a bug? Have a feature request?
+#### Build fails or slow performance
+```bash
+# Ensure you have the latest dependencies
+npm update
 
-1. **Check Existing Issues** - [Browse Issues](https://github.com/abhishekkumar177/College_Media/issues)
-2. **Create New Issue** - [New Issue](https://github.com/abhishekkumar177/College_Media/issues/new)
-3. **Provide Details:**
-   - Clear title and description
-   - Steps to reproduce (for bugs)
-   - Expected vs actual behavior
-   - Screenshots or error logs (if applicable)
-   - Environment details (OS, browser, Node version)
+# Clean build cache
+rm -rf dist .vite
 
----
+# Build again
+npm run build
+```
 
+#### Environment variables not loading
+- Verify `.env.local` exists in the project root
+- Ensure variable names start with `VITE_`
+- Restart the dev server after changing environment variables
+- Check browser console for any variable-related errors
+
+#### Hot Module Replacement (HMR) not working
+```bash
+# Restart the development server
+npm run dev
+
+# If still not working, hard refresh your browser (Ctrl+Shift+R on Windows)
+```
+
+#### Module not found errors
+```bash
+# Check if all dependencies are installed
+npm install
+
+# Verify import paths match actual file locations
+# Windows uses backslashes but imports use forward slashes: ./src/components/Header
+
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Getting More Help
+
+- Check existing [Issues](https://github.com/abhishekkumar177/College_Media/issues) page
+- Create a new issue with:
+  - Clear error message and stack trace
+  - Steps to reproduce
+  - Your environment (OS, Node version, npm version)
+  - Screenshot if UI-related
+- Join [Discussions](https://github.com/abhishekkumar177/College_Media/discussions) for questions
 ## 📈 Future Roadmap
 
 ### Phase 1 - Backend Integration (Q1 2026)

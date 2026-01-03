@@ -1,5 +1,8 @@
+
 import React, { useState, useEffect } from "react";
+import PostFeed from "../components/PostFeed";
 import SkeletonPost from "../components/SkeletonPost";
+import SEO from "../components/Seo";
 
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
@@ -83,11 +86,16 @@ const Home = () => {
   ];
 
   const toggleLike = (postId) => {
-    setLikedPosts((prev) => ({
+    setLikedPosts(prev => ({
       ...prev,
-      [postId]: !prev[postId],
+      [postId]: !prev[postId]
     }));
   };
+
+  useEffect(() => {
+    // Add your data fetching logic here
+    setLoading(false);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -301,6 +309,7 @@ const Home = () => {
         ))
       )}
 
+      {/* Styles */}
       <style jsx global>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
@@ -310,7 +319,8 @@ const Home = () => {
           scrollbar-width: none;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 
