@@ -15,7 +15,7 @@ const HomeCTA = () => {
   const navigate = useNavigate();
   return (
     <>
-    <section id="community" className="py-24 bg-slate-50 overflow-hidden">
+    <section id="community" className="py-24 bg-slate-50 dark:bg-slate-950 overflow-hidden transition-colors">
         <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row items-end justify-between mb-12">
                 <div>
@@ -52,8 +52,8 @@ const HomeCTA = () => {
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-cyan-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">Alex Thompson</div>
-                            <div className="text-xs text-slate-400">Stanford '25</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">Alex Thompson</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">Stanford '25</div>
                         </div>
                     </div>
                 </div>
@@ -71,8 +71,8 @@ const HomeCTA = () => {
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-400 to-rose-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">Jessica Lee</div>
-                            <div className="text-xs text-slate-400">NYU '24</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">Jessica Lee</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">NYU '24</div>
                         </div>
                     </div>
                 </div>
@@ -90,8 +90,8 @@ const HomeCTA = () => {
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-indigo-300"></div>
                         <div>
-                            <div className="text-sm font-semibold text-slate-900">David Chen</div>
-                            <div className="text-xs text-slate-400">MIT '26</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">David Chen</div>
+                            <div className="text-xs text-slate-400 dark:text-slate-500">MIT '26</div>
                         </div>
                     </div>
                 </div>

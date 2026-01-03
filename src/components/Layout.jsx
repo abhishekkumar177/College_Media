@@ -6,7 +6,7 @@ import RightSidebar from "../components/RightSidebar";
 
 const Layout = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-black transition-colors">
       <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
