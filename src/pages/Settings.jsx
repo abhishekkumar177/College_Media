@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
+// import { useTheme } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
 const Settings = () => {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  // const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [settings, setSettings] = useState({
