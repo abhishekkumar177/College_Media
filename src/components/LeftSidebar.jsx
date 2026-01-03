@@ -22,7 +22,7 @@ function LeftSidebar({ activeTab, setActiveTab }) {
   };
   return (
     <div className="lg:col-span-1">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 sticky top-24 border border-gray-100 dark:border-slate-800 transition-colors">
+      <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-24">
         <div className="space-y-4">
           {menuItems.map((item, index) => (
             <button
@@ -30,8 +30,8 @@ function LeftSidebar({ activeTab, setActiveTab }) {
               onClick={() => handleTabClick(item)}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-800 ${
                 item.active
-                  ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 dark:from-slate-800 dark:to-slate-700 dark:text-slate-100 shadow-sm"
-                  : "text-gray-600 dark:text-slate-200"
+                  ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 shadow-sm"
+                  : "text-gray-600"
               }`}
             >
               <span className="text-xl">{item.icon}</span>
