@@ -1,21 +1,27 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function LeftSidebar({ activeTab, setActiveTab }) {
+  const navigate = useNavigate();
   const menuItems = [
-    { icon: "🏠", label: "Home", active: activeTab === "Home" },
-    { icon: "🔍", label: "Explore", active: activeTab === "Explore" },
-    { icon: "🎬", label: "Reels", active: activeTab === "Reels" },
-    { icon: "💬", label: "Messages", active: activeTab === "Messages" },
+    { icon: "🏠", label: "Home", active: activeTab === "Home", path: "/home" },
+    { icon: "🔍", label: "Explore", active: activeTab === "Explore", path: "/home" },
+    { icon: "🎬", label: "Reels", active: activeTab === "Reels", path: "/home" },
+    { icon: "💬", label: "Messages", active: activeTab === "Messages", path: "/messages" },
     {
       icon: "🔔",
       label: "Notifications",
       active: activeTab === "Notifications",
+      path: "/home"
     },
-    { icon: "⚙️", label: "Settings", active: activeTab === "Settings" },
+    { icon: "⚙️", label: "Settings", active: activeTab === "Settings", path: "/settings" },
   ];
 
-  const handleTabClick = (tabLabel) => {
-    setActiveTab(tabLabel);
+  const handleTabClick = (item) => {
+    setActiveTab(item.label);
+    if (item.path) {
+      navigate(item.path);
+    }
   };
   return (
     <div className="lg:col-span-1">
@@ -24,7 +30,7 @@ function LeftSidebar({ activeTab, setActiveTab }) {
           {menuItems.map((item, index) => (
             <button
               key={index}
-              onClick={() => handleTabClick(item.label)}
+              onClick={() => handleTabClick(item)}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 dark:hover:bg-slate-800 ${
                 item.active
                   ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 dark:from-slate-800 dark:to-slate-700 dark:text-slate-100 shadow-sm"
