@@ -2,7 +2,6 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import ThemeToggle from './ThemeToggle';
 
 /**
  * LandingNavbar Component
@@ -82,7 +81,7 @@ const LandingNavbar = () => {
                         <>
                             <button 
                                 onClick={() => navigate('/profile')} 
-                                className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors"
+                                className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors"
                             >
                                 Profile
                             </button>
@@ -95,7 +94,7 @@ const LandingNavbar = () => {
                         </>
                     ) : (
                         <>
-                            <button onClick={() => navigate('/login')} className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-purple-600 transition-colors">Log in</button>
+                            <button onClick={() => navigate('/login')} className="hidden md:block text-sm font-medium hover:text-purple-600 transition-colors">Log in</button>
                             <button onClick={() => navigate('/signup')} className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-95">
                                 Join Campus
                             </button>
