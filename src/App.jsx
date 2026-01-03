@@ -4,49 +4,26 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import "./App.css";
 
 import { AuthProvider } from './context/AuthContext';
-import Home from "./pages/Home";
-
-/**
- * College Media - Main Application Component
- * 
- * A comprehensive social media feed application built with React.
- * Features include:
- * - Stories carousel with auto-scroll functionality
- * - Dynamic post feed with like/comment interactions
- * - Search functionality
- * - Navigation tabs (Home, Explore, Reels, Messages, Notifications, Settings)
- * - Suggested accounts sidebar
- * - Trending hashtags
- * - Online friends display
- * - Fully responsive gradient-themed UI
- * 
- * @component Main application container
- * @returns {React.ReactElement} Main app layout with navigation and feed
- */
-
-import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import "./App.css";
 
 /* ===== Pages ===== */
-
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
+
+/* ===== Auth Components ===== */
+
 import Settings from "./pages/Settings";
 import Layout from "./components/Layout";
+import MessagesLayout from "./components/MessagesLayout";
 import LoginForm from './components/Auth/LoginForm';
 import SignupForm from './components/Auth/SignupForm';
 import ProfileEditForm from './components/Auth/ProfileEditForm';
-
 
 /* ===== Layout Components ===== */
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
-
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,7 +48,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === "/home") setActiveTab("Home");
+    if (location.pathname === "/" || location.pathname === "/home") setActiveTab("Home");
     else if (location.pathname === "/messages") setActiveTab("Messages");
     else if (location.pathname === "/profile") setActiveTab("Profile");
     else if (location.pathname === "/settings") setActiveTab("Settings");

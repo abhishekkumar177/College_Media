@@ -31,7 +31,9 @@ import { ThemeProvider } from './context/ThemeContext'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HelmetProvider>
-      <App />
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     </HelmetProvider>
   </StrictMode>,
 )

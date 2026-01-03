@@ -52,6 +52,62 @@ function Navbar({ searchQuery, setSearchQuery }) {
             </div>
           </div>
 
+          {/* MESSAGES ICON */}
+          <button
+            onClick={() => navigate('/messages')}
+            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 relative mr-2"
+            title="Messages"
+          >
+            <svg
+              className="h-6 w-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+          </button>
+
+          {/* PROFILE */}
+          <div className="relative">
+            {user ? (
+              <button
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className="p-1 rounded-full hover:bg-gray-100 transition-all duration-300"
+              >
+                <img
+                  src={user.profilePicture || 'https://placehold.co/40x40/FF6B6B/FFFFFF?text=U'}
+                  alt="Profile"
+                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-300"
+                />
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
+              >
+                <svg
+                  className="h-6 w-6 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+
           {/* ACTIONS */}
           <div className="flex items-center gap-3">
             <ThemeToggle className="flex" />

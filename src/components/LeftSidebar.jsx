@@ -3,18 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 function LeftSidebar({ activeTab, setActiveTab }) {
   const navigate = useNavigate();
+
   const menuItems = [
-    { icon: "🏠", label: "Home", active: activeTab === "Home", path: "/home" },
-    { icon: "🔍", label: "Explore", active: activeTab === "Explore", path: "/home" },
-    { icon: "🎬", label: "Reels", active: activeTab === "Reels", path: "/home" },
+    { icon: "🏠", label: "Home", active: activeTab === "Home", path: "/" },
     { icon: "💬", label: "Messages", active: activeTab === "Messages", path: "/messages" },
     {
       icon: "🔔",
       label: "Notifications",
       active: activeTab === "Notifications",
-      path: "/home"
     },
-    { icon: "⚙️", label: "Settings", active: activeTab === "Settings", path: "/settings" },
   ];
 
   const handleTabClick = (item) => {
