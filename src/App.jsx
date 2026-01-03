@@ -77,9 +77,11 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       <Route
         path="/messages"
         element={
-          <MessagesLayout
+          <Layout
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
           />
         }
       >
