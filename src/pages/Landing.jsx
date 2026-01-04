@@ -7,6 +7,7 @@ import Footer from '../components/Footer'
 import SEO from '../components/Seo'
 
 import { useEffect } from 'react'
+import EngineeredConnection from '../components/EngineeredConnection'
 
 /**
  * Landing Page Component
@@ -55,6 +56,7 @@ const Landing = () => {
        
        {/* Key Highlights - Showcase platform features and benefits */}
        <KeyHiglight/>
+       <EngineeredConnection/>
        
        {/* Bento Grid - Feature cards in responsive grid layout */}
        <BentoGrid/>
