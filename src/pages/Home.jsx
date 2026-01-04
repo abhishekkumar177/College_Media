@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PostFeed from "../components/PostFeed";
 import SkeletonPost from "../components/SkeletonPost";
 import SEO from "../components/Seo";
@@ -7,6 +6,23 @@ import SEO from "../components/Seo";
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [loading, setLoading] = useState(true);
+  const [shareMenuOpen, setShareMenuOpen] = useState(null); // Which post's share menu is open
+  const [copiedLink, setCopiedLink] = useState(null);
+  const shareMenuRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target)) {
+        setShareMenuOpen(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,6 +31,109 @@ const Home = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Generate post URL
+  const getPostUrl = (post) => {
+    return `https://collegemedia.com/post/${post.id}`;
+  };
+
+  // Generate share text
+  const getShareText = (post) => {
+    return `Check out this post from ${post.user.username}: ${post.caption}`;
+  };
+
+  // Share Functions
+  const handleShareWhatsApp = (post) => {
+    const text = getShareText(post);
+    const url = getPostUrl(post);
+    const shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+    window.open(shareUrl, '_blank');
+    setShareMenuOpen(null);
+  };
+
+  const handleShareLinkedIn = (post) => {
+    const url = getPostUrl(post);
+    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    window.open(shareUrl, '_blank');
+    setShareMenuOpen(null);
+  };
+
+  const handleShareTwitter = (post) => {
+    const text = getShareText(post);
+    const url = getPostUrl(post);
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=CollegeMedia`;
+    window.open(shareUrl, '_blank');
+    setShareMenuOpen(null);
+  };
+
+  const handleShareFacebook = (post) => {
+    const url = getPostUrl(post);
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(shareUrl, '_blank');
+    setShareMenuOpen(null);
+  };
+
+  const handleShareTelegram = (post) => {
+    const text = getShareText(post);
+    const url = getPostUrl(post);
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    window.open(shareUrl, '_blank');
+    setShareMenuOpen(null);
+  };
+
+  const handleShareEmail = (post) => {
+    const text = getShareText(post);
+    const url = getPostUrl(post);
+    const subject = `Check out this post from ${post.user.username} on CollegeMedia`;
+    const body = `${text}\n\n${url}\n\nShared from CollegeMedia - The college social network`;
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    setShareMenuOpen(null);
+  };
+
+  const handleCopyLink = (post) => {
+    const url = getPostUrl(post);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          setCopiedLink(post.id);
+          setTimeout(() => setCopiedLink(null), 2000);
+          setShareMenuOpen(null);
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          fallbackCopyToClipboard(url, post.id);
+        });
+    } else {
+      fallbackCopyToClipboard(url, post.id);
+    }
+  };
+
+  const fallbackCopyToClipboard = (text, postId) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      setCopiedLink(postId);
+      setTimeout(() => setCopiedLink(null), 2000);
+      setShareMenuOpen(null);
+    } catch (err) {
+      console.error('Fallback copy failed: ', err);
+    }
+    
+    document.body.removeChild(textArea);
+  };
+
+  const toggleShareMenu = (postId) => {
+    setShareMenuOpen(shareMenuOpen === postId ? null : postId);
+  };
 
   // Mock data for stories
   const stories = [
@@ -92,13 +211,8 @@ const Home = () => {
     }));
   };
 
-  useEffect(() => {
-    // Add your data fetching logic here
-    setLoading(false);
-  }, []);
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={shareMenuRef}>
       {/* Stories Section */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
         <div className="flex items-center justify-between mb-4">
@@ -151,7 +265,6 @@ const Home = () => {
         </div>
       </div>
 
-     
       {/* Posts Feed */}
       {loading ? (
         <>
@@ -223,6 +336,7 @@ const Home = () => {
             <div className="p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-6">
+                  {/* Like Button */}
                   <button
                     onClick={() => toggleLike(post.id)}
                     className="flex items-center space-x-2 group"
@@ -249,6 +363,7 @@ const Home = () => {
                     </span>
                   </button>
 
+                  {/* Comment Button */}
                   <button className="flex items-center space-x-2 group">
                     <svg
                       className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors duration-300"
@@ -268,26 +383,128 @@ const Home = () => {
                     </span>
                   </button>
 
-                  <button className="flex items-center space-x-2 group">
-                    <svg
-                      className="w-6 h-6 text-gray-600 group-hover:text-green-500 transition-colors duration-300"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
+                  {/* ===== SHARE BUTTON WITH DROPDOWN ===== */}
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleShareMenu(post.id)}
+                      className="flex items-center space-x-2 group"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-                      />
-                    </svg>
-                    <span className="font-semibold text-gray-700 text-sm">
-                      {post.shares}
-                    </span>
-                  </button>
+                      <svg
+                        className="w-6 h-6 text-gray-600 group-hover:text-green-500 transition-colors duration-300"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                        />
+                      </svg>
+                      <span className="font-semibold text-gray-700 text-sm">
+                        {post.shares}
+                      </span>
+                    </button>
+
+                    {/* Share Dropdown Menu */}
+                    {shareMenuOpen === post.id && (
+                      <div className="absolute left-0 bottom-full mb-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+                        <div className="p-3">
+                          <h3 className="font-semibold text-gray-900 mb-3 text-center">Share Post</h3>
+                          
+                          <div className="space-y-1">
+                            {/* WhatsApp */}
+                            <button
+                              onClick={() => handleShareWhatsApp(post)}
+                              className="flex items-center w-full p-2 text-left hover:bg-green-50 rounded-lg transition-colors"
+                            >
+                              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-green-600 font-bold text-sm">WA</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">WhatsApp</p>
+                                <p className="text-xs text-gray-500">Share with friends</p>
+                              </div>
+                            </button>
+
+                            {/* LinkedIn */}
+                            <button
+                              onClick={() => handleShareLinkedIn(post)}
+                              className="flex items-center w-full p-2 text-left hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-blue-600 font-bold text-sm">in</span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">LinkedIn</p>
+                                <p className="text-xs text-gray-500">Share professionally</p>
+                              </div>
+                            </button>
+
+                            {/* Twitter */}
+                            <button
+                              onClick={() => handleShareTwitter(post)}
+                              className="flex items-center w-full p-2 text-left hover:bg-sky-50 rounded-lg transition-colors"
+                            >
+                              <div className="w-8 h-8 bg-sky-100 rounded-full flex items-center justify-center mr-3">
+                                <svg className="w-4 h-4 text-sky-500" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">Twitter</p>
+                                <p className="text-xs text-gray-500">Tweet this post</p>
+                              </div>
+                            </button>
+
+                            {/* Facebook */}
+                            <button
+                              onClick={() => handleShareFacebook(post)}
+                              className="flex items-center w-full p-2 text-left hover:bg-indigo-50 rounded-lg transition-colors"
+                            >
+                              <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
+                                <svg className="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">Facebook</p>
+                                <p className="text-xs text-gray-500">Share on timeline</p>
+                              </div>
+                            </button>
+
+                            {/* Copy Link */}
+                            <button
+                              onClick={() => handleCopyLink(post)}
+                              className="flex items-center w-full p-2 text-left hover:bg-gray-50 rounded-lg transition-colors"
+                            >
+                              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                                {copiedLink === post.id ? (
+                                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                  </svg>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-900">
+                                  {copiedLink === post.id ? 'Link Copied!' : 'Copy Link'}
+                                </p>
+                                <p className="text-xs text-gray-500">Copy post URL</p>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
+                {/* Bookmark Button */}
                 <button className="group">
                   <svg
                     className="w-6 h-6 text-gray-600 group-hover:text-indigo-600 transition-colors duration-300"
@@ -309,8 +526,8 @@ const Home = () => {
         ))
       )}
 
-      {/* Styles */}
-      <style jsx global>{`
+      {/* Fix for React warning - change jsx={true} to jsx="true" */}
+      <style jsx="true" global="true">{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
@@ -319,7 +536,7 @@ const Home = () => {
           scrollbar-width: none;
         }
       `}</style>
-      </div>
+    </div>
   );
 };
 
