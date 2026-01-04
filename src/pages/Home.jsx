@@ -6,9 +6,12 @@ import SEO from "../components/Seo";
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [loading, setLoading] = useState(true);
-  const [shareMenuOpen, setShareMenuOpen] = useState(null); // Which post's share menu is open
+  const [shareMenuOpen, setShareMenuOpen] = useState(null);
   const [copiedLink, setCopiedLink] = useState(null);
+  const [expandedPosts, setExpandedPosts] = useState({}); // Track expanded posts
   const shareMenuRef = useRef(null);
+
+  const MAX_CAPTION_LENGTH = 150; // Characters to show when collapsed
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -133,6 +136,33 @@ const Home = () => {
 
   const toggleShareMenu = (postId) => {
     setShareMenuOpen(shareMenuOpen === postId ? null : postId);
+  };
+
+  // Toggle read more/less for a specific post
+  const toggleReadMore = (postId) => {
+    setExpandedPosts(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  // Format caption with read more/less
+  const formatCaption = (post) => {
+    const isExpanded = expandedPosts[post.id] || false;
+    
+    if (isExpanded || post.caption.length <= MAX_CAPTION_LENGTH) {
+      return post.caption;
+    }
+    
+    // Truncate to the last complete word before MAX_CAPTION_LENGTH
+    const truncated = post.caption.substring(0, MAX_CAPTION_LENGTH);
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    
+    if (lastSpaceIndex > 0) {
+      return truncated.substring(0, lastSpaceIndex) + '...';
+    }
+    
+    return truncated + '...';
   };
 
   // Mock data for stories
@@ -306,10 +336,18 @@ const Home = () => {
               </button>
             </div>
 
-            {/* Post Content */}
+            {/* Post Content with Read More/Less */}
             <div className="px-5 pb-4">
               <p className="text-gray-800 mb-3 leading-relaxed">
-                {post.caption}
+                {formatCaption(post)}
+                {post.caption.length > MAX_CAPTION_LENGTH && (
+                  <button
+                    onClick={() => toggleReadMore(post.id)}
+                    className="ml-1 text-indigo-600 hover:text-indigo-800 font-medium text-sm focus:outline-none"
+                  >
+                    {expandedPosts[post.id] ? ' Read Less' : ' Read More'}
+                  </button>
+                )}
               </p>
               <div className="flex flex-wrap gap-2 mb-3">
                 {post.hashtags.map((tag, index) => (
