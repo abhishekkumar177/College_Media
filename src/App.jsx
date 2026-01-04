@@ -10,17 +10,16 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
-
-/* ===== Auth Components ===== */
-
+import EditProfile from "./pages/EditProfile";
+import Trending from "./pages/Trending";
+import Explore from "./pages/Explore";
+import Stories from "./pages/Stories";
+import CreateStory from "./pages/CreateStory";
+import Notifications from "./pages/Notifications";
+import More from "./pages/More";
 import Settings from "./pages/Settings";
-import Layout from "./components/Layout";
-import MessagesLayout from "./components/MessagesLayout";
-import LoginForm from './components/Auth/LoginForm';
-import SignupForm from './components/Auth/SignupForm';
-import ProfileEditForm from './components/Auth/ProfileEditForm';
-
-/* ===== Layout Components ===== */
+import Reels from "./pages/Reels";
+import CreatePost from "./pages/CreatePost";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
@@ -51,9 +50,7 @@ const App = () => {
   
   /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
-  
-  /** Active navigation tab name */
-  const [activeTab, setActiveTab] = useState("Home");
+  const [activeTab, setActiveTab] = useState("Feed");
 
 
   return (
@@ -292,126 +289,150 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
   return (
     <Router>
       <Routes>
-        {/* ========== LANDING PAGE ROUTE ========== */}
-        {/* 
-          Entry/landing page for non-authenticated users
-          Shows product overview and call-to-action
-        */}
         <Route path="/" element={<Landing />} />
-        
-        {/* ========== HOME FEED ROUTE ========== */}
-        {/* 
-          Main application feed with sidebar navigation
-          Displays stories, posts, and social features
-        */}
         <Route path="/home" element={
-          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-            {/* ========== NAVIGATION BAR ========== */}
-            {/* 
-              Sticky navbar with logo, search bar, and user menu
-              Contains:
-              - Application logo/branding
-              - Search functionality
-              - User profile button
-            */}
-            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {/* ========== MAIN CONTENT GRID ========== */}
-              {/* Main content grid: Sidebar | Feed | Right Sidebar */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                
-                {/* ========== LEFT SIDEBAR ========== */}
-                {/* 
-                  Navigation menu for main sections
-                  Sticky positioning for constant visibility
-                  Highlights active tab with gradient background
-                */}
-                <LeftSidebar 
-                  activeTab={activeTab} 
-                  setActiveTab={setActiveTab}
-                  menuItems={menuItems}
-                  handleTabClick={handleTabClick}
-                />
-                
-                {/* ========== CENTRAL FEED ========== */}
-                {/* 
-                  Main content area with stories and posts
-                  Renders Home component with all necessary data
-                */}
-                <Home 
-                  stories={stories}
-                  posts={posts}
-                  currentStoryIndex={currentStoryIndex}
-                  setCurrentStoryIndex={setCurrentStoryIndex}
-                  likedPosts={likedPosts}
-                  toggleLike={toggleLike}
-                />
-                
-                {/* ========== RIGHT SIDEBAR ========== */}
-                {/* 
-                  Additional info panels: suggested accounts, trending, online friends
-                  Displays social recommendations and engagement features
-                */}
-                <RightSidebar 
-                  suggestedAccounts={suggestedAccounts}
-                  trendingHashtags={trendingHashtags}
-                  onlineFriends={onlineFriends}
-                />
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-6xl mx-auto px-6 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-6">
+                    <Home />
+                  </div>
+                  <div className="lg:col-span-1">
+                    <RightSidebar />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         } />
-        
-        {/* ========== MESSAGES ROUTE ========== */}
-        {/* 
-          Dedicated messaging interface
-          Direct messages and conversations
-        */}
+        <Route path="/trending" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <Trending />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/explore" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <Explore />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/stories" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <Stories />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/create-story" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <CreateStory />
+              </div>
+            </div>
+          </div>
+        } />
         <Route path="/messages" element={
-          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <LeftSidebar 
-                  activeTab={activeTab} 
-                  setActiveTab={setActiveTab}
-                  menuItems={menuItems}
-                  handleTabClick={handleTabClick}
-                />
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
                 <Messages />
-                <RightSidebar 
-                  suggestedAccounts={suggestedAccounts}
-                  trendingHashtags={trendingHashtags}
-                  onlineFriends={onlineFriends}
-                />
               </div>
             </div>
           </div>
         } />
-        
-        {/* ========== PROFILE ROUTE ========== */}
-        {/* 
-          User profile page
-          Shows user posts, bio, and profile information
-        */}
+        <Route path="/notifications" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <Notifications />
+              </div>
+            </div>
+          </div>
+        } />
         <Route path="/profile" element={
-          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <LeftSidebar 
-                  activeTab={activeTab} 
-                  setActiveTab={setActiveTab}
-                  menuItems={menuItems}
-                  handleTabClick={handleTabClick}
-                />
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
                 <Profile />
-                <RightSidebar 
-                  suggestedAccounts={suggestedAccounts}
-                  trendingHashtags={trendingHashtags}
-                  onlineFriends={onlineFriends}
-                />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/edit-profile" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <EditProfile />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/more" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <More />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/settings" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <Settings />
+              </div>
+            </div>
+          </div>
+        } />
+        <Route path="/reels" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Reels />
+            </div>
+          </div>
+        } />
+        <Route path="/create-post" element={
+          <div className="min-h-screen bg-gray-50">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <CreatePost />
               </div>
             </div>
           </div>

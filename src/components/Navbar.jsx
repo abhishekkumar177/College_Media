@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from '../context/AuthContext';
-import ProfileMenu from "./ProfileMenu";
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Navbar({ searchQuery, setSearchQuery }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -9,80 +7,18 @@ function Navbar({ searchQuery, setSearchQuery }) {
   const { user } = useAuth();
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-
-          {/* LOGO */}
-          <button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2"
-          >
-            <img
-              src="/college-media-logo.svg"
-              alt="College Media Logo"
-              className="h-8 w-auto"
-            />
-          </button>
-
-          {/* SEARCH */}
-          <div className="flex-1 max-w-lg mx-8">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white transition-all duration-300"
-              />
-              <svg
-                className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-          </div>
-
-          {/* MESSAGES ICON */}
-          <button
-            onClick={() => navigate('/messages')}
-            className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300 relative mr-2"
-            title="Messages"
-          >
-            <svg
-              className="h-6 w-6 text-gray-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
-          </button>
-
-          {/* PROFILE */}
-          <div className="relative">
-            {user ? (
-              <button
-                onClick={() => setIsProfileOpen((prev) => !prev)}
-                className="p-1 rounded-full hover:bg-gray-100 transition-all duration-300"
-              >
-                <img
-                  src={user.profilePicture || 'https://placehold.co/40x40/FF6B6B/FFFFFF?text=U'}
-                  alt="Profile"
-                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-300"
+    <div>
+      <nav className="top-0 z-50 ml-20 ">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between gap-6">
+            <div className="flex-1 max-w-xl">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search for friends, groups, pages..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm"
                 />
               </button>
             ) : (
@@ -136,7 +72,23 @@ function Navbar({ searchQuery, setSearchQuery }) {
               <div className="absolute top-14 right-2">
                 <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
               </div>
-            )}
+            </div>
+            
+            <div className="flex items-center space-x-3 mr-4">
+              <Link to="/create-post" className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center space-x-2 shadow-sm">
+                <span className="text-lg">+</span>
+                <span>Add New Post</span>
+              </Link>
+              
+              <Link to="/notifications" className="relative p-2 rounded-full hover:bg-gray-100 transition-all duration-300">
+                <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </Link>
+              
+              
+            </div>
           </div>
 
         </div>
