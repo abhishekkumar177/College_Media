@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const { initDB } = require('./config/db');
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
 
@@ -50,14 +51,18 @@ connectDB();
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'College Media API is running!' });
+  res.json({
+    success: true,
+    data: null,
+    message: 'College Media API is running!'
+  });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
+// 404 Not Found Handler (must be after all routes)
+app.use(notFound);
+
+// Global Error Handler (must be last)
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

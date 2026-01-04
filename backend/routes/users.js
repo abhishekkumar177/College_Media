@@ -1,6 +1,7 @@
 const express = require('express');
 const UserMongo = require('../models/User');
 const UserMock = require('../mockdb/userDB');
+const { validateProfileUpdate, checkValidation } = require('../middleware/validationMiddleware');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
@@ -13,7 +14,11 @@ const verifyToken = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]; // Bearer TOKEN
 
   if (!token) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
+    return res.status(401).json({
+      success: false,
+      data: null,
+      message: 'Access denied. No token provided.'
+    });
   }
 
   try {
@@ -21,7 +26,11 @@ const verifyToken = (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(400).json({ message: 'Invalid token.' });
+    res.status(400).json({
+      success: false,
+      data: null,
+      message: 'Invalid token.'
+    });
   }
 };
 
@@ -50,7 +59,7 @@ const upload = multer({
 });
 
 // Get current user profile
-router.get('/profile', verifyToken, async (req, res) => {
+router.get('/profile', verifyToken, async (req, res, next) => {
   try {
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
@@ -59,33 +68,43 @@ router.get('/profile', verifyToken, async (req, res) => {
       // Use MongoDB
       const user = await UserMongo.findById(req.userId).select('-password');
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
-        data: user
+        data: user,
+        message: 'Profile retrieved successfully'
       });
     } else {
       // Use mock database
       const user = await UserMock.findById(req.userId);
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
-        data: user
+        data: user,
+        message: 'Profile retrieved successfully'
       });
     }
   } catch (error) {
     console.error('Get profile error:', error);
-    res.status(500).json({ message: 'Server error' });
+    next(error);
   }
 });
 
 // Update user profile
-router.put('/profile', verifyToken, async (req, res) => {
+router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, async (req, res, next) => {
   try {
     const { firstName, lastName, bio } = req.body;
     
@@ -101,12 +120,17 @@ router.put('/profile', verifyToken, async (req, res) => {
       ).select('-password');
 
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
-        data: updatedUser
+        data: updatedUser,
+        message: 'Profile updated successfully'
       });
     } else {
       // Use mock database
@@ -116,25 +140,34 @@ router.put('/profile', verifyToken, async (req, res) => {
       );
 
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
-        data: updatedUser
+        data: updatedUser,
+        message: 'Profile updated successfully'
       });
     }
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ message: 'Server error' });
+    next(error);
   }
 });
 
 // Upload profile picture
-router.post('/profile-picture', verifyToken, upload.single('profilePicture'), async (req, res) => {
+router.post('/profile-picture', verifyToken, upload.single('profilePicture'), async (req, res, next) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: 'No file uploaded'
+      });
     }
     
     // Get database connection from app
@@ -149,14 +182,19 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
       ).select('-password');
 
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
         data: {
           profilePicture: updatedUser.profilePicture
-        }
+        },
+        message: 'Profile picture uploaded successfully'
       });
     } else {
       // Use mock database
@@ -166,19 +204,24 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
       );
 
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          data: null,
+          message: 'User not found'
+        });
       }
 
       res.json({
         success: true,
         data: {
           profilePicture: updatedUser.profilePicture
-        }
+        },
+        message: 'Profile picture uploaded successfully'
       });
     }
   } catch (error) {
     console.error('Upload profile picture error:', error);
-    res.status(500).json({ message: 'Server error' });
+    next(error);
   }
 });
 
