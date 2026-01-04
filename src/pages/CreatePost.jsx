@@ -4,19 +4,38 @@ const CreatePost = () => {
   const [postType, setPostType] = useState('text');
   const [caption, setCaption] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
+  
+  // Character counter configuration
+  const maxLength = 2000;
+  const [charCount, setCharCount] = useState(0);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFiles(files);
   };
 
+  const handleCaptionChange = (e) => {
+    const text = e.target.value;
+    if (text.length <= maxLength) {
+      setCaption(text);
+      setCharCount(text.length);
+    }
+  };
+
   const handleSubmit = () => {
     // Handle post submission
     console.log('Post submitted:', { postType, caption, selectedFiles });
+    alert('Post created successfully!');
+    
+    // Reset form
+    setCaption('');
+    setCharCount(0);
+    setSelectedFiles([]);
+    setPostType('text');
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 p-4">
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Post</h1>
@@ -95,7 +114,7 @@ const CreatePost = () => {
           />
           <div className="flex-1">
             <p className="font-bold text-gray-900">Your Name</p>
-            <select className="mt-1 text-sm text-gray-600 border border-gray-300 rounded-lg px-2 py-1">
+            <select className="mt-1 text-sm text-gray-600 border border-gray-300 rounded-lg px-2 py-1 bg-white">
               <option>Public</option>
               <option>Friends</option>
               <option>Only Me</option>
@@ -105,16 +124,34 @@ const CreatePost = () => {
 
         <textarea
           value={caption}
-          onChange={(e) => setCaption(e.target.value)}
+          onChange={handleCaptionChange}
           placeholder="What's on your mind?"
           className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none text-gray-900"
           rows={6}
+          maxLength={maxLength}
         />
+
+        {/* Character Counter */}
+        <div className="flex justify-end mt-2">
+          <span 
+            className={`text-sm font-medium ${
+              charCount >= maxLength 
+                ? 'text-red-600' 
+                : charCount > maxLength * 0.9 
+                ? 'text-orange-500'
+                : charCount > maxLength * 0.75
+                ? 'text-yellow-500'
+                : 'text-gray-500'
+            }`}
+          >
+            {charCount} / {maxLength}
+          </span>
+        </div>
 
         {/* File Upload */}
         {(postType === 'photo' || postType === 'video') && (
-          <div className="mt-4">
-            <label className="block w-full p-8 border-2 border-dashed border-gray-300 rounded-xl hover:border-indigo-400 transition-colors duration-200 cursor-pointer">
+          <div className="mt-6">
+            <label className="block w-full p-8 border-2 border-dashed border-gray-300 rounded-xl hover:border-indigo-400 transition-colors duration-200 cursor-pointer bg-gray-50 hover:bg-gray-100">
               <input
                 type="file"
                 multiple={postType === 'photo'}
@@ -128,11 +165,20 @@ const CreatePost = () => {
                 </svg>
                 <p className="text-gray-600 font-medium">Click to upload {postType}</p>
                 <p className="text-sm text-gray-500 mt-1">or drag and drop</p>
+                <p className="text-xs text-gray-400 mt-2">Max file size: 10MB</p>
               </div>
             </label>
             {selectedFiles.length > 0 && (
-              <div className="mt-3">
-                <p className="text-sm text-gray-600">{selectedFiles.length} file(s) selected</p>
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm font-medium text-green-800">
+                  {selectedFiles.length} {postType}(s) selected
+                </p>
+                <button
+                  onClick={() => setSelectedFiles([])}
+                  className="mt-2 text-xs text-red-600 hover:text-red-800 font-medium"
+                >
+                  Remove all
+                </button>
               </div>
             )}
           </div>
@@ -140,7 +186,8 @@ const CreatePost = () => {
 
         {/* Poll Options */}
         {postType === 'poll' && (
-          <div className="mt-4 space-y-3">
+          <div className="mt-6 space-y-3">
+            <h3 className="font-medium text-gray-900 mb-3">Poll Options</h3>
             <input
               type="text"
               placeholder="Option 1"
@@ -151,8 +198,11 @@ const CreatePost = () => {
               placeholder="Option 2"
               className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300"
             />
-            <button className="text-indigo-600 font-medium text-sm hover:text-indigo-700">
-              + Add Option
+            <button className="text-indigo-600 font-medium text-sm hover:text-indigo-700 flex items-center">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Option
             </button>
           </div>
         )}
@@ -183,7 +233,8 @@ const CreatePost = () => {
         {/* Submit Button */}
         <button
           onClick={handleSubmit}
-          className="w-full mt-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+          disabled={!caption.trim() && selectedFiles.length === 0}
+          className="w-full mt-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow"
         >
           Post
         </button>
