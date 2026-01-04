@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark Background with Rounded Corners -->
+  <rect width="512" height="512" rx="90" fill="#1F2937"/>
+  
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="capGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F59E0B"/>
+      <stop offset="25%" style="stop-color:#EF4444"/>
+      <stop offset="50%" style="stop-color:#EC4899"/>
+      <stop offset="75%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#6366F1"/>
+    </linearGradient>
+    <linearGradient id="baseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60A5FA"/>
+      <stop offset="50%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#F472B6"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Graduation Cap -->
+  <g transform="translate(256, 256)">
+    <!-- Cap Top (Board) -->
+    <path d="M -100 -40 L 0 -80 L 100 -40 L 100 -30 L 0 -70 L -100 -30 Z" fill="url(#capGradient)"/>
+    
+    <!-- Cap Base -->
+    <ellipse cx="0" cy="-30" rx="100" ry="20" fill="url(#baseGradient)"/>
+    
+    <!-- Cap Side -->
+    <path d="M -100 -30 L -100 20 Q -100 35 -80 45 L 0 70 L 80 45 Q 100 35 100 20 L 100 -30" fill="url(#baseGradient)" opacity="0.9"/>
+    
+    <!-- Tassel -->
+    <line x1="0" y1="-80" x2="40" y2="-100" stroke="#F59E0B" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="40" cy="-100" r="8" fill="#F59E0B"/>
+    
+    <!-- Tassel Strands -->
+    <g opacity="0.9">
+      <line x1="40" y1="-92" x2="38" y2="-75" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+      <line x1="40" y1="-92" x2="42" y2="-75" stroke="#EC4899" stroke-width="2" stroke-linecap="round"/>
+      <line x1="40" y1="-92" x2="45" y2="-78" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
+      <line x1="40" y1="-92" x2="35" y2="-78" stroke="#6366F1" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- Shine Effect -->
+  <circle cx="180" cy="180" r="40" fill="#FFFFFF" opacity="0.15"/>
+  <circle cx="160" cy="160" r="25" fill="#FFFFFF" opacity="0.2"/>
+</svg>
