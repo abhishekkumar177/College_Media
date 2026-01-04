@@ -1,14 +1,35 @@
 
+
 import { useNavigate } from 'react-router-dom';
 
+
+/**
+ * Hero Component
+ * 
+ * Main hero section for the landing page with UniHub branding
+ * Emphasizes UniHub as a centralized platform for everything college
+ * Features:
+ * - Animated background effects
+ * - Compelling headline about centralized platform
+ * - Call-to-action buttons
+ * - Interactive UI mockup
+ * - Proper heading hierarchy for accessibility
+ * 
+ * @component
+ * @returns {React.ReactElement} Hero section with branding and CTA
+ */
 const Hero = () => {
     const navigate = useNavigate();
     return (
-        <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
-            {/* <!-- Animated Background Blobs --> */}
-            <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-            <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+        <section 
+            id="main-content"
+            className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden"
+            aria-label="Hero section"
+        >
+            {/* Animated Background Blobs */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" aria-hidden="true"></div>
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000" aria-hidden="true"></div>
+            <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000" aria-hidden="true"></div>
 
             <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
 
@@ -20,71 +41,78 @@ const Hero = () => {
                     Now live on 50+ Campuses
                 </div>
 
+                {/* Main Heading - H1 for proper hierarchy */}
                 <h1 className="text-5xl md:text-7xl font-semibold tracking-tight text-slate-900 mb-6 max-w-4xl mx-auto leading-[1.1]">
-                    The Social Network Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">College Life</span>
+                    Your Centralized Hub for <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">Everything College</span>
                 </h1>
 
                 <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto mb-10 font-normal leading-relaxed">
-                    Connect with classmates, share campus moments, and build your network in a clean, distraction-free environment designed for the next generation.
+                    Beyond social media - UniHub brings together academics, events, career opportunities, and campus connections all in one powerful platform designed for students.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-                    <button onClick={() => navigate('/home')} className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2">
+                    <button 
+                        className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium hover:opacity-90 transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2"
+                        aria-label="Join UniHub and connect with your campus"
+                    >
                         Join Your Campus
-                        <span>→</span>
+                        <span aria-hidden="true">→</span>
                     </button>
-                    <button className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-slate-700 border border-slate-200 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 flex items-center justify-center gap-2">
-                        <span>▶</span>
+                    <button 
+                        className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-slate-700 border border-slate-200 font-medium hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        aria-label="Watch UniHub demo video"
+                    >
+                        <span aria-hidden="true">▶</span>
                         View Demo
                     </button>
                 </div>
 
-                {/* <!-- UI Mockup --> */}
+                {/* UI Mockup */}
                 <div className="relative max-w-5xl mx-auto perspective-1000">
                     <div className="relative bg-white rounded-2xl shadow-2xl border border-slate-200/60 overflow-hidden transform rotate-x-12 hover:rotate-0 transition-transform duration-700 ease-out p-1">
-                        {/* <!-- Browser Bar --> */}
+                        {/* Browser Bar */}
                         <div className="bg-slate-50 border-b border-slate-100 px-4 py-3 flex items-center gap-2">
-                            <div className="flex gap-1.5">
+                            <div className="flex gap-1.5" aria-hidden="true">
                                 <div className="w-3 h-3 rounded-full bg-red-400"></div>
                                 <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                                 <div className="w-3 h-3 rounded-full bg-green-400"></div>
                             </div>
                             <div className="mx-auto bg-white border border-slate-200 rounded-md px-3 py-1 text-[10px] text-slate-400 font-medium w-64 text-center">
-                                collegemedia.app
+                                unihub.app
                             </div>
                         </div>
 
-                        {/* <!-- App Interface --> */}
+                        {/* App Interface */}
                         <div className="flex h-[500px] bg-slate-50 text-left">
-                            {/* <!-- Sidebar --> */}
+                            {/* Sidebar */}
                             <div className="w-64 bg-white border-r border-slate-100 hidden md:flex flex-col p-4 gap-1">
                                 <div className="flex items-center gap-3 p-3 rounded-lg bg-purple-50 text-purple-600">
-                                    <span>🏠</span>
+                                    <span aria-hidden="true">🏠</span>
                                     <span className="text-sm font-medium">Feed</span>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-50">
-                                    <span>👥</span>
-                                    <span className="text-sm font-medium">ClassNamemates</span>
+                                    <span aria-hidden="true">👥</span>
+                                    <span className="text-sm font-medium">Classmates</span>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 rounded-lg text-slate-500 hover:bg-slate-50">
-                                    <span>🔔</span>
+                                    <span aria-hidden="true">🔔</span>
                                     <span className="text-sm font-medium">Notifications</span>
                                     <span className="ml-auto w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">3</span>
                                 </div>
                                 <div className="mt-8 text-xs font-semibold text-slate-400 uppercase tracking-wider px-3">Trending</div>
                                 <div className="flex items-center gap-3 p-3 text-slate-600">
-                                    <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                    <span className="w-2 h-2 rounded-full bg-indigo-500" aria-hidden="true"></span>
                                     <span className="text-sm">#FinalsWeek</span>
                                 </div>
                                 <div className="flex items-center gap-3 p-3 text-slate-600">
-                                    <span className="w-2 h-2 rounded-full bg-pink-500"></span>
+                                    <span className="w-2 h-2 rounded-full bg-pink-500" aria-hidden="true"></span>
                                     <span className="text-sm">#CampusFest</span>
                                 </div>
                             </div>
 
-                            {/* <!-- Main Feed --> */}
+                            {/* Main Feed */}
                             <div className="flex-1 overflow-y-auto p-6">
-                                {/* <!-- Stories --> */}
+                                {/* Stories */}
                                 <div className="flex gap-4 mb-6 overflow-x-auto pb-2 scrollbar-hide">
                                     <div className="flex flex-col items-center gap-2 min-w-[70px]">
                                         <div className="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 to-purple-600">
