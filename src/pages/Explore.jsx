@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import RisingStudent from '../components/RisingStudent';
+import SeniorAndAlumini from '../components/SeniorAndAlumini';
+import CrossCollegeDiscoveris from '../components/CrossCollegeDiscoveris';
+import CampusTrending from '../components/CampusTrending';
 
 const Explore = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -77,7 +81,7 @@ const Explore = () => {
           ))}
         </div>
       </div>
-
+   
       {/* Explore Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredItems.map((item) => (
@@ -120,6 +124,10 @@ const Explore = () => {
           </div>
         ))}
       </div>
+      <CampusTrending/>
+      <RisingStudent/>
+      <SeniorAndAlumini/>
+      <CrossCollegeDiscoveris/>
     </div>
   );
 };
