@@ -10,7 +10,8 @@
 import React from 'react'
 
 const Footer = () => {
-  return (
+    const currentYear = new Date().getFullYear()
+    return (
 <footer className="bg-white border-t border-slate-100 pt-16 pb-8" role="contentinfo">
         <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
@@ -72,7 +73,7 @@ const Footer = () => {
             </div>
             
             <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-slate-100 gap-4">
-                <p className="text-xs text-slate-400">© 2026 UniHub Inc. All rights reserved.</p>
+                <p className="text-xs text-slate-400">© {currentYear} UniHub Inc. All rights reserved.</p>
                 <div className="flex gap-6" role="list" aria-label="Social media links">
                     <a 
                         href="#" 
