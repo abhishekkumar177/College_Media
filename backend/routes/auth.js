@@ -3,12 +3,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserMongo = require('../models/User');
 const UserMock = require('../mockdb/userDB');
+const { validateRegister, validateLogin, checkValidation } = require('../middleware/validationMiddleware');
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
 
 // Register a new user
-router.post('/register', async (req, res) => {
+router.post('/register', validateRegister, checkValidation, async (req, res, next) => {
   try {
     const { username, email, password, firstName, lastName } = req.body;
     
@@ -23,7 +24,8 @@ router.post('/register', async (req, res) => {
       
       if (existingUser) {
         return res.status(400).json({ 
-          success: false, 
+          success: false,
+          data: null,
           message: 'User with this email or username already exists' 
         });
       }
@@ -59,7 +61,8 @@ router.post('/register', async (req, res) => {
           firstName: newUser.firstName,
           lastName: newUser.lastName,
           token
-        }
+        },
+        message: 'User registered successfully'
       });
     } else {
       // Use mock database
@@ -88,12 +91,14 @@ router.post('/register', async (req, res) => {
             firstName: newUser.firstName,
             lastName: newUser.lastName,
             token
-          }
+          },
+          message: 'User registered successfully'
         });
       } catch (error) {
         if (error.message.includes('already exists')) {
           return res.status(400).json({ 
-            success: false, 
+            success: false,
+            data: null,
             message: error.message 
           });
         }
@@ -102,15 +107,12 @@ router.post('/register', async (req, res) => {
     }
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error during registration' 
-    });
+    next(error); // Pass to error handler
   }
 });
 
 // Login user
-router.post('/login', async (req, res) => {
+router.post('/login', validateLogin, checkValidation, async (req, res, next) => {
   try {
     const { email, password } = req.body;
     
@@ -122,7 +124,8 @@ router.post('/login', async (req, res) => {
       const user = await UserMongo.findOne({ email });
       if (!user) {
         return res.status(400).json({ 
-          success: false, 
+          success: false,
+          data: null,
           message: 'Invalid credentials' 
         });
       }
@@ -131,7 +134,8 @@ router.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ 
-          success: false, 
+          success: false,
+          data: null,
           message: 'Invalid credentials' 
         });
       }
@@ -154,14 +158,16 @@ router.post('/login', async (req, res) => {
           profilePicture: user.profilePicture,
           bio: user.bio,
           token
-        }
+        },
+        message: 'Login successful'
       });
     } else {
       // Use mock database
       const user = await UserMock.findByEmail(email);
       if (!user) {
         return res.status(400).json({ 
-          success: false, 
+          success: false,
+          data: null,
           message: 'Invalid credentials' 
         });
       }
@@ -170,7 +176,8 @@ router.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ 
-          success: false, 
+          success: false,
+          data: null,
           message: 'Invalid credentials' 
         });
       }
@@ -193,15 +200,13 @@ router.post('/login', async (req, res) => {
           profilePicture: user.profilePicture,
           bio: user.bio,
           token
-        }
+        },
+        message: 'Login successful'
       });
     }
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Server error during login' 
-    });
+    next(error); // Pass to error handler
   }
 });
 
