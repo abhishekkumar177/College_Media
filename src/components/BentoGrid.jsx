@@ -9,6 +9,7 @@
  * @returns {React.ReactElement} Bento grid feature section
  */
 import React from 'react'
+import { Icon } from '@iconify/react';
 
 const BentoGrid = () => {
   return (
@@ -117,33 +118,54 @@ const BentoGrid = () => {
                 </div>
 
                 {/* Feature 6: Real-time Updates - Wide */}
-                <div className="md:col-span-3 bg-slate-900 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group">
-                    <div className="relative z-10 max-w-lg">
-                        <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4">
-                            <span className="iconify text-white" data-icon="lucide:zap" data-width="24"></span>
-                        </div>
-                        <h3 className="text-xl font-semibold text-white mb-2">Lightning Fast & Secure</h3>
-                        <p className="text-sm text-slate-300 leading-relaxed">
-                            Real-time notifications for everything that matters - from study group updates to campus emergency alerts. Built with modern technology for instant, secure communication.
-                        </p>
-                    </div>
-                    <div className="flex gap-4 mt-6 md:mt-0 relative z-10">
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="w-16 h-16 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center">
-                                <span className="iconify text-green-400" data-icon="lucide:shield-check" data-width="28"></span>
-                            </div>
-                            <span className="text-xs text-slate-400">Secure</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="w-16 h-16 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center">
-                                <span className="iconify text-blue-400" data-icon="lucide:rocket" data-width="28"></span>
-                            </div>
-                            <span className="text-xs text-slate-400">Fast</span>
-                        </div>
-                    </div>
-                    {/* Decorative gradient */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 blur-3xl rounded-full" aria-hidden="true"></div>
-                </div>
+              <div className="md:col-span-3 bg-slate-900 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between relative overflow-hidden group">
+  <div className="relative z-10 max-w-lg">
+    <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-4">
+      <Icon
+        icon="lucide:zap"
+        className="w-6 h-6 text-white"
+      />
+    </div>
+
+    <h3 className="text-xl font-semibold text-white mb-2">
+      Lightning Fast & Secure
+    </h3>
+
+    <p className="text-sm text-slate-300 leading-relaxed">
+      Real-time notifications for everything that matters – from study group updates to campus emergency alerts.
+      Built with modern technology for instant, secure communication.
+    </p>
+  </div>
+
+  <div className="flex gap-4 mt-6 md:mt-0 relative z-10">
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-16 h-16 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center">
+        <Icon
+          icon="lucide:shield-check"
+          className="w-7 h-7 text-green-400"
+        />
+      </div>
+      <span className="text-xs text-slate-400">Secure</span>
+    </div>
+
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-16 h-16 rounded-full bg-blue-500/20 border-2 border-blue-400 flex items-center justify-center">
+        <Icon
+          icon="lucide:rocket"
+          className="w-7 h-7 text-blue-400"
+        />
+      </div>
+      <span className="text-xs text-slate-400">Fast</span>
+    </div>
+  </div>
+
+  {/* Decorative gradient */}
+  <div
+    className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 blur-3xl rounded-full"
+    aria-hidden="true"
+  />
+</div>
+
             </div>
         </div>
     </section>
