@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "1767420831078",
+    "username": "ranajiharxx",
+    "email": "ranajiharsxx1@gmail.com",
+    "password": "$2a$10$vAX4Ou8e1rYG7sxXkwgSV.lBpN.FQZbYJIZTLKk91zMALBm81TZaG",
+    "firstName": "Harsh ",
+    "lastName": "Rana",
+    "createdAt": "2026-01-03T06:13:51.078Z",
+    "updatedAt": "2026-01-03T06:45:37.287Z",
+    "bio": "",
+    "profilePicture": "http://localhost:5000/uploads/1767422737270.jpg"
+  }
+]
