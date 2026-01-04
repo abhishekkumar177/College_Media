@@ -1,25 +1,25 @@
-// src/app.js
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
+
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-// Middlewares
 app.use(express.json());
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 
+// routes
 app.use("/api/v1/auth", authRoutes);
 
-// Routes
+// health check
 app.get("/api/v1/health", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
-    message: "College Media Backend is Healthy 🚀",
+    message: "College Media Backend is healthy",
   });
 });
 
