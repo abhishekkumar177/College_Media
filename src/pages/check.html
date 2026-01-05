@@ -1,0 +1,482 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHub - Explore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar hiding for horizontal sections */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Sticky Header -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
+        <div class="max-w-7xl mx-auto px-4 py-4 md:px-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-semibold tracking-tight text-slate-900">Explore</h1>
+                    <p class="hidden md:block text-sm text-slate-500 mt-1">Discover opportunities, people, and ideas across your campus</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="p-2 text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 rounded-full">
+                        <span class="iconify" data-icon="lucide:search" data-width="20" data-height="20" style="stroke-width: 1.5;"></span>
+                    </button>
+                    <button class="p-2 text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 rounded-full relative">
+                        <span class="iconify" data-icon="lucide:bell" data-width="20" data-height="20" style="stroke-width: 1.5;"></span>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border border-white"></span>
+                    </button>
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border border-white shadow-sm ml-1"></div>
+                </div>
+            </div>
+            <!-- Mobile Subtitle -->
+            <p class="md:hidden text-xs text-slate-500 mt-2">Discover opportunities, people, and ideas.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto pb-24">
+
+        <!-- Section 2: Campus Trending -->
+        <section class="py-6 border-b border-slate-100">
+            <div class="px-4 md:px-6 mb-4 flex items-center gap-2">
+                <span class="iconify text-orange-500" data-icon="lucide:flame" data-width="18" style="stroke-width: 1.5;"></span>
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Campus Trending</h2>
+            </div>
+            
+            <div class="flex overflow-x-auto gap-3 px-4 md:px-6 no-scrollbar snap-x">
+                <!-- Trend Card 1 -->
+                <button class="snap-start min-w-[160px] text-left group bg-white hover:bg-indigo-50/50 border border-slate-200/60 hover:border-indigo-200 rounded-2xl p-4 transition-all shadow-sm hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-white transition-colors">
+                            <span class="iconify" data-icon="lucide:hash" width="16"></span>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-600 flex items-center bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                            <span class="iconify mr-0.5" data-icon="lucide:trending-up" width="12"></span> 12%
+                        </span>
+                    </div>
+                    <h3 class="font-semibold text-slate-800 text-sm group-hover:text-indigo-700">Internships</h3>
+                    <p class="text-xs text-slate-500 mt-1">45 new posts</p>
+                </button>
+
+                <!-- Trend Card 2 -->
+                <button class="snap-start min-w-[160px] text-left group bg-white hover:bg-purple-50/50 border border-slate-200/60 hover:border-purple-200 rounded-2xl p-4 transition-all shadow-sm hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="h-8 w-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 group-hover:bg-white transition-colors">
+                            <span class="iconify" data-icon="lucide:code-2" width="16"></span>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-600 flex items-center bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                            <span class="iconify mr-0.5" data-icon="lucide:trending-up" width="12"></span> 24%
+                        </span>
+                    </div>
+                    <h3 class="font-semibold text-slate-800 text-sm group-hover:text-purple-700">Hackathon</h3>
+                    <p class="text-xs text-slate-500 mt-1">Upcoming events</p>
+                </button>
+
+                <!-- Trend Card 3 -->
+                <button class="snap-start min-w-[160px] text-left group bg-white hover:bg-blue-50/50 border border-slate-200/60 hover:border-blue-200 rounded-2xl p-4 transition-all shadow-sm hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-white transition-colors">
+                            <span class="iconify" data-icon="lucide:book-open" width="16"></span>
+                        </div>
+                         <span class="text-xs font-medium text-slate-500 flex items-center bg-slate-100 px-1.5 py-0.5 rounded-full">
+                            Stable
+                        </span>
+                    </div>
+                    <h3 class="font-semibold text-slate-800 text-sm group-hover:text-blue-700">Exam Prep</h3>
+                    <p class="text-xs text-slate-500 mt-1">Notes &amp; Tips</p>
+                </button>
+
+                 <!-- Trend Card 4 -->
+                 <button class="snap-start min-w-[160px] text-left group bg-white hover:bg-pink-50/50 border border-slate-200/60 hover:border-pink-200 rounded-2xl p-4 transition-all shadow-sm hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="h-8 w-8 rounded-full bg-pink-50 flex items-center justify-center text-pink-600 group-hover:bg-white transition-colors">
+                            <span class="iconify" data-icon="lucide:music" width="16"></span>
+                        </div>
+                         <span class="text-xs font-medium text-emerald-600 flex items-center bg-emerald-50 px-1.5 py-0.5 rounded-full">
+                            <span class="iconify mr-0.5" data-icon="lucide:trending-up" width="12"></span> 8%
+                        </span>
+                    </div>
+                    <h3 class="font-semibold text-slate-800 text-sm group-hover:text-pink-700">Cultural Fest</h3>
+                    <p class="text-xs text-slate-500 mt-1">Buzzing now</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 3: Opportunities Near You -->
+        <section class="py-8 px-4 md:px-6">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold tracking-tight text-slate-900">Opportunities Near You</h2>
+                    <p class="text-sm text-slate-500">Curated for your year and major</p>
+                </div>
+                <button class="text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center">
+                    View All <span class="iconify ml-1" data-icon="lucide:arrow-right" width="16"></span>
+                </button>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
+                <button class="px-3 py-1.5 rounded-full bg-slate-900 text-white text-xs font-medium whitespace-nowrap">For You</button>
+                <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:border-slate-300 text-xs font-medium whitespace-nowrap transition">Internships</button>
+                <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:border-slate-300 text-xs font-medium whitespace-nowrap transition">Research</button>
+                <button class="px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:border-slate-300 text-xs font-medium whitespace-nowrap transition">Hackathons</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Opportunity Card 1 -->
+                <div class="group bg-white rounded-3xl p-5 border border-slate-200/60 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-3 items-center">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 to-white border border-indigo-50 flex items-center justify-center">
+                                <span class="iconify text-indigo-600" data-icon="lucide:briefcase" width="20"></span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-indigo-600 mb-0.5">Summer Internship</p>
+                                <p class="text-xs text-slate-400">TechCorp Inc.</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-semibold bg-slate-50 text-slate-500 border border-slate-100 px-2 py-1 rounded-lg">2d left</span>
+                    </div>
+                    <h3 class="text-base font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">Frontend Developer Intern</h3>
+                    <div class="flex gap-2 mb-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Remote</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Paid</span>
+                    </div>
+                    <button class="w-full py-2 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold hover:bg-slate-100 border border-slate-200 transition-colors">View Details</button>
+                </div>
+
+                <!-- Opportunity Card 2 -->
+                <div class="group bg-white rounded-3xl p-5 border border-slate-200/60 shadow-sm hover:shadow-md hover:border-purple-100 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-3 items-center">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-white border border-purple-50 flex items-center justify-center">
+                                <span class="iconify text-purple-600" data-icon="lucide:code" width="20"></span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-purple-600 mb-0.5">Hackathon</p>
+                                <p class="text-xs text-slate-400">Coding Club</p>
+                            </div>
+                        </div>
+                         <span class="text-[10px] font-semibold bg-slate-50 text-slate-500 border border-slate-100 px-2 py-1 rounded-lg">Tomorrow</span>
+                    </div>
+                    <h3 class="text-base font-semibold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">Campus DevSprint 2024</h3>
+                    <div class="flex gap-2 mb-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">In-Person</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Team</span>
+                    </div>
+                    <button class="w-full py-2 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold hover:bg-slate-100 border border-slate-200 transition-colors">Register</button>
+                </div>
+
+                <!-- Opportunity Card 3 -->
+                <div class="group bg-white rounded-3xl p-5 border border-slate-200/60 shadow-sm hover:shadow-md hover:border-blue-100 transition-all cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex gap-3 items-center">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-white border border-blue-50 flex items-center justify-center">
+                                <span class="iconify text-blue-600" data-icon="lucide:flask-conical" width="20"></span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-medium text-blue-600 mb-0.5">Research</p>
+                                <p class="text-xs text-slate-400">Dept. of AI</p>
+                            </div>
+                        </div>
+                         <span class="text-[10px] font-semibold bg-slate-50 text-slate-500 border border-slate-100 px-2 py-1 rounded-lg">Open</span>
+                    </div>
+                    <h3 class="text-base font-semibold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">ML Model Optimization</h3>
+                    <div class="flex gap-2 mb-4">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Publication</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-50 text-slate-600 border border-slate-100">Advanced</span>
+                    </div>
+                    <button class="w-full py-2 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold hover:bg-slate-100 border border-slate-200 transition-colors">Apply</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Rising Students & Creators -->
+        <section class="py-8 bg-white border-y border-slate-100">
+            <div class="max-w-7xl mx-auto px-4 md:px-6">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="iconify text-purple-500" data-icon="lucide:rocket" data-width="20" style="stroke-width: 1.5;"></span>
+                    <h2 class="text-lg font-semibold tracking-tight text-slate-900">Rising Students</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Profile Card 1 -->
+                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all text-center">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 p-0.5 mb-3">
+                            <div class="w-full h-full rounded-full bg-white border-2 border-transparent"></div> <!-- Placeholder for img -->
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900">Alex Chen</h3>
+                        <p class="text-xs text-slate-500 mb-2">CS • Year 3</p>
+                        <p class="text-xs text-slate-600 mb-4 line-clamp-1">Building open source tools for...</p>
+                        <button class="text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-1.5 rounded-full transition-colors w-full">Follow</button>
+                    </div>
+
+                    <!-- Profile Card 2 -->
+                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all text-center">
+                         <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-300 via-cyan-300 to-emerald-400 p-0.5 mb-3">
+                             <div class="w-full h-full rounded-full bg-white border-2 border-transparent"></div>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900">Sarah Miller</h3>
+                        <p class="text-xs text-slate-500 mb-2">Design • Year 4</p>
+                        <p class="text-xs text-slate-600 mb-4 line-clamp-1">UI/UX Designer @ Startup</p>
+                        <button class="text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-1.5 rounded-full transition-colors w-full">Follow</button>
+                    </div>
+
+                    <!-- Profile Card 3 -->
+                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all text-center hidden sm:block">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-orange-300 via-amber-300 to-yellow-400 p-0.5 mb-3">
+                             <div class="w-full h-full rounded-full bg-white border-2 border-transparent"></div>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900">David Kim</h3>
+                        <p class="text-xs text-slate-500 mb-2">MBA • Year 1</p>
+                        <p class="text-xs text-slate-600 mb-4 line-clamp-1">Finance enthusiast &amp; writer</p>
+                        <button class="text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-1.5 rounded-full transition-colors w-full">Follow</button>
+                    </div>
+
+                     <!-- Profile Card 4 -->
+                     <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all text-center hidden lg:block">
+                        <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-slate-300 via-gray-300 to-zinc-400 p-0.5 mb-3">
+                             <div class="w-full h-full rounded-full bg-white border-2 border-transparent"></div>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900">Priya Patel</h3>
+                        <p class="text-xs text-slate-500 mb-2">EE • Year 2</p>
+                        <p class="text-xs text-slate-600 mb-4 line-clamp-1">Robotics Club Lead</p>
+                        <button class="text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-1.5 rounded-full transition-colors w-full">Follow</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Skill & Career Tracks (Bento Grid) -->
+        <section class="py-8 px-4 md:px-6">
+            <h2 class="text-lg font-semibold tracking-tight text-slate-900 mb-6">Explore Tracks</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                
+                <!-- Track 1 (Large) -->
+                <div class="col-span-2 md:col-span-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl p-6 text-white relative overflow-hidden group cursor-pointer shadow-sm">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <div class="relative z-10 h-full flex flex-col justify-between">
+                        <div class="bg-white/20 w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-md mb-4">
+                             <span class="iconify" data-icon="lucide:layers" width="20"></span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold mb-1">Full-Stack Dev</h3>
+                            <p class="text-indigo-100 text-xs mb-3">From React to Node.js. The complete roadmap.</p>
+                            <span class="inline-flex items-center text-xs font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition backdrop-blur-sm">Start Track <span class="iconify ml-1" data-icon="lucide:arrow-right" width="12"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track 2 -->
+                <div class="col-span-1 bg-white border border-slate-200 rounded-3xl p-5 hover:border-indigo-200 hover:shadow-md transition cursor-pointer group">
+                    <div class="bg-orange-50 w-10 h-10 rounded-xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-105 transition">
+                        <span class="iconify" data-icon="lucide:database" width="20"></span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-900">Data Science</h3>
+                    <p class="text-xs text-slate-500 mt-1">Python, SQL, ML</p>
+                </div>
+
+                <!-- Track 3 -->
+                <div class="col-span-1 bg-white border border-slate-200 rounded-3xl p-5 hover:border-indigo-200 hover:shadow-md transition cursor-pointer group">
+                    <div class="bg-blue-50 w-10 h-10 rounded-xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-105 transition">
+                        <span class="iconify" data-icon="lucide:globe" width="20"></span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-900">GSoC Prep</h3>
+                    <p class="text-xs text-slate-500 mt-1">Open Source Guide</p>
+                </div>
+
+                <!-- Track 4 -->
+                <div class="col-span-1 bg-white border border-slate-200 rounded-3xl p-5 hover:border-indigo-200 hover:shadow-md transition cursor-pointer group">
+                     <div class="bg-emerald-50 w-10 h-10 rounded-xl flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-105 transition">
+                        <span class="iconify" data-icon="lucide:briefcase" width="20"></span>
+                    </div>
+                    <h3 class="text-sm font-semibold text-slate-900">Consulting</h3>
+                    <p class="text-xs text-slate-500 mt-1">Case Studies</p>
+                </div>
+
+                <!-- Track 5 -->
+                <div class="col-span-1 bg-white border border-slate-200 rounded-3xl p-5 hover:border-indigo-200 hover:shadow-md transition cursor-pointer group flex flex-col justify-center items-center text-center">
+                    <div class="bg-slate-50 w-10 h-10 rounded-full flex items-center justify-center text-slate-500 mb-2 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition">
+                         <span class="iconify" data-icon="lucide:plus" width="20"></span>
+                    </div>
+                    <span class="text-xs font-medium text-slate-600">View All</span>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="grid md:grid-cols-2 gap-8 px-4 md:px-6">
+            <!-- Section 6: From Seniors & Alumni -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                     <span class="iconify text-slate-400" data-icon="lucide:graduation-cap" width="20"></span>
+                     <h2 class="text-lg font-semibold tracking-tight text-slate-900">From Seniors &amp; Alumni</h2>
+                </div>
+                
+                <div class="space-y-3">
+                    <!-- Post Card 1 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm hover:border-indigo-100 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                             <div class="w-8 h-8 rounded-full bg-slate-100"></div>
+                             <div>
+                                 <p class="text-xs font-semibold text-slate-900">James L. <span class="text-slate-400 font-normal">• Alumni '22</span></p>
+                                 <p class="text-[10px] text-slate-500">Software Engineer @ Google</p>
+                             </div>
+                        </div>
+                        <h3 class="text-sm font-medium text-slate-800 mb-2">How I cracked the off-campus placement interviews</h3>
+                        <p class="text-xs text-slate-500 mb-3 line-clamp-2">Here is a comprehensive guide on the resources I used for DSA and System Design...</p>
+                        <button class="text-xs font-medium text-indigo-600 hover:underline">Read Article</button>
+                    </div>
+
+                    <!-- Post Card 2 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm hover:border-indigo-100 transition">
+                        <div class="flex items-center gap-3 mb-3">
+                             <div class="w-8 h-8 rounded-full bg-slate-100"></div>
+                             <div>
+                                 <p class="text-xs font-semibold text-slate-900">Maria G. <span class="text-slate-400 font-normal">• Final Year</span></p>
+                                 <p class="text-[10px] text-slate-500">Mech Eng.</p>
+                             </div>
+                        </div>
+                        <h3 class="text-sm font-medium text-slate-800 mb-2">Mistakes to avoid in your first year of engineering</h3>
+                        <button class="text-xs font-medium text-indigo-600 hover:underline">Read Article</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Campus Life & Clubs -->
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="iconify text-slate-400" data-icon="lucide:calendar" width="20"></span>
+                    <h2 class="text-lg font-semibold tracking-tight text-slate-900">Campus Life</h2>
+               </div>
+               
+               <div class="space-y-3">
+                    <!-- Event Card 1 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex gap-4 items-center">
+                        <div class="flex-shrink-0 w-14 h-14 bg-indigo-50 rounded-xl flex flex-col items-center justify-center text-indigo-600 border border-indigo-100">
+                            <span class="text-[10px] uppercase font-bold tracking-wide">Oct</span>
+                            <span class="text-lg font-bold leading-none">24</span>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-sm font-semibold text-slate-900">Debate Club Orientations</h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">5:00 PM</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Main Auditorium • Open to all</p>
+                        </div>
+                        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition">
+                            <span class="iconify" data-icon="lucide:chevron-right" width="16"></span>
+                        </button>
+                    </div>
+
+                    <!-- Event Card 2 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/60 shadow-sm flex gap-4 items-center">
+                        <div class="flex-shrink-0 w-14 h-14 bg-pink-50 rounded-xl flex flex-col items-center justify-center text-pink-600 border border-pink-100">
+                            <span class="text-[10px] uppercase font-bold tracking-wide">Oct</span>
+                            <span class="text-lg font-bold leading-none">28</span>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-sm font-semibold text-slate-900">Music Society Jam</h3>
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">7:00 PM</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">Student Center • Entry Free</p>
+                        </div>
+                        <button class="h-8 w-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition">
+                            <span class="iconify" data-icon="lucide:chevron-right" width="16"></span>
+                        </button>
+                    </div>
+               </div>
+            </section>
+        </div>
+
+        <!-- Section 8: Cross-College Discoveries -->
+        <section class="mt-12 mx-4 md:mx-6 p-6 md:p-8 rounded-3xl bg-gradient-to-b from-white to-indigo-50/50 border border-slate-200 relative overflow-hidden">
+            <!-- Decorative BG element -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-100/40 rounded-full blur-3xl -mr-20 -mt-20"></div>
+
+            <div class="relative z-10">
+                <div class="mb-6 max-w-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                         <span class="iconify text-indigo-500" data-icon="lucide:globe-2" width="20"></span>
+                         <h2 class="text-lg font-semibold tracking-tight text-slate-900">Cross-College Discoveries</h2>
+                    </div>
+                    <p class="text-sm text-slate-500">See what students are building at other top universities.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Discovery Card 1 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-[10px] font-semibold tracking-wide text-slate-400 uppercase">Project</span>
+                            <span class="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">MIT</span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-1">EcoSense IoT</h3>
+                        <p class="text-xs text-slate-500 mb-3">Smart waste management system using LoRaWAN.</p>
+                        <div class="flex items-center gap-2">
+                             <div class="flex -space-x-2">
+                                <div class="w-6 h-6 rounded-full bg-slate-200 border-2 border-white"></div>
+                                <div class="w-6 h-6 rounded-full bg-slate-300 border-2 border-white"></div>
+                             </div>
+                             <span class="text-[10px] text-slate-400">+2 others</span>
+                        </div>
+                    </div>
+
+                    <!-- Discovery Card 2 -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-[10px] font-semibold tracking-wide text-slate-400 uppercase">Competition</span>
+                             <span class="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Stanford</span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-slate-900 mb-1">HealthAI Challenge</h3>
+                        <p class="text-xs text-slate-500 mb-3">Looking for remote teammates for global finals.</p>
+                        <button class="text-xs font-medium text-indigo-600 border border-indigo-100 bg-indigo-50 px-3 py-1 rounded-lg">View Team</button>
+                    </div>
+
+                     <!-- Discovery Card 3 -->
+                     <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition flex flex-col justify-center items-center text-center">
+                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-2">
+                            <span class="iconify" data-icon="lucide:arrow-right" width="20"></span>
+                        </div>
+                        <p class="text-xs font-medium text-slate-600">Browse Global Projects</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Mobile Bottom Nav (Visual only, functional completion) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center z-50 pb-safe">
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="iconify" data-icon="lucide:home" width="20" style="stroke-width: 2;"></span>
+            <span class="text-[10px] font-medium">Home</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-indigo-600">
+            <span class="iconify" data-icon="lucide:compass" width="20" style="stroke-width: 2;"></span>
+            <span class="text-[10px] font-medium">Explore</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="iconify" data-icon="lucide:plus-square" width="20" style="stroke-width: 2;"></span>
+            <span class="text-[10px] font-medium">Post</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-slate-400">
+            <span class="iconify" data-icon="lucide:users" width="20" style="stroke-width: 2;"></span>
+            <span class="text-[10px] font-medium">Network</span>
+        </button>
+    </nav>
+
+
+</body></html>
