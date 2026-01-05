@@ -1,17 +1,54 @@
 import React, { useState, useEffect, useRef } from "react";
-import PostFeed from "../components/PostFeed";
 import SkeletonPost from "../components/SkeletonPost";
-import SEO from "../components/Seo";
 
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [loading, setLoading] = useState(true);
   const [shareMenuOpen, setShareMenuOpen] = useState(null);
   const [copiedLink, setCopiedLink] = useState(null);
-  const [expandedPosts, setExpandedPosts] = useState({}); // Track expanded posts
+  const [expandedPosts, setExpandedPosts] = useState({});
+  const [showComments, setShowComments] = useState({});
+  const [commentInputs, setCommentInputs] = useState({});
   const shareMenuRef = useRef(null);
 
-  const MAX_CAPTION_LENGTH = 150; // Characters to show when collapsed
+  const MAX_CAPTION_LENGTH = 150;
+
+  // Sample comments data
+  const sampleComments = [
+    {
+      id: 1,
+      user: {
+        name: "Alex Johnson",
+        avatar: "https://placehold.co/32x32/3B82F6/FFFFFF?text=AJ",
+        username: "@alexj"
+      },
+      text: "This looks amazing! Great work on the project.",
+      time: "2 hours ago",
+      likes: 5
+    },
+    {
+      id: 2,
+      user: {
+        name: "Sarah Miller",
+        avatar: "https://placehold.co/32x32/10B981/FFFFFF?text=SM",
+        username: "@sarahm"
+      },
+      text: "Can't wait to see the final results!",
+      time: "1 hour ago",
+      likes: 3
+    },
+    {
+      id: 3,
+      user: {
+        name: "Mike Davis",
+        avatar: "https://placehold.co/32x32/EC4899/FFFFFF?text=MD",
+        username: "@miked"
+      },
+      text: "The presentation was fantastic!",
+      time: "45 minutes ago",
+      likes: 7
+    }
+  ];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -138,6 +175,40 @@ const Home = () => {
     setShareMenuOpen(shareMenuOpen === postId ? null : postId);
   };
 
+  // Toggle comments visibility
+  const toggleComments = (postId) => {
+    setShowComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  // Handle comment input change
+  const handleCommentChange = (postId, value) => {
+    setCommentInputs(prev => ({
+      ...prev,
+      [postId]: value
+    }));
+  };
+
+  // Submit a comment
+  const handleCommentSubmit = (postId) => {
+    const comment = commentInputs[postId]?.trim();
+    if (!comment) return;
+
+    // In a real app, this would be an API call
+    console.log(`Posting comment on post ${postId}: ${comment}`);
+    
+    // Clear the input
+    setCommentInputs(prev => ({
+      ...prev,
+      [postId]: ''
+    }));
+    
+    // Show success message
+    alert('Comment posted! (This is a demo - in real app, comment would appear)');
+  };
+
   // Toggle read more/less for a specific post
   const toggleReadMore = (postId) => {
     setExpandedPosts(prev => ({
@@ -154,7 +225,6 @@ const Home = () => {
       return post.caption;
     }
     
-    // Truncate to the last complete word before MAX_CAPTION_LENGTH
     const truncated = post.caption.substring(0, MAX_CAPTION_LENGTH);
     const lastSpaceIndex = truncated.lastIndexOf(' ');
     
@@ -232,6 +302,44 @@ const Home = () => {
       shares: 12,
       bookmarks: 8,
     },
+    {
+      id: 2,
+      user: {
+        username: "StudyBuddy",
+        handle: "@studybuddies",
+        title: "Study Group Leader",
+        avatar: "https://placehold.co/48x48/10B981/FFFFFF?text=SB",
+        time: "5 hours ago",
+      },
+      media:
+        "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop",
+      caption:
+        "Late night study session at the library with amazing friends! Coffee, snacks, and great company make even the toughest subjects bearable. Remember, teamwork makes the dream work! 📚☕️",
+      hashtags: ["#studynight", "#library", "#collegelife", "#education"],
+      likes: 89,
+      comments: 23,
+      shares: 5,
+      bookmarks: 12,
+    },
+    {
+      id: 3,
+      user: {
+        username: "CampusChef",
+        handle: "@campuschef",
+        title: "Food Enthusiast",
+        avatar: "https://placehold.co/48x48/EF4444/FFFFFF?text=CC",
+        time: "1 day ago",
+      },
+      media:
+        "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&h=400&fit=crop",
+      caption:
+        "Experimenting with new recipes in the dorm kitchen! Made this delicious pasta from scratch with ingredients from the campus farmer's market. Who says dorm food has to be boring? 🍝✨",
+      hashtags: ["#dormcooking", "#foodie", "#collegefood", "#homemade"],
+      likes: 156,
+      comments: 34,
+      shares: 8,
+      bookmarks: 6,
+    },
   ];
 
   const toggleLike = (postId) => {
@@ -298,6 +406,7 @@ const Home = () => {
       {/* Posts Feed */}
       {loading ? (
         <>
+          <SkeletonPost />
           <SkeletonPost />
           <SkeletonPost />
         </>
@@ -401,8 +510,11 @@ const Home = () => {
                     </span>
                   </button>
 
-                  {/* Comment Button */}
-                  <button className="flex items-center space-x-2 group">
+                  {/* FIXED: Comment Button with onClick handler */}
+                  <button
+                    onClick={() => toggleComments(post.id)}
+                    className="flex items-center space-x-2 group"
+                  >
                     <svg
                       className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors duration-300"
                       fill="none"
@@ -421,7 +533,7 @@ const Home = () => {
                     </span>
                   </button>
 
-                  {/* ===== SHARE BUTTON WITH DROPDOWN ===== */}
+                  {/* Share Button with Dropdown */}
                   <div className="relative">
                     <button
                       onClick={() => toggleShareMenu(post.id)}
@@ -559,6 +671,77 @@ const Home = () => {
                   </svg>
                 </button>
               </div>
+
+              {/* ===== COMMENTS SECTION ===== */}
+              {showComments[post.id] && (
+                <div className="mt-6 pt-6 border-t border-gray-100">
+                  <h4 className="font-semibold text-gray-900 mb-4">Comments ({post.comments})</h4>
+                  
+                  {/* Sample Comments */}
+                  <div className="space-y-4 mb-4">
+                    {sampleComments.map((comment) => (
+                      <div key={comment.id} className="flex space-x-3">
+                        <img
+                          src={comment.user.avatar}
+                          alt={comment.user.name}
+                          className="w-8 h-8 rounded-full"
+                        />
+                        <div className="flex-1">
+                          <div className="bg-gray-50 rounded-2xl p-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium text-gray-900">{comment.user.name}</span>
+                                <span className="text-xs text-gray-500">{comment.user.username}</span>
+                              </div>
+                              <span className="text-xs text-gray-500">{comment.time}</span>
+                            </div>
+                            <p className="text-gray-700 text-sm">{comment.text}</p>
+                            <div className="flex items-center space-x-4 mt-2">
+                              <button className="text-xs text-gray-500 hover:text-red-500 flex items-center">
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                {comment.likes}
+                              </button>
+                              <button className="text-xs text-gray-500 hover:text-blue-500">Reply</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Comment Form */}
+                  <div className="flex space-x-3">
+                    <img
+                      src="https://placehold.co/32x32/6366F1/FFFFFF?text=ME"
+                      alt="Your avatar"
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div className="flex-1">
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          value={commentInputs[post.id] || ''}
+                          onChange={(e) => handleCommentChange(post.id, e.target.value)}
+                          placeholder="Add a comment..."
+                          className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(post.id)}
+                        />
+                        <button
+                          onClick={() => handleCommentSubmit(post.id)}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors"
+                        >
+                          Post
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2 ml-2">
+                        Press Enter to post
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))
