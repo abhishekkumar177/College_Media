@@ -5,7 +5,7 @@ import KeyHiglight from '../components/KeyHiglight'
 import LandingNavbar from '../components/LandingNavbar'
 import Footer from '../components/Footer'
 import SEO from '../components/Seo'
-
+import Lenis from 'lenis'
 import { useEffect } from 'react'
 import EngineeredConnection from '../components/EngineeredConnection'
 

@@ -1,4 +1,7 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { useAuth } from '../context/AuthContext';
+import ProfileMenu from './ProfileMenu';
 
 function Navbar({ searchQuery, setSearchQuery }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -19,26 +22,24 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm"
                 />
-            ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
-              >
-                <svg
-                  className="h-6 w-6 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <button
+                  onClick={() => navigate('/login')}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </button>
-            )
+                  <svg
+                    className="h-6 w-6 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </button>
           </div>
 
           {/* ACTIONS */}
