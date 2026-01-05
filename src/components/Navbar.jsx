@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext';
 import ProfileMenu from './ProfileMenu';
@@ -44,7 +44,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-3">
-            <ThemeToggle className="flex" />
+            {/* <ThemeToggle className="flex" /> */}
 
             <div className="relative">
               {user ? (
