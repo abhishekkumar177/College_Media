@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUserData = async (token) => {
     try {
       setError(null);
-      const response = await fetch('http://localhost:5000/api/users/profile', {
+      const response = await fetch('http://localhost:5001/api/users/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:5001/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -85,6 +85,36 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (formData) => {
+    try {
+      const response = await fetch('http://localhost:5001/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const { token, ...userData } = data.data;
+        localStorage.setItem('token', token);
+        setToken(token);
+        setUser(userData);
+        setError(null);
+        return { success: true, user: userData };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch {
+      return {
+        success: false,
+        message: !navigator.onLine
+          ? "No internet connection."
+          : "Registration failed. Please try again."
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -95,6 +125,7 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     login,
+    register,
     logout,
     loading,
     error,

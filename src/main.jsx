@@ -15,9 +15,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
+import { ThemeProvider } from './context/ThemeContext'
 import './index.css'
 import App from './App.jsx'
-import { ThemeProvider } from '@aws-amplify/ui-react';
 
 /**
  * Initialize and render the React application
