@@ -22,11 +22,9 @@ import CreatePost from "./pages/CreatePost";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
-import LoginForm from "./components/Auth/LoginForm"
-import SignupForm from "./components/Auth/SignupForm"
-import ProfileEditForm  from "./components/Auth/ProfileEditForm"
-import Layout from "./components/Layout"
 
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
 
 /**

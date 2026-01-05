@@ -7,7 +7,6 @@ import Footer from '../components/Footer'
 import SEO from '../components/Seo'
 
 import { useEffect } from 'react'
-import Lenis from 'lenis'
 import EngineeredConnection from '../components/EngineeredConnection'
 
 /**
@@ -54,22 +53,22 @@ const Landing = () => {
     };
   }, []);
 
-  // const videos = [
-  //   "https://info.mssmedia.com/hs-fs/hubfs/African%20American%20College%20Students-1.jpg?width=750&height=393&name=African%20American%20College%20Students-1.jpgw=400&h=600&fit=crop",
-  //   "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=600&fit=crop",
-  //   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=600&fit=crop",
-  //   "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=600&fit=crop",
-  //   "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&h=600&fit=crop",
-  // ];
+  const videos = [
+    "https://info.mssmedia.com/hs-fs/hubfs/African%20American%20College%20Students-1.jpg?width=750&height=393&name=African%20American%20College%20Students-1.jpgw=400&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=600&fit=crop",
+    "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&h=600&fit=crop",
+  ];
 
-  // const features = [
-  //   { icon: Video, title: "Share Moments", description: "Post photos & videos from campus life" },
-  //   { icon: Users, title: "Campus Network", description: "Connect with students from your college" },
-  //   { icon: MessageCircle, title: "Messaging", description: "Chat privately or in groups" },
-  //   { icon: Calendar, title: "Events", description: "Never miss college fests & workshops" },
-  //   { icon: BookOpen, title: "Study Groups", description: "Collaborate and share notes" },
-  //   { icon: TrendingUp, title: "Trending", description: "See what's popular on campus" },
-  // ];
+  const features = [
+    { icon: Video, title: "Share Moments", description: "Post photos & videos from campus life" },
+    { icon: Users, title: "Campus Network", description: "Connect with students from your college" },
+    { icon: MessageCircle, title: "Messaging", description: "Chat privately or in groups" },
+    { icon: Calendar, title: "Events", description: "Never miss college fests & workshops" },
+    { icon: BookOpen, title: "Study Groups", description: "Collaborate and share notes" },
+    { icon: TrendingUp, title: "Trending", description: "See what's popular on campus" },
+  ];
 
   return (
    <>
