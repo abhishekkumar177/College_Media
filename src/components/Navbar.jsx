@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 
 function Navbar({ searchQuery, setSearchQuery }) {
@@ -20,7 +19,6 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm"
                 />
-              </button>
             ) : (
               <button
                 onClick={() => navigate('/login')}
@@ -40,7 +38,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   />
                 </svg>
               </button>
-            )}
+            )
           </div>
 
           {/* ACTIONS */}
@@ -68,11 +66,11 @@ function Navbar({ searchQuery, setSearchQuery }) {
                 </svg>
               </button>
             ):null}
-            {isProfileOpen && (
+            {isProfileOpen && (         
               <div className="absolute top-14 right-2">
                 <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
               </div>
-            </div>
+            )}
             
             <div className="flex items-center space-x-3 mr-4">
               <Link to="/create-post" className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-medium hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center space-x-2 shadow-sm">
@@ -93,8 +91,11 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
         </div>
       </div>
-      </div>
-    </nav>
+          </div>
+        </div>
+      </nav>
+    </div>
   );
 }
+
 export default Navbar;
