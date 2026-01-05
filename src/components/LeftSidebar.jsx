@@ -1,5 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+// Import your image - adjust the path based on where logos.png is located
+import collegeMediaLogo from '../assets/logos.png';
 
 function LeftSidebar({ activeTab, setActiveTab }) {
   const location = useLocation();
@@ -74,17 +76,16 @@ function LeftSidebar({ activeTab, setActiveTab }) {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-40 flex flex-col">
-      {/* Logo */}
+      {/* Logo with Image */}
       <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center space-x-2">
-          
-          </div>
-          <span className="text-xl font-bold">
-            <span className="text-gray-800">College</span>
-            <span className="text-indigo-600">Media</span>
-          </span>
+        <div className="flex items-center justify-center">
+          <img 
+            src={collegeMediaLogo} 
+            alt="College Media Logo" 
+            className="h-12 w-auto object-contain" 
+          />
         </div>
-      
+      </div>
 
       {/* Menu Items */}
       <nav className="flex-1 overflow-y-auto py-4 px-3">
