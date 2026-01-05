@@ -21,10 +21,10 @@ import Reels from "./pages/Reels";
 import CreatePost from "./pages/CreatePost";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
-import RightSidebar from "./components/RightSidebar";
-
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import Layout from "./components/Layout";
+import LoginForm from "./components/Auth/LoginForm";
+import SignupForm from "./components/Auth/SignupForm";
+import ProfileEditForm from "./components/Auth/ProfileEditForm";
 import './App.css'
 
 /**
@@ -40,13 +40,7 @@ import './App.css'
  */
 const App = () => {
   // ============= STATE MANAGEMENT =============
-  
-  /** Track liked posts with object: { postId: boolean } */
-  const [likedPosts, setLikedPosts] = useState({});
-  
-  /** Current story index for carousel rotation */
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-  
+
   /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Feed");
