@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import "./App.css";
 
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 /* ===== Pages ===== */
 import Landing from "./pages/Landing";
@@ -47,16 +48,18 @@ const App = () => {
 
 
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 
@@ -137,7 +140,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
 
       {/* Individual Routes without Layout */}
       <Route path="/trending" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -148,7 +151,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/explore" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -159,7 +162,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/stories" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -170,7 +173,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/create-story" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -181,7 +184,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/notifications" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -192,7 +195,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/edit-profile" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -203,7 +206,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/more" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -229,7 +232,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       
       {/* ===== ADD THE CREATE-POST ROUTE ===== */}
       <Route path="/create-post" element={
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />

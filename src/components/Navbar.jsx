@@ -10,7 +10,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
   const { user } = useAuth();
 
   return (
-    <nav className="top-0 z-50 ml-20  ">
+    <nav className="top-0 z-50 ml-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <div className="px-6 py-4">
         <div className="flex items-center justify-center gap-6">
           {/* SEARCH BAR - CENTERED */}
@@ -34,7 +34,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                 placeholder="Search for friends, groups, pages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-800 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
           </div>
@@ -96,34 +96,11 @@ function Navbar({ searchQuery, setSearchQuery }) {
                   </svg>
                 </button>
 
-          {/* ACTIONS */}
-          <div className="flex items-center gap-3">
-            {/* <ThemeToggle className="flex" /> */}
-
-            <div className="relative">
-              {user ? (
-                <button
-                  onClick={() => setIsProfileOpen((prev) => !prev)}
-                  className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-all duration-300"
-                >
-                <svg
-                  className="h-6 w-6 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </button>
-            ):null}
-            {isProfileOpen && (         
-              <div className="absolute top-14 right-2">
-                <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
+                {isProfileOpen && (         
+                  <div className="absolute top-14 right-2">
+                    <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
+                  </div>
+                )}
               </div>
             )}
           </div>

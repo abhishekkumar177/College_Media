@@ -40,22 +40,22 @@ const Trending = () => {
   return (
     <div className="space-y-6">
       {/* Trending Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Trending Now</h1>
-        <p className="text-gray-600">Discover what's popular in your college community</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Trending Now</h1>
+        <p className="text-gray-600 dark:text-gray-400">Discover what's popular in your college community</p>
       </div>
 
       {/* Trending Topics */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Top Trending Topics</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Top Trending Topics</h2>
         <div className="space-y-3">
           {trendingTopics.map((topic) => (
             <div
               key={topic.id}
-              className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+              className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
             >
               <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30">
                   {topic.trending === 'up' ? (
                     <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -71,11 +71,11 @@ const Trending = () => {
                   )}
                 </div>
                 <div>
-                  <p className="font-bold text-indigo-600">{topic.tag}</p>
-                  <p className="text-sm text-gray-500">{topic.posts}</p>
+                  <p className="font-bold text-indigo-600 dark:text-indigo-400">{topic.tag}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{topic.posts}</p>
                 </div>
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -84,23 +84,23 @@ const Trending = () => {
       </div>
 
       {/* Trending Posts */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Popular Posts</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Popular Posts</h2>
         <div className="space-y-4">
           {trendingPosts.map((post) => (
-            <div key={post.id} className="p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors duration-200">
+            <div key={post.id} className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 transition-colors duration-200">
               <div className="flex items-center space-x-3 mb-3">
                 <img src={post.user.avatar} alt={post.user.name} className="w-12 h-12 rounded-full" />
                 <div>
-                  <p className="font-bold text-gray-900">{post.user.name}</p>
-                  <p className="text-sm text-gray-500">{post.user.handle}</p>
+                  <p className="font-bold text-gray-900 dark:text-gray-100">{post.user.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{post.user.handle}</p>
                 </div>
               </div>
-              <p className="text-gray-800 mb-3">{post.content}</p>
-              <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-3">
+              <p className="text-gray-800 dark:text-gray-200 mb-3">{post.content}</p>
+              <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-full text-sm font-medium mb-3">
                 {post.tag}
               </span>
-              <div className="flex items-center space-x-6 text-gray-500 text-sm">
+              <div className="flex items-center space-x-6 text-gray-500 dark:text-gray-400 text-sm">
                 <span className="flex items-center space-x-1">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />

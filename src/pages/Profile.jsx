@@ -32,7 +32,7 @@ const Profile = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Profile Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Profile Picture */}
           <div className="flex justify-center md:justify-start">
@@ -40,7 +40,7 @@ const Profile = () => {
               <img 
                 src="https://placehold.co/200x200/4F46E5/FFFFFF?text=U" 
                 alt="Profile" 
-                className="w-full h-full rounded-full object-cover border-4 border-gray-100"
+                className="w-full h-full rounded-full object-cover border-4 border-gray-100 dark:border-gray-700"
               />
             </div>
           </div>
@@ -49,10 +49,10 @@ const Profile = () => {
           <div className="flex-1 space-y-6">
             {/* Username and Edit Button */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-900">johndoe_2026</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">johndoe_2026</h2>
               <Link 
                 to="/edit-profile"
-                className="px-6 py-2 bg-gray-100 text-gray-900 rounded-xl font-medium hover:bg-gray-200 transition-colors duration-200"
+                className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
               >
                 Edit Profile
               </Link>
@@ -61,39 +61,39 @@ const Profile = () => {
             {/* Stats */}
             <div className="flex gap-8">
               <div className="text-center">
-                <span className="block text-xl font-bold text-gray-900">{userStats.posts}</span>
-                <span className="text-sm text-gray-600">posts</span>
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.posts}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">posts</span>
               </div>
               <button className="text-center hover:opacity-80 transition-opacity">
-                <span className="block text-xl font-bold text-gray-900">{userStats.followers}</span>
-                <span className="text-sm text-gray-600">followers</span>
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.followers}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">followers</span>
               </button>
               <button className="text-center hover:opacity-80 transition-opacity">
-                <span className="block text-xl font-bold text-gray-900">{userStats.following}</span>
-                <span className="text-sm text-gray-600">following</span>
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.following}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">following</span>
               </button>
             </div>
 
             {/* Bio */}
             <div>
-              <p className="font-bold text-gray-900 mb-1">John Doe</p>
-              <p className="text-gray-600 text-sm">Computer Science Student 🎓</p>
-              <p className="text-gray-600 text-sm">Love coding, music, and photography 📸</p>
-              <p className="text-indigo-600 text-sm mt-1">www.johndoe.com</p>
+              <p className="font-bold text-gray-900 dark:text-gray-100 mb-1">John Doe</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Computer Science Student 🎓</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Love coding, music, and photography 📸</p>
+              <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-1">www.johndoe.com</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="flex border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab('posts')}
             className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
               activeTab === 'posts'
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -107,8 +107,8 @@ const Profile = () => {
             onClick={() => setActiveTab('saved')}
             className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
               activeTab === 'saved'
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -122,8 +122,8 @@ const Profile = () => {
             onClick={() => setActiveTab('tagged')}
             className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
               activeTab === 'tagged'
-                ? 'text-indigo-600 border-b-2 border-indigo-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
@@ -169,21 +169,21 @@ const Profile = () => {
           
           {activeTab === 'saved' && (
             <div className="text-center py-12">
-              <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
               </svg>
-              <p className="text-gray-600 font-medium">No saved posts yet</p>
-              <p className="text-gray-500 text-sm mt-2">Save posts to see them here</p>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No saved posts yet</p>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">Save posts to see them here</p>
             </div>
           )}
           
           {activeTab === 'tagged' && (
             <div className="text-center py-12">
-              <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <p className="text-gray-600 font-medium">No tagged posts yet</p>
-              <p className="text-gray-500 text-sm mt-2">Photos and videos you're tagged in will appear here</p>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No tagged posts yet</p>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">Photos and videos you're tagged in will appear here</p>
             </div>
           )}
         </div>

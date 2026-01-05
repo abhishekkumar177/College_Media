@@ -40,13 +40,13 @@ const Stories = () => {
   return (
     <div className="space-y-6">
       {/* Stories Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Stories</h1>
-        <p className="text-gray-600">View stories from your friends and classmates</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Stories</h1>
+        <p className="text-gray-600 dark:text-gray-400">View stories from your friends and classmates</p>
       </div>
 
       {/* Create Story */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center space-x-4">
           <div className="relative">
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
@@ -71,11 +71,11 @@ const Stories = () => {
       {/* All Stories */}
       <div className="space-y-4">
         {allStories.map((userStory) => (
-          <div key={userStory.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div key={userStory.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="relative">
                 <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600">
-                  <div className="w-full h-full bg-white rounded-full p-0.5">
+                  <div className="w-full h-full bg-white dark:bg-gray-800 rounded-full p-0.5">
                     <img
                       src={userStory.user.avatar}
                       alt={userStory.user.name}
@@ -85,8 +85,8 @@ const Stories = () => {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">{userStory.user.name}</h3>
-                <p className="text-sm text-gray-500">{userStory.stories.length} stories</p>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100">{userStory.user.name}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{userStory.stories.length} stories</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2">

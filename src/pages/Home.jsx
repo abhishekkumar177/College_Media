@@ -352,10 +352,10 @@ const Home = () => {
   return (
     <div className="space-y-6" ref={shareMenuRef}>
       {/* Stories Section */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-800">Stories</h2>
-          <button className="text-indigo-600 text-sm font-medium hover:text-indigo-700 flex items-center">
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Stories</h2>
+          <button className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
             See All
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -395,7 +395,7 @@ const Home = () => {
                   </div>
                 )}
               </div>
-              <span className="text-xs text-gray-600 truncate w-20 text-center font-medium">
+              <span className="text-xs text-gray-600 dark:text-gray-300 truncate w-20 text-center font-medium">
                 {story.username}
               </span>
             </div>
@@ -414,7 +414,7 @@ const Home = () => {
         posts.map((post) => (
           <div
             key={post.id}
-            className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 overflow-hidden"
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300 overflow-hidden"
           >
             {/* Post Header */}
             <div className="flex items-center justify-between p-5">
@@ -426,17 +426,17 @@ const Home = () => {
                 />
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold text-gray-800 cursor-pointer hover:text-indigo-600 transition-colors duration-300">
+                    <span className="font-bold text-gray-800 dark:text-gray-100 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
                       {post.user.username}
                     </span>
-                    <span className="text-gray-500 text-sm">{post.user.handle}</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-sm">{post.user.handle}</span>
                   </div>
-                  <p className="text-xs text-gray-500">{post.user.title} • {post.user.time}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{post.user.title} • {post.user.time}</p>
                 </div>
               </div>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-300">
+              <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-300">
                 <svg
-                  className="h-5 w-5 text-gray-500"
+                  className="h-5 w-5 text-gray-500 dark:text-gray-400"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
@@ -447,7 +447,7 @@ const Home = () => {
 
             {/* Post Content with Read More/Less */}
             <div className="px-5 pb-4">
-              <p className="text-gray-800 mb-3 leading-relaxed">
+              <p className="text-gray-800 dark:text-gray-200 mb-3 leading-relaxed">
                 {formatCaption(post)}
                 {post.caption.length > MAX_CAPTION_LENGTH && (
                   <button
@@ -505,7 +505,7 @@ const Home = () => {
                         d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                       />
                     </svg>
-                    <span className="font-semibold text-gray-700 text-sm">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
                       {likedPosts[post.id] ? post.likes + 1 : post.likes}
                     </span>
                   </button>
@@ -528,7 +528,7 @@ const Home = () => {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       />
                     </svg>
-                    <span className="font-semibold text-gray-700 text-sm">
+                    <span className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
                       {post.comments}
                     </span>
                   </button>
@@ -552,16 +552,16 @@ const Home = () => {
                           d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
                         />
                       </svg>
-                      <span className="font-semibold text-gray-700 text-sm">
+                      <span className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
                         {post.shares}
                       </span>
                     </button>
 
                     {/* Share Dropdown Menu */}
                     {shareMenuOpen === post.id && (
-                      <div className="absolute left-0 bottom-full mb-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
+                      <div className="absolute left-0 bottom-full mb-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50">
                         <div className="p-3">
-                          <h3 className="font-semibold text-gray-900 mb-3 text-center">Share Post</h3>
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 text-center">Share Post</h3>
                           
                           <div className="space-y-1">
                             {/* WhatsApp */}
@@ -674,8 +674,8 @@ const Home = () => {
 
               {/* ===== COMMENTS SECTION ===== */}
               {showComments[post.id] && (
-                <div className="mt-6 pt-6 border-t border-gray-100">
-                  <h4 className="font-semibold text-gray-900 mb-4">Comments ({post.comments})</h4>
+                <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">Comments ({post.comments})</h4>
                   
                   {/* Sample Comments */}
                   <div className="space-y-4 mb-4">
@@ -687,15 +687,15 @@ const Home = () => {
                           className="w-8 h-8 rounded-full"
                         />
                         <div className="flex-1">
-                          <div className="bg-gray-50 rounded-2xl p-3">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-3">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center space-x-2">
-                                <span className="font-medium text-gray-900">{comment.user.name}</span>
-                                <span className="text-xs text-gray-500">{comment.user.username}</span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">{comment.user.name}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{comment.user.username}</span>
                               </div>
-                              <span className="text-xs text-gray-500">{comment.time}</span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">{comment.time}</span>
                             </div>
-                            <p className="text-gray-700 text-sm">{comment.text}</p>
+                            <p className="text-gray-700 dark:text-gray-200 text-sm">{comment.text}</p>
                             <div className="flex items-center space-x-4 mt-2">
                               <button className="text-xs text-gray-500 hover:text-red-500 flex items-center">
                                 <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -725,7 +725,7 @@ const Home = () => {
                           value={commentInputs[post.id] || ''}
                           onChange={(e) => handleCommentChange(post.id, e.target.value)}
                           placeholder="Add a comment..."
-                          className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(post.id)}
                         />
                         <button
