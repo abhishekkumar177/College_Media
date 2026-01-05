@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
   try {
-    // Authorization header check
+    // 1️⃣ Authorization header check
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -12,15 +12,16 @@ const authMiddleware = (req, res, next) => {
       });
     }
 
-    // Token extract
+    // 2️⃣ Token extract
     const token = authHeader.split(' ')[1];
 
-    // Token verify
+    // 3️⃣ Token verify
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // User info attach to request
+    // 4️⃣ User info + ROLE attach to request (IMPORTANT FOR RBAC)
     req.user = {
-      userId: decoded.userId
+      userId: decoded.userId,
+      role: decoded.role
     };
 
     next();
