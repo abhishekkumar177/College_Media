@@ -1,49 +1,50 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import{ createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage for saved theme preference
+    // 1. Check localStorage first
     const savedTheme = localStorage.getItem('theme');
-    console.log('Initializing theme, saved theme:', savedTheme);
     if (savedTheme) {
       return savedTheme === 'dark';
     }
-    // Default to light mode
+    
+    // 2. Fallback to System Preference
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    
+    // 3. Default to light
     return false;
   });
 
-  // Initial setup on mount
   useEffect(() => {
     const htmlElement = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    
-    if (savedTheme === 'dark') {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
-  }, []);
-
-  useEffect(() => {
-    // Update localStorage and DOM when theme changes
-    const htmlElement = document.documentElement;
-    console.log('Theme changed, isDarkMode:', isDarkMode);
     
     if (isDarkMode) {
       htmlElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
-      console.log('Applied dark mode');
     } else {
       htmlElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
-      console.log('Applied light mode');
     }
   }, [isDarkMode]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = (e) => {
+      if (!localStorage.getItem('theme')) {
+        setIsDarkMode(e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const toggleTheme = () => {
-    console.log('Toggle theme clicked, current mode:', isDarkMode);
     setIsDarkMode((prev) => !prev);
   };
 

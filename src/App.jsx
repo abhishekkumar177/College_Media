@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 
@@ -31,22 +31,11 @@ import './App.css'
 
 /**
  * App Component - Main container and state management
- * 
- * Manages:
- * - Post likes state (object with postId as key)
- * - Current story carousel position
- * - Search query input
- * - Active navigation tab
- * 
- * @returns {React.ReactElement} Main application layout
  */
 const App = () => {
   // ============= STATE MANAGEMENT =============
-
-  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("Feed");
-
 
   return (
     <ThemeProvider>
@@ -141,7 +130,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
 
       {/* Individual Routes without Layout */}
       <Route path="/trending" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -152,7 +141,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/explore" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -163,7 +152,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/stories" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -174,7 +163,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/create-story" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -185,7 +174,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/notifications" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -196,7 +185,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/edit-profile" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -207,7 +196,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       <Route path="/more" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -231,9 +220,8 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         <Route index element={<Reels />} />
       </Route>
       
-      {/* ===== ADD THE CREATE-POST ROUTE ===== */}
       <Route path="/create-post" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <div className="ml-64">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -244,10 +232,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
         </div>
       } />
       
-      {/* ===== CONTACT US PAGE ROUTE ===== */}
       <Route path="/contact" element={<ContactUs />} />
-      
-      {/* Add other routes as needed */}
     </Routes>
   );
 };
