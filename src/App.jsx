@@ -8,6 +8,10 @@ import { ThemeProvider } from './context/ThemeContext';
 /* ===== Pages ===== */
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
+import ForgotPassword from './pages/ForgotPassword'; // 🔹 ADD
+
+<Route path="/forgot-password" element={<ForgotPassword />} />
+
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
