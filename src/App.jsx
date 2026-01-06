@@ -8,6 +8,10 @@ import { ThemeProvider } from './context/ThemeContext';
 /* ===== Pages ===== */
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
+import ForgotPassword from './pages/ForgotPassword'; // 🔹 ADD
+
+<Route path="/forgot-password" element={<ForgotPassword />} />
+
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
@@ -22,6 +26,7 @@ import Reels from "./pages/Reels";
 import CreatePost from "./pages/CreatePost";
 import ContactUs from "./pages/ContactUs";
 import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage";
+import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import Layout from "./components/Layout";
@@ -235,6 +240,8 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       
       <Route path="/contact" element={<ContactUs />} />
       <Route path="/assessment" element={<GamifiedAssessmentPage />} />
+      
+      <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
     </Routes>
   );
 };

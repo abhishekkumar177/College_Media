@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../firebase';
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -84,6 +85,17 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
+
+
+const resetPassword = (email) => {
+  return sendPasswordResetEmail(auth, email);
+};
+
+return (
+  <AuthContext.Provider value={{ login, signup, resetPassword }}>
+    {children}
+  </AuthContext.Provider>
+);
 
   const register = async (formData) => {
     try {
