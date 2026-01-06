@@ -1,0 +1,173 @@
+.reels-container {
+  min-height: calc(100vh - 4rem);
+  width: 100%;
+  background: linear-gradient(to right bottom, rgb(26, 26, 26), rgb(30, 30, 30), black);
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reels-section {
+  height: calc(100vh - 6rem);
+  width: 100%;
+  max-width: 350px;
+  background-color: black;
+  border-radius: 10px;
+  margin: 0 auto;
+}
+
+.all-reels {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.all-reels::-webkit-scrollbar {
+  display: none;
+}
+
+.reel {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.reel video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.reel .bottom {
+  padding: 30px 20px;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.948));
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.bottom .user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.bottom .user img {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.bottom .user h4 {
+  font-size: 15px;
+  font-weight: 500;
+  color: white;
+}
+
+.bottom .user button {
+  background-color: transparent;
+  padding: 2px 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 2px;
+  border: 1px solid white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.bottom .user button:hover {
+  background-color: white;
+  color: black !important;
+}
+
+.bottom > h3 {
+  font-weight: 500;
+  color: white;
+  font-size: 20px;
+}
+
+.right {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  width: 40px;
+  position: absolute;
+  right: 0;
+  bottom: 12%;
+}
+
+.right h4 {
+  cursor: pointer;
+}
+
+.right i {
+  font-size: 25px;
+  font-weight: 500;
+  color: white;
+}
+
+.right h6 {
+  font-size: 15px;
+  font-weight: 500;
+  color: white;
+}
+
+.right > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+  cursor: pointer;
+}
+
+.love {
+  color: red;
+}
+
+.right > div h4 {
+  pointer-events: none;
+}
+
+.right > div h6 {
+  pointer-events: none;
+}
+
+.mute {
+  background-color: #333;
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.mute i {
+  font-size: 20px;
+  pointer-events: none;
+  color: white;
+}
+
+.mute:active {
+  scale: 0.95;
+}

@@ -213,14 +213,19 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
           </div>
         </div>
       } />
-      <Route path="/reels" element={
-        <div className="min-h-screen bg-gray-50">
-          <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <div className="ml-64">
-            <Reels />
-          </div>
-        </div>
-      } />
+      <Route
+        path="/reels"
+        element={
+          <Layout
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+        }
+      >
+        <Route index element={<Reels />} />
+      </Route>
       
       {/* ===== ADD THE CREATE-POST ROUTE ===== */}
       <Route path="/create-post" element={
