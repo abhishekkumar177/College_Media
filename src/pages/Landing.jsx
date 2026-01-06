@@ -4,6 +4,7 @@ import HomeCTA from '../components/HomeCTA'
 import KeyHiglight from '../components/KeyHiglight'
 import LandingNavbar from '../components/LandingNavbar'
 import Footer from '../components/Footer'
+import DeveloperIntro from '../components/DeveloperIntro'
 import SEO from '../components/Seo'
 import Lenis from 'lenis'
 import { useEffect } from 'react'
@@ -70,6 +71,9 @@ const Landing = () => {
      <main className="overflow-x-hidden">
        {/* Hero Section - Primary value proposition with gradient theme */}
        <Hero/>
+       
+       {/* Developer Intro Section - Personalized introduction */}
+       <DeveloperIntro/>
        
        {/* Key Highlights - Showcase platform features and benefits */}
        <KeyHiglight/>
