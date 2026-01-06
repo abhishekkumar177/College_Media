@@ -20,6 +20,7 @@ import More from "./pages/More";
 import Settings from "./pages/Settings";
 import Reels from "./pages/Reels";
 import CreatePost from "./pages/CreatePost";
+import ContactUs from "./pages/ContactUs";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import Layout from "./components/Layout";
@@ -242,6 +243,9 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
           </div>
         </div>
       } />
+      
+      {/* ===== CONTACT US PAGE ROUTE ===== */}
+      <Route path="/contact" element={<ContactUs />} />
       
       {/* Add other routes as needed */}
     </Routes>

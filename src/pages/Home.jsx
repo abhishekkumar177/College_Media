@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import SkeletonPost from "../components/SkeletonPost";
+import { sortByLatest, sortByLikes } from "../utils/feedSort";
+
 
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
@@ -9,6 +11,7 @@ const Home = () => {
   const [expandedPosts, setExpandedPosts] = useState({});
   const [showComments, setShowComments] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [sortType, setSortType] = useState("latest");
   const shareMenuRef = useRef(null);
 
   const MAX_CAPTION_LENGTH = 150;
@@ -342,6 +345,13 @@ const Home = () => {
     },
   ];
 
+
+  const sortedPosts =
+  sortType === "likes"
+    ? sortByLikes(posts)
+    : sortByLatest(posts);
+
+
   const toggleLike = (postId) => {
     setLikedPosts(prev => ({
       ...prev,
@@ -403,6 +413,30 @@ const Home = () => {
         </div>
       </div>
 
+      <div className="flex gap-3 mb-4">
+  <button
+    onClick={() => setSortType("latest")}
+    className={`px-4 py-2 rounded-full text-sm font-medium ${
+      sortType === "latest"
+        ? "bg-indigo-600 text-white"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    Latest
+  </button>
+
+  <button
+    onClick={() => setSortType("likes")}
+    className={`px-4 py-2 rounded-full text-sm font-medium ${
+      sortType === "likes"
+        ? "bg-indigo-600 text-white"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    Most Liked
+  </button>
+</div>
+
       {/* Posts Feed */}
       {loading ? (
         <>
@@ -411,7 +445,7 @@ const Home = () => {
           <SkeletonPost />
         </>
       ) : (
-        posts.map((post) => (
+        sortedPosts.map((post) => (
           <div
             key={post.id}
             className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300 overflow-hidden"

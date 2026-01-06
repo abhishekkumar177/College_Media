@@ -10,7 +10,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
   const { user } = useAuth();
 
   return (
-    <nav className="top-0 z-50 ml-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+    <nav className="top-0 z-50 ml-20">
       <div className="px-6 py-4">
         <div className="flex items-center justify-center gap-6">
           {/* SEARCH BAR - CENTERED */}
@@ -95,8 +95,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                     />
                   </svg>
                 </button>
-
-                {isProfileOpen && (         
+                {isProfileOpen && (
                   <div className="absolute top-14 right-2">
                     <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
                   </div>
