@@ -21,6 +21,7 @@ import Settings from "./pages/Settings";
 import Reels from "./pages/Reels";
 import CreatePost from "./pages/CreatePost";
 import ContactUs from "./pages/ContactUs";
+import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import Layout from "./components/Layout";
@@ -233,6 +234,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       } />
       
       <Route path="/contact" element={<ContactUs />} />
+      <Route path="/assessment" element={<GamifiedAssessmentPage />} />
     </Routes>
   );
 };
