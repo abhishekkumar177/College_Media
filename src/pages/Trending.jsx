@@ -225,8 +225,8 @@ const Trending = () => {
       </div>
 
       {/* Trending Topics */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Top Trending Topics</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Top Trending Topics</h2>
         <div className="space-y-3">
           {filteredTopics.map((topic, index) => (
             <div

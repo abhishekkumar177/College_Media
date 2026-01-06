@@ -61,26 +61,26 @@ const Settings = () => {
   return (
     <div className="space-y-6">
       {/* Settings Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Settings</h1>
-        <p className="text-gray-600">Manage your account and preferences</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400">Manage your account and preferences</p>
       </div>
 
       {/* Settings Sections */}
       {settingsSections.map((section, index) => (
-        <div key={index} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">{section.title}</h2>
+        <div key={index} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{section.title}</h2>
           <div className="space-y-2">
             {section.items.map((item, itemIndex) => (
               <div
                 key={itemIndex}
-                className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
               >
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="text-2xl">{item.icon}</div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900">{item.label}</p>
-                    <p className="text-sm text-gray-500 capitalize">{item.description}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100">{item.label}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{item.description}</p>
                   </div>
                 </div>
                 {item.type === 'toggle' && (
@@ -98,7 +98,7 @@ const Settings = () => {
                   </button>
                 )}
                 {item.type === 'link' && (
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 )}
@@ -106,7 +106,7 @@ const Settings = () => {
                   <select
                     value={settings[item.key]}
                     onChange={(e) => setSettings({ ...settings, [item.key]: e.target.value })}
-                    className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   >
                     {item.options.map((option) => (
                       <option key={option} value={option}>
@@ -122,23 +122,23 @@ const Settings = () => {
       ))}
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-2xl shadow-sm border border-red-200 p-6">
-        <h2 className="text-lg font-bold text-red-600 mb-4">Danger Zone</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-red-200 dark:border-red-900/50 p-6">
+        <h2 className="text-lg font-bold text-red-600 dark:text-red-400 mb-4">Danger Zone</h2>
         <div className="space-y-3">
-          <button className="w-full p-4 rounded-xl border border-red-200 hover:bg-red-50 transition-colors duration-200 text-left">
-            <p className="font-bold text-red-600">Deactivate Account</p>
-            <p className="text-sm text-gray-600">Temporarily disable your account</p>
+          <button className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left">
+            <p className="font-bold text-red-600 dark:text-red-400">Deactivate Account</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Temporarily disable your account</p>
           </button>
-          <button className="w-full p-4 rounded-xl border border-red-200 hover:bg-red-50 transition-colors duration-200 text-left">
-            <p className="font-bold text-red-600">Delete Account</p>
-            <p className="text-sm text-gray-600">Permanently delete your account and data</p>
+          <button className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left">
+            <p className="font-bold text-red-600 dark:text-red-400">Delete Account</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Permanently delete your account and data</p>
           </button>
         </div>
       </div>
 
       {/* Logout Button */}
-      <button className="w-full p-4 bg-white rounded-2xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors duration-200">
-        <p className="font-bold text-gray-900">Log Out</p>
+      <button className="w-full p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+        <p className="font-bold text-gray-900 dark:text-gray-100">Log Out</p>
       </button>
     </div>
   );
