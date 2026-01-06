@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUserData = async (token) => {
     try {
       setError(null);
-      const response = await fetch('http://localhost:5001/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/users/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5001/api/v1/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -87,30 +87,44 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5001/api/v1/auth/register', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        throw new Error('Server returned an invalid response. Please try again later.');
+      }
 
       if (data.success) {
         const { token, ...userData } = data.data;
+        
         localStorage.setItem('token', token);
         setToken(token);
         setUser(userData);
         setError(null);
+        
         return { success: true, user: userData };
       } else {
-        return { success: false, message: data.message };
+        return { 
+          success: false, 
+          message: data.message || 'Registration failed.' 
+        };
       }
-    } catch {
+    } catch (err) {
+      console.error("Registration Error:", err);
+      
       return {
         success: false,
         message: !navigator.onLine
           ? "No internet connection."
-          : "Registration failed. Please try again."
+          : err.message || "Registration failed. Please check your server connection."
       };
     }
   };
