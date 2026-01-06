@@ -1,133 +1,192 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import './Profile.css';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  
+  const [activeTab, setActiveTab] = useState('posts');
   const [userStats, setUserStats] = useState({
     posts: 0,
     followers: 0,
-    following: 0
+    following: 0,
   });
-  
+
   const [userPosts, setUserPosts] = useState([]);
 
-
   useEffect(() => {
-    const fetchProfileData = async () => {
-      if (user) {
-        try {
-          // Set stats from user object
-          setUserStats({
-            posts: user.postCount || 0,
-            followers: user.followerCount || 0,
-            following: user.followingCount || 0
-          });
-          
-          // In a real app, fetch user's posts from API
-          // const postsResponse = await fetch(`/api/users/${user.id}/posts`, {
-          //   headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-          // });
-          // const postsData = await postsResponse.json();
-          // setUserPosts(postsData.posts);
-          
-          // For now, we'll use mock data
-          setUserPosts([
-            { id: 1, imageUrl: 'https://placehold.co/600x600/FF6B6B/FFFFFF?text=Post+1', likes: 12 },
-            { id: 2, imageUrl: 'https://placehold.co/600x600/4ECDC4/FFFFFF?text=Post+2', likes: 24 },
-            { id: 3, imageUrl: 'https://placehold.co/600x600/45B7D1/FFFFFF?text=Post+3', likes: 8 },
-            { id: 4, imageUrl: 'https://placehold.co/600x600/96CEB4/FFFFFF?text=Post+4', likes: 32 },
-            { id: 5, imageUrl: 'https://placehold.co/600x600/FFEAA7/FFFFFF?text=Post+5', likes: 17 },
-            { id: 6, imageUrl: 'https://placehold.co/600x600/DDA0DD/FFFFFF?text=Post+6', likes: 5 },
-          ]);
-        } catch (error) {
-          console.error('Error fetching profile data:', error);
-        }
-      }
-    };
-    
-    fetchProfileData();
-  }, [user]);
+    // mock data (replace later with API)
+    setUserStats({
+      posts: 12,
+      followers: 234,
+      following: 180,
+    });
+
+    setUserPosts([
+      { id: 1, imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=400&fit=crop', likes: 45, comments: 12 },
+      { id: 2, imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=400&fit=crop', likes: 67, comments: 23 },
+      { id: 3, imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&h=400&fit=crop', likes: 89, comments: 15 },
+      { id: 4, imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=400&h=400&fit=crop', likes: 34, comments: 8 },
+      { id: 5, imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop', likes: 56, comments: 19 },
+      { id: 6, imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop', likes: 78, comments: 25 },
+    ]);
+  }, []);
 
   return (
-    <div className="profile-container">
-      <div className="profile-header p-6">
-        <div className="flex flex-col items-center mb-6">
-          <img 
-            src={user?.profilePicture || 'https://placehold.co/150x150/FF6B6B/FFFFFF?text=U'} 
-            alt="Profile" 
-            className="w-32 h-32 rounded-full object-cover border-4 border-purple-300 mb-4"
-          />
-          <h1 className="text-2xl font-bold text-gray-900">{user?.username || 'username'}</h1>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">{userStats.posts}</p>
-              <p className="text-gray-600">posts</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">{userStats.followers}</p>
-              <p className="text-gray-600">followers</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">{userStats.following}</p>
-              <p className="text-gray-600">following</p>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Profile Header */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Profile Picture */}
+          <div className="flex justify-center md:justify-start">
+            <div className="w-32 h-32 md:w-40 md:h-40">
+              <img 
+                src="https://placehold.co/200x200/4F46E5/FFFFFF?text=U" 
+                alt="Profile" 
+                className="w-full h-full rounded-full object-cover border-4 border-gray-100 dark:border-gray-700"
+              />
             </div>
           </div>
-          <div className="mt-4 flex gap-2">
-            <button 
-              onClick={() => navigate('/profile/edit')} 
-              className="px-6 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-            >
-              Edit Profile
-            </button>
-            <button 
-              onClick={logout}
-              className="px-6 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors"
-            >
-              Logout
-            </button>
+
+          {/* Profile Info */}
+          <div className="flex-1 space-y-6">
+            {/* Username and Edit Button */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">johndoe_2026</h2>
+              <Link 
+                to="/edit-profile"
+                className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+              >
+                Edit Profile
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="flex gap-8">
+              <div className="text-center">
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.posts}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">posts</span>
+              </div>
+              <button className="text-center hover:opacity-80 transition-opacity">
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.followers}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">followers</span>
+              </button>
+              <button className="text-center hover:opacity-80 transition-opacity">
+                <span className="block text-xl font-bold text-gray-900 dark:text-gray-100">{userStats.following}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">following</span>
+              </button>
+            </div>
+
+            {/* Bio */}
+            <div>
+              <p className="font-bold text-gray-900 dark:text-gray-100 mb-1">John Doe</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Computer Science Student 🎓</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Love coding, music, and photography 📸</p>
+              <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-1">www.johndoe.com</p>
+            </div>
           </div>
-        </div>
-        
-        <div className="text-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Full Name'}</h2>
-          <p className="text-gray-600">{user?.bio || 'Bio not set'}</p>
         </div>
       </div>
 
-      <div className="border-t border-gray-200 pt-6">
-        <div className="flex justify-center space-x-8 mb-6">
-          <button className="pb-2 border-b-2 border-black text-black font-semibold">
-            Posts
+      {/* Tabs */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setActiveTab('posts')}
+            className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
+              activeTab === 'posts'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span>POSTS</span>
+            </div>
           </button>
-          <button className="pb-2 text-gray-500 hover:text-gray-700">
-            Reels
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
+              activeTab === 'saved'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <span>SAVED</span>
+            </div>
           </button>
-          <button className="pb-2 text-gray-500 hover:text-gray-700">
-            Tagged
+          <button
+            onClick={() => setActiveTab('tagged')}
+            className={`flex-1 py-4 px-6 font-medium transition-all duration-200 ${
+              activeTab === 'tagged'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>TAGGED</span>
+            </div>
           </button>
         </div>
-        
-        {userPosts.length > 0 ? (
-          <div className="grid grid-cols-3 gap-1 md:gap-4">
-            {userPosts.map(post => (
-              <div key={post.id} className="aspect-square overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity">
-                <img 
-                  src={post.imageUrl} 
-                  alt="Post" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12 text-gray-500">
-            <p>No posts yet. Start sharing your college life!</p>
-          </div>
-        )}
+
+        {/* Posts Grid */}
+        <div className="p-6">
+          {activeTab === 'posts' && (
+            <div className="grid grid-cols-3 gap-1 md:gap-2">
+              {userPosts.map((post) => (
+                <div key={post.id} className="relative aspect-square group cursor-pointer">
+                  <img 
+                    src={post.imageUrl} 
+                    alt="Post" 
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
+                    <div className="flex space-x-6 text-white">
+                      <span className="flex items-center space-x-2">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span className="font-bold">{post.likes}</span>
+                      </span>
+                      <span className="flex items-center space-x-2">
+                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        <span className="font-bold">{post.comments}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {activeTab === 'saved' && (
+            <div className="text-center py-12">
+              <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No saved posts yet</p>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">Save posts to see them here</p>
+            </div>
+          )}
+          
+          {activeTab === 'tagged' && (
+            <div className="text-center py-12">
+              <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <p className="text-gray-600 dark:text-gray-400 font-medium">No tagged posts yet</p>
+              <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">Photos and videos you're tagged in will appear here</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

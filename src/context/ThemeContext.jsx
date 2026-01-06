@@ -1,56 +1,64 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import{ createContext, useContext, useState, useEffect } from 'react';
 
-const ThemeContext = createContext({
-  theme: 'light',
-  isDark: false,
-  toggleTheme: () => {},
-});
-
-const getInitialTheme = () => {
-  if (typeof window === 'undefined') return 'light';
-  const stored = localStorage.getItem('theme');
-  if (stored === 'light' || stored === 'dark') return stored;
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return prefersDark ? 'dark' : 'light';
-};
+const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(getInitialTheme);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // 1. Check localStorage first
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme === 'dark';
+    }
+    
+    // 2. Fallback to System Preference
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    
+    // 3. Default to light
+    return false;
+  });
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
+    const htmlElement = document.documentElement;
+    
+    if (isDarkMode) {
+      htmlElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
-      root.classList.remove('dark');
+      htmlElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
+  }, [isDarkMode]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (event) => {
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light' || stored === 'dark') return;
-      setTheme(event.matches ? 'dark' : 'light');
+    
+    const handleChange = (e) => {
+      if (!localStorage.getItem('theme')) {
+        setIsDarkMode(e.matches);
+      }
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  const value = useMemo(
-    () => ({
-      theme,
-      isDark: theme === 'dark',
-      toggleTheme: () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark')),
-      setTheme,
-    }),
-    [theme],
-  );
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};

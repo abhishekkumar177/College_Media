@@ -1,22 +1,44 @@
-import React from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { FiSun, FiMoon } from 'react-icons/fi';
 
 const ThemeToggle = ({ className = '' }) => {
-  const { isDark, toggleTheme } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   return (
     <button
-      type="button"
       onClick={toggleTheme}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className={`flex items-center gap-2 px-3 py-2 rounded-full border bg-white/80 text-slate-700 shadow-sm hover:shadow-md transition-all backdrop-blur dark:bg-slate-800/80 dark:text-slate-100 dark:border-slate-700 ${className}`}
+      className={`
+        relative p-2 rounded-full transition-all duration-300 ease-in-out
+        hover:bg-coral-50 dark:hover:bg-slate-800
+        focus:outline-none focus:ring-2 focus:ring-coral-500/50
+        ${className}
+      `}
+      aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
-      <span className="text-lg" aria-hidden>
-        {isDark ? '☀️' : '🌙'}
-      </span>
-      <span className="hidden sm:inline text-xs font-semibold tracking-tight">
-        {isDark ? 'Light' : 'Dark'} mode
-      </span>
+      <div className="relative w-5 h-5">
+        {/* Sun Icon (Show when Light) */}
+        <div
+          className={`absolute inset-0 transform transition-all duration-500 ${
+            isDarkMode 
+              ? 'rotate-90 opacity-0 scale-50' 
+              : 'rotate-0 opacity-100 scale-100'
+          }`}
+        >
+          <FiSun className="w-5 h-5 text-gray-700 hover:text-coral-500 transition-colors" />
+        </div>
+
+        {/* Moon Icon (Show when Dark) */}
+        <div
+          className={`absolute inset-0 transform transition-all duration-500 ${
+            isDarkMode 
+              ? 'rotate-0 opacity-100 scale-100' 
+              : '-rotate-90 opacity-0 scale-50'
+          }`}
+        >
+          <FiMoon className="w-5 h-5 text-gray-200 hover:text-coral-300 transition-colors" />
+        </div>
+      </div>
     </button>
   );
 };

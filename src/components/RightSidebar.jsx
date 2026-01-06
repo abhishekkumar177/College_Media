@@ -1,87 +1,106 @@
 import React from "react";
 
 function RightSidebar() {
-  const suggestedAccounts = [
+  const friendSuggestions = [
     {
-      username: "design_inspiration",
-      avatar: "https://placehold.co/30x30/FF6B6B/FFFFFF?text=DI",
-      followers: "2.1M",
+      name: "Julia Smith",
+      avatar: "https://placehold.co/40x40/6366F1/FFFFFF?text=JS",
+      followers: "2.1K",
     },
     {
-      username: "tech_trends",
-      avatar: "https://placehold.co/30x30/4ECDC4/FFFFFF?text=TT",
-      followers: "1.8M",
+      name: "Vermillion D. Gray",
+      avatar: "https://placehold.co/40x40/3B82F6/FFFFFF?text=VG",
+      followers: "1.8K",
     },
     {
-      username: "art_daily",
-      avatar: "https://placehold.co/30x30/45B7D1/FFFFFF?text=AD",
-      followers: "3.4M",
+      name: "Mai Senpai",
+      avatar: "https://placehold.co/40x40/8B5CF6/FFFFFF?text=MS",
+      followers: "3.4K",
+    },
+    {
+      name: "Azunyan U. Wu",
+      avatar: "https://placehold.co/40x40/EC4899/FFFFFF?text=AW",
+      followers: "956",
     },
   ];
 
   const trendingHashtags = [
     "#photography",
-    "#travel",
-    "#fashion",
-    "#food",
-    "#art",
-    "#fitness",
+    "#campuslife",
+    "#studygroup",
+    "#collegesports",
+    "#hackathon2024",
   ];
 
   const onlineFriends = [
     {
-      username: "friend_one",
-      avatar: "https://placehold.co/30x30/96CEB4/FFFFFF?text=F1",
+      name: "friend_one",
+      avatar: "https://placehold.co/48x48/10B981/FFFFFF?text=F1",
     },
     {
-      username: "friend_two",
-      avatar: "https://placehold.co/30x30/DDA0DD/FFFFFF?text=F2",
+      name: "friend_two",
+      avatar: "https://placehold.co/48x48/A78BFA/FFFFFF?text=F2",
     },
     {
-      username: "friend_three",
-      avatar: "https://placehold.co/30x30/FFB3BA/FFFFFF?text=F3",
+      name: "friend_three",
+      avatar: "https://placehold.co/48x48/F472B6/FFFFFF?text=F3",
     },
   ];
 
   return (
     <div className="lg:col-span-1 space-y-6">
-      {/* Suggested Accounts */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
-        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Suggested for you</h3>
-        <div className="space-y-3">
-          {suggestedAccounts.map((account, index) => (
+      {/* Friend Suggestions */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">Friend Suggestions</h3>
+          <button className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
+            See All
+            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        <div className="space-y-4">
+          {friendSuggestions.map((friend, index) => (
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <img
-                  src={account.avatar}
-                  alt={account.username}
-                  className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
+                  src={friend.avatar}
+                  alt={friend.name}
+                  className="w-10 h-10 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
                 />
                 <div>
-                  <p className="font-medium text-gray-800 dark:text-slate-100 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">
-                    {account.username}
+                  <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
+                    {friend.name}
                   </p>
-                  <p className="text-gray-500 dark:text-slate-400 text-xs">
-                    {account.followers} followers
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                    {friend.followers} followers
                   </p>
                 </div>
               </div>
-              <button className="px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full hover:bg-blue-600 transition-colors duration-300">
-                Follow
+              <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Trending Hashtags */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
-        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Trending</h3>
+      {/* Trending Now */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+        <div className="flex items-center mb-4">
+          <svg className="w-5 h-5 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">Trending Now</h3>
+        </div>
         <div className="flex flex-wrap gap-2">
           {trendingHashtags.map((hashtag, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm dark:from-slate-800 dark:to-slate-700 dark:text-slate-100"
+              className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 cursor-pointer"
             >
               {hashtag}
             </span>
@@ -89,28 +108,50 @@ function RightSidebar() {
         </div>
       </div>
 
+      {/* Profile Activity */}
+      <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-sm border border-indigo-700 p-5 text-white">
+        <h3 className="font-bold text-lg mb-3">Profile Activity</h3>
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-2">
+              <img src="https://placehold.co/32x32/6366F1/FFFFFF?text=U1" alt="User" className="w-8 h-8 rounded-full" />
+              <img src="https://placehold.co/32x32/3B82F6/FFFFFF?text=U2" alt="User" className="w-8 h-8 rounded-full -ml-3" />
+              <img src="https://placehold.co/32x32/8B5CF6/FFFFFF?text=U3" alt="User" className="w-8 h-8 rounded-full -ml-3" />
+              <img src="https://placehold.co/32x32/EC4899/FFFFFF?text=U4" alt="User" className="w-8 h-8 rounded-full -ml-3" />
+            </div>
+          </div>
+          <div className="text-3xl font-bold mb-1">+1,158</div>
+          <div className="text-sm opacity-90 mb-2">New Followers</div>
+          <div className="text-xs opacity-75 flex items-center">
+            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+            23% vs last month
+          </div>
+        </div>
+        <p className="text-sm opacity-90">You gained a substantial amount of followers this month!</p>
+      </div>
+
       {/* Online Friends */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm p-4 border border-gray-100 dark:border-slate-800 transition-colors">
-        <h3 className="font-bold text-gray-800 dark:text-slate-100 mb-4">Online Friends</h3>
-        <div className="flex space-x-3">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-4">Online Friends</h3>
+        <div className="flex items-center space-x-3">
           {onlineFriends.map((friend, index) => (
             <div
               key={index}
-              className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300"
+              className="relative cursor-pointer hover:scale-105 transition-transform duration-300"
             >
-              <div className="relative">
-                <img
-                  src={friend.avatar}
-                  alt={friend.username}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-              </div>
-              <span className="text-xs text-gray-600 dark:text-slate-300 mt-1 truncate w-12 text-center">
-                {friend.username}
-              </span>
+              <img
+                src={friend.avatar}
+                alt={friend.name}
+                className="w-12 h-12 rounded-full border-2 border-white shadow-md"
+              />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
           ))}
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold text-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300">
+            +12
+          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -14,13 +13,12 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
-    // Check if user is already logged in on initial load
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
-      // Verify token and fetch user data
       fetchUserData(storedToken);
     } else {
       setLoading(false);
@@ -29,27 +27,29 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUserData = async (token) => {
     try {
-      const response = await fetch('http://localhost:5000/api/users/profile', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      setError(null);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.data);
-        setToken(token);
-      } else {
-        // Token might be invalid, clear it
-        localStorage.removeItem('token');
-        setToken(null);
-        setUser(null);
+      if (!response.ok) {
+        throw new Error("Session expired. Please login again.");
       }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+
+      const data = await response.json();
+      setUser(data.data);
+      setToken(token);
+    } catch (err) {
+      console.error(err);
       localStorage.removeItem('token');
       setToken(null);
       setUser(null);
+
+      if (!navigator.onLine) {
+        setError("No internet connection. Please check your network.");
+      } else {
+        setError(err.message || "Failed to load user data.");
+      }
     } finally {
       setLoading(false);
     }
@@ -57,11 +57,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/v1/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
@@ -72,40 +70,62 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', token);
         setToken(token);
         setUser(userData);
+        setError(null);
         return { success: true, user: userData };
       } else {
         return { success: false, message: data.message };
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, message: 'An error occurred during login' };
+    } catch {
+      return {
+        success: false,
+        message: !navigator.onLine
+          ? "No internet connection."
+          : "Login failed. Please try again."
+      };
     }
   };
 
-  const register = async (userData) => {
+  const register = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        throw new Error('Server returned an invalid response. Please try again later.');
+      }
 
       if (data.success) {
-        const { token, ...user } = data.data;
+        const { token, ...userData } = data.data;
+        
         localStorage.setItem('token', token);
         setToken(token);
-        setUser(user);
-        return { success: true, user };
+        setUser(userData);
+        setError(null);
+        
+        return { success: true, user: userData };
       } else {
-        return { success: false, message: data.message };
+        return { 
+          success: false, 
+          message: data.message || 'Registration failed.' 
+        };
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      return { success: false, message: 'An error occurred during registration' };
+    } catch (err) {
+      console.error("Registration Error:", err);
+      
+      return {
+        success: false,
+        message: !navigator.onLine
+          ? "No internet connection."
+          : err.message || "Registration failed. Please check your server connection."
+      };
     }
   };
 
@@ -115,72 +135,32 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const updateUserProfile = async (profileData) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(profileData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUser(prevUser => ({ ...prevUser, ...data.data }));
-        return { success: true, user: data.data };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (error) {
-      console.error('Update profile error:', error);
-      return { success: false, message: 'An error occurred updating profile' };
-    }
-  };
-
-  const uploadProfilePicture = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append('profilePicture', file);
-
-      const response = await fetch('http://localhost:5000/api/users/profile-picture', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUser(prevUser => ({ ...prevUser, profilePicture: data.data.profilePicture }));
-        return { success: true, profilePicture: data.data.profilePicture };
-      } else {
-        return { success: false, message: data.message };
-      }
-    } catch (error) {
-      console.error('Upload profile picture error:', error);
-      return { success: false, message: 'An error occurred uploading profile picture' };
-    }
-  };
-
   const value = {
     user,
     token,
     login,
     register,
     logout,
-    updateUserProfile,
-    uploadProfilePicture,
     loading,
+    error,
+    setError,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {error && (
+        <div style={{
+          background: "#fee",
+          color: "#900",
+          padding: "12px",
+          margin: "10px",
+          borderRadius: "6px",
+          textAlign: "center"
+        }}>
+          ⚠️ {error}
+        </div>
+      )}
+      {!loading && !error && children}
     </AuthContext.Provider>
   );
 };

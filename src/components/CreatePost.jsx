@@ -7,6 +7,9 @@ const CreatePost = ({ onPostCreated }) => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  
+  // Character counter configuration
+  const maxLength = 500;
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -17,6 +20,13 @@ const CreatePost = ({ onPostCreated }) => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCaptionChange = (e) => {
+    const text = e.target.value;
+    if (text.length <= maxLength) {
+      setCaption(text);
     }
   };
 
@@ -53,7 +63,7 @@ const CreatePost = ({ onPostCreated }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100 dark:border-slate-800 transition-colors">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
       <div className="p-4">
         <div className="flex items-center mb-4">
           <img 
@@ -62,18 +72,34 @@ const CreatePost = ({ onPostCreated }) => {
             className="w-10 h-10 rounded-full object-cover mr-3"
           />
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 dark:text-slate-100">{user?.username}</h3>
+            <h3 className="font-semibold text-gray-900">{user?.username}</h3>
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
           <textarea
             value={caption}
-            onChange={(e) => setCaption(e.target.value)}
+            onChange={handleCaptionChange}
             placeholder="What's happening?"
-            className="w-full p-3 border border-gray-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 transition-colors"
+            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
             rows="3"
+            maxLength={maxLength}
           />
+          
+          {/* Character Counter */}
+          <div className="flex justify-end mt-1">
+            <span 
+              className={`text-xs ${
+                caption.length >= maxLength 
+                  ? 'text-red-600 font-bold' 
+                  : caption.length > maxLength * 0.8 
+                  ? 'text-yellow-600 font-medium'
+                  : 'text-gray-500'
+              }`}
+            >
+              {caption.length} / {maxLength}
+            </span>
+          </div>
           
           {imagePreview && (
             <div className="mt-3 relative">
@@ -88,7 +114,7 @@ const CreatePost = ({ onPostCreated }) => {
                   setImage(null);
                   setImagePreview(null);
                 }}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
               >
                 ×
               </button>
@@ -97,7 +123,7 @@ const CreatePost = ({ onPostCreated }) => {
 
           <div className="flex items-center justify-between mt-3">
             <div className="flex space-x-2">
-              <label className="cursor-pointer text-gray-600 dark:text-slate-300 hover:text-purple-600 transition-colors">
+              <label className="cursor-pointer text-gray-600 hover:text-purple-600 transition-colors p-1 rounded hover:bg-purple-50">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
