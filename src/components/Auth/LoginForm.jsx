@@ -7,8 +7,12 @@ const LoginForm = () => {
     email: '',
     password: '',
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // 🔴 NEW: state to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -42,7 +46,7 @@ const LoginForm = () => {
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl">
 
-        {/* 🔹 HEADER */}
+        {/* HEADER */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome Back
@@ -52,14 +56,14 @@ const LoginForm = () => {
           </p>
         </div>
 
-        {/* 🔹 ERROR MESSAGE */}
+        {/* ERROR MESSAGE */}
         {error && (
           <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center">
             {error}
           </div>
         )}
 
-        {/* 🔹 LOGIN FORM */}
+        {/* LOGIN FORM */}
         <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* EMAIL FIELD */}
@@ -83,17 +87,30 @@ const LoginForm = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="Enter your password"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg"
-            />
 
-            {/* 🔹 FORGOT PASSWORD BUTTON (NEW) */}
+            {/* 🔴 UPDATED: Password input with toggle */}
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'} // 🔴 UPDATED
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter your password"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg pr-12"
+              />
+
+              {/* 🔴 NEW: Toggle button */}
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-purple-600 font-medium"
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            {/* FORGOT PASSWORD */}
             <div className="text-right mt-2">
               <button
                 type="button"
