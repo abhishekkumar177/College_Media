@@ -1,34 +1,51 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const { initDB } = require('./config/db');
+import express from "express";
+import morgan from "morgan";
+import dotenv from "dotenv";
 
-// Load .env.local file
-dotenv.config({ path: '.env.local' });
+import postsRoutes from "./routes/posts.js";
+import authRoutes from "./routes/auth.js";
+
+dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// Middlewares
 app.use(express.json());
+app.use(morgan("dev"));
 
-const startServer = async () => {
-  // Initialize database ONCE
-  const dbConnection = await initDB();
-  app.set('dbConnection', dbConnection);
+// Routes
+app.use("/api/v1/posts", postsRoutes);
+app.use("/api/v1/auth", authRoutes);
 
-  // Routes
-  app.use('/api/v1/posts', require('./routes/posts'));
-  app.use('/api/v1/auth', require('./routes/auth'));
-  app.use('/api/users', require('./routes/users'));
-  app.use('/uploads', express.static('uploads'));
+// Health check
+app.get("/", (req, res) => {
+  res.json({ ok: true });
+});
 
-  app.get('/', (req, res) => {
-    res.json({ ok: true });
+// 🔥 PORT MUST BE DECLARED BEFORE USE
+const PORT = process.env.PORT || 5001;
+
+// ✅ Start server
+const server = app.listen(PORT, () => {
+  console.log(`🔥 BACKEND RUNNING ON ${PORT} 🔥`);
+});
+
+// 🛑 Graceful Shutdown
+const gracefulShutdown = (signal) => {
+  console.log(`🛑 Received ${signal}. Closing server gracefully...`);
+
+  server.close(() => {
+    console.log("✅ HTTP server closed");
+    process.exit(0);
   });
 
-  app.listen(5001, () => {
-    console.log('🔥 BACKEND RUNNING ON 5001 🔥');
-  });
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    console.error("❌ Force shutdown");
+    process.exit(1);
+  }, 10000);
 };
 
-startServer();
+// Handle termination signals
+process.on("SIGINT", gracefulShutdown);   // Ctrl + C
+process.on("SIGTERM", gracefulShutdown);  // Server stop / deploy
