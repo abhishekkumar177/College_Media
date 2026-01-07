@@ -1,0 +1,66 @@
+name: 🛠️ Maintenance Task
+description: General cleanup, dependency updates, refactoring, or configuration changes.
+title: "chore: "
+labels: ["chore"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping maintain **College Media**!  
+        Please provide the details below to help us review the task efficiently.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Description
+      description: Clearly describe the maintenance task.
+      placeholder: What needs to be cleaned up, updated, or refactored?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: 📁 Scope / Area Affected
+      description: Mention which parts of the project are affected.
+      placeholder: |
+        - UI / Styling
+        - Components
+        - Pages
+        - Configuration
+        - Dependencies
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: Add screenshots or logs if applicable.
+      placeholder: Drag and drop images or paste logs here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: ⚠️ Potential Risks
+      description: Describe any risks, regressions, or breaking changes.
+      placeholder: What could go wrong after this change?
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: ✅ Checklist
+      description: Confirm the following before submitting.
+      placeholder: |
+        - [ ] No feature logic added
+        - [ ] Code follows ESLint rules
+        - [ ] UI consistency maintained
+        - [ ] Tested locally
+    validations:
+      required: false
