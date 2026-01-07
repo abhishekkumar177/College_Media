@@ -21,12 +21,12 @@ router.post('/login', async (req, res) => {
   };
 
   if (email !== mockUser.email) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({success: false, message: 'Invalid credentials' });
   }
 
   const isMatch = await bcrypt.compare(password, mockUser.password);
   if (!isMatch) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 
   const token = jwt.sign(
