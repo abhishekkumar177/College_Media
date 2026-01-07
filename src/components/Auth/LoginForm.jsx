@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +14,45 @@ const LoginForm = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // 🔹 Chatbase Integration (NO UI / LOGIC CHANGES)
+useEffect(() => {
+  (function () {
+    if (!window.chatbase || window.chatbase("getState") !== "initialized") {
+      window.chatbase = (...args) => {
+        if (!window.chatbase.q) {
+          window.chatbase.q = [];
+        }
+        window.chatbase.q.push(args);
+      };
+
+      window.chatbase = new Proxy(window.chatbase, {
+        get(target, prop) {
+          if (prop === "q") {
+            return target.q;
+          }
+          return (...args) => target(prop, ...args);
+        },
+      });
+    }
+
+    const onLoad = function () {
+      const script = document.createElement("script");
+      script.src = "https://www.chatbase.co/embed.min.js";
+      script.id = "ZCVSZJkLsz_8_j5RMvq5l";
+      script.domain = "www.chatbase.co";
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    if (document.readyState === "complete") {
+      onLoad();
+    } else {
+      window.addEventListener("load", onLoad);
+    }
+  })();
+}, []);
+
 
   // 🔹 HANDLE INPUT CHANGE
   const handleChange = (e) => {
@@ -40,17 +79,16 @@ const LoginForm = () => {
     setLoading(false);
   };
 
-  // 🔴 NEW: Handle close button click
+  // 🔴 Handle close button click
   const handleClose = () => {
-    navigate(-1); // Go back to previous page
-    // या navigate('/'); // Home page पर जाने के लिए
+    navigate(-1);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl relative">
-        
-        {/* 🔴 NEW: Close Button (X) - WITHOUT EXTERNAL LIBRARY */}
+
+        {/* Close Button */}
         <button
           type="button"
           onClick={handleClose}
@@ -58,21 +96,9 @@ const LoginForm = () => {
           aria-label="Close login form"
           title="Close"
         >
-          {/* Using HTML entity for X icon */}
           <span className="text-xl text-gray-500 group-hover:text-gray-700 font-semibold transition-colors">
             ×
           </span>
-          
-          {/* Alternative: Using SVG for better control */}
-          {/* <svg 
-            className="w-5 h-5 text-gray-500 group-hover:text-gray-700 transition-colors" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24" 
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg> */}
         </button>
 
         {/* HEADER */}
@@ -117,7 +143,6 @@ const LoginForm = () => {
               Password
             </label>
 
-            {/* 🔴 UPDATED: Password input with toggle */}
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -129,7 +154,6 @@ const LoginForm = () => {
                 className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg pr-12 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
               />
 
-              {/* 🔴 NEW: Toggle button */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -139,7 +163,6 @@ const LoginForm = () => {
               </button>
             </div>
 
-            {/* FORGOT PASSWORD */}
             <div className="text-right mt-2">
               <button
                 type="button"

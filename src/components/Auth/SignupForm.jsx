@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { FaTimes } from 'react-icons/fa'; // Cross icon के लिए import
 
 const SignupForm = () => {
   const [formData, setFormData] = useState({
@@ -43,9 +44,25 @@ const SignupForm = () => {
     setLoading(false);
   };
 
+  // Cross button click handler
+  const handleClose = () => {
+    navigate('/'); // Home page पर navigate करेगा
+    // या navigate(-1) से previous page पर जा सकते हैं
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4">
-      <div className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-white p-4 relative">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl relative">
+        
+        {/* 🔴 NEW: Cross Button - Top Right Corner */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-200"
+          aria-label="Close"
+          type="button"
+        >
+          <FaTimes className="text-lg" />
+        </button>
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
