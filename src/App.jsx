@@ -30,6 +30,8 @@ import Layout from "./components/Layout";
 import LoginForm from "./components/Auth/LoginForm";
 import SignupForm from "./components/Auth/SignupForm";
 import ProfileEditForm from "./components/Auth/ProfileEditForm";
+import CertificatePage from "./pages/CertificatePage";
+import './App.css'
 
 /**
  * App Component - Main container and state management
@@ -236,6 +238,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       } />
       
       <Route path="/contact" element={<ContactUs />} />
+      <Route path="/certificate" element={<CertificatePage />} />
       <Route path="/assessment" element={<GamifiedAssessmentPage />} />
       
       <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
