@@ -1,8 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* keep your existing CSS BELOW this */
 /* Pro tier entrance animation base */
 .pro-entrance {
   opacity: 0;

@@ -17,9 +17,16 @@
  */
 
 import React, { useState, useEffect } from "react";
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { Route, Routes } from "react-router-dom";
+import Reels from "./pages/Reels.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
+import CertificatePage from "./pages/CertificatePage.jsx";
+import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage.jsx";
+import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage.jsx";
+import LeftSidebar from "./components/LeftSidebar.jsx";
+import Navbar from "./components/Navbar.jsx";
+import CreatePost from "./components/CreatePost.jsx";
 
 /**
  * App Component - Main container and state management
@@ -455,28 +462,29 @@ const App = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.2); }
         }
-      >
+      `}</style>
+      <Routes>
         <Route index element={<Reels />} />
-      </Route>
-      
-      <Route path="/create-post" element={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-          <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          <div className="ml-64">
-            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div className="max-w-5xl mx-auto px-6 py-8">
-              <CreatePost />
+        
+        <Route path="/create-post" element={
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+            <div className="ml-64">
+              <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <div className="max-w-5xl mx-auto px-6 py-8">
+                <CreatePost />
+              </div>
             </div>
           </div>
-        </div>
-      } />
-      
-      <Route path="/contact" element={<ContactUs />} />
-      <Route path="/certificate" element={<CertificatePage />} />
-      <Route path="/assessment" element={<GamifiedAssessmentPage />} />
-      
-      <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
-    </Routes>
+        } />
+        
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/certificate" element={<CertificatePage />} />
+        <Route path="/assessment" element={<GamifiedAssessmentPage />} />
+        
+        <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
+      </Routes>
+    </div>
   );
 };
 
