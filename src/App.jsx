@@ -455,11 +455,28 @@ const App = () => {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.2); }
         }
-        .animate-bounce {
-          animation: bounce 0.5s ease-in-out;
-        }
-      `}</style>
-    </div>
+      >
+        <Route index element={<Reels />} />
+      </Route>
+      
+      <Route path="/create-post" element={
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+          <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="ml-64">
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <div className="max-w-5xl mx-auto px-6 py-8">
+              <CreatePost />
+            </div>
+          </div>
+        </div>
+      } />
+      
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/certificate" element={<CertificatePage />} />
+      <Route path="/assessment" element={<GamifiedAssessmentPage />} />
+      
+      <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
+    </Routes>
   );
 };
 
