@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
@@ -10,11 +10,13 @@ const postSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Post', postSchema);
+const Post = mongoose.model("Post", postSchema);
+
+export default Post;

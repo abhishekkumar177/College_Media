@@ -1,18 +1,30 @@
-const express = require('express');
+import express from "express";
+import morgan from "morgan";
+import dotenv from "dotenv";
+
+import postsRoutes from "./routes/posts.js";
+import authRoutes from "./routes/auth.js";
 
 const app = express();
-const dotenv = require('dotenv');
+
+// Load env variables
 dotenv.config();
 
+// Middlewares
 app.use(express.json());
-app.use('/api/v1/posts', require('./routes/posts'));
+app.use(morgan("dev"));
 
-app.use('/api/v1/auth', require('./routes/auth'));
+// Routes
+app.use("/api/v1/posts", postsRoutes);
+app.use("/api/v1/auth", authRoutes);
 
-app.get('/', (req, res) => {
+// Health check
+app.get("/", (req, res) => {
   res.json({ ok: true });
 });
 
-app.listen(5001, () => {
-  console.log('🔥 BACKEND RUNNING ON 5001 🔥');
+// Server
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`🔥 BACKEND RUNNING ON ${PORT} 🔥`);
 });

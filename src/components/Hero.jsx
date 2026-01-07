@@ -138,7 +138,7 @@ const Hero = ({ variant = "home" }) => {
   </div>
 )}
 
-            </divv>
+            </div>
           </div>
         )}
       </div>
