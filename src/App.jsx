@@ -27,6 +27,7 @@ import Layout from "./components/Layout";
 import LoginForm from "./components/Auth/LoginForm";
 import SignupForm from "./components/Auth/SignupForm";
 import ProfileEditForm from "./components/Auth/ProfileEditForm";
+import CertificatePage from "./pages/CertificatePage";
 import './App.css'
 
 /**
@@ -233,6 +234,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       } />
       
       <Route path="/contact" element={<ContactUs />} />
+      <Route path="/certificate" element={<CertificatePage />} />
     </Routes>
   );
 };
