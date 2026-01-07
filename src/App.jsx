@@ -143,24 +143,6 @@ const App = () => {
     { username: "friend_three", avatar: "https://placehold.co/30x30/FFB3BA/FFFFFF?text=F3" },
   ];
 
-  // ============= MOCK DATA - Navigation Menu =============
-
-  /**
-   * Navigation menu items for left sidebar
-   * Each item has:
-   * - icon: Emoji icon for visual identification
-   * - label: Navigation label
-   * - active: Boolean indicating if currently selected
-   */
-  const menuItems = [
-    { icon: "🏠", label: "Home", active: activeTab === "Home" },
-    { icon: "🔍", label: "Explore", active: activeTab === "Explore" },
-    { icon: "🎬", label: "Reels", active: activeTab === "Reels" },
-    { icon: "💬", label: "Messages", active: activeTab === "Messages" },
-    { icon: "🔔", label: "Notifications", active: activeTab === "Notifications" },
-    { icon: "⚙️", label: "Settings", active: activeTab === "Settings" },
-  ];
-
   // ============= EFFECTS & EVENT HANDLERS =============
 
   /**
@@ -241,27 +223,7 @@ const App = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Main content grid: Sidebar | Feed | Right Sidebar */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* ========== LEFT SIDEBAR ========== */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-24">
-              <div className="space-y-4">
-                {menuItems.map((item, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleTabClick(item.label)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 ${
-                      item.active
-                        ? "bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 shadow-sm"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <LeftSidebar />
 
           {/* ========== CENTRAL FEED ========== */}
           <div className="lg:col-span-2 space-y-6">
