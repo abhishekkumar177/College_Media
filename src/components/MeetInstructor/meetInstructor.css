@@ -1,0 +1,76 @@
+.meet-instructor {
+  position: relative;
+  padding: 6rem 2rem;
+  overflow: hidden;
+}
+
+.background-text {
+  position: absolute;
+  inset: 0;
+  font-size: 12rem;
+  font-weight: 900;
+  color: #000;
+  opacity: 0.05;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.content {
+  display: flex;
+  gap: 4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.image-wrapper {
+  flex: 1;
+}
+
+.instructor-image {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 20px;
+}
+
+.info {
+  flex: 2;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  font-weight: bold;
+}
+
+.instructor-card {
+  background: #111;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  cursor: pointer;
+  max-width: 300px;
+  transition: box-shadow 0.3s;
+}
+
+.instructor-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.instructor-card .card-details {
+  display: none;
+  margin-top: 1rem;
+}
+
+.instructor-card.fullscreen {
+  position: fixed;
+  inset: 10%;
+  max-width: none;
+  z-index: 999;
+}
+
+.instructor-card.fullscreen .card-details {
+  display: block;
+}
