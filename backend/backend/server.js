@@ -5,10 +5,9 @@ import dotenv from "dotenv";
 import postsRoutes from "./routes/posts.js";
 import authRoutes from "./routes/auth.js";
 
-const app = express();
-
-// Load env variables
 dotenv.config();
+
+const app = express();
 
 // Middlewares
 app.use(express.json());
@@ -23,8 +22,30 @@ app.get("/", (req, res) => {
   res.json({ ok: true });
 });
 
-// Server
+// 🔥 PORT MUST BE DECLARED BEFORE USE
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
+
+// ✅ Start server
+const server = app.listen(PORT, () => {
   console.log(`🔥 BACKEND RUNNING ON ${PORT} 🔥`);
 });
+
+// 🛑 Graceful Shutdown
+const gracefulShutdown = (signal) => {
+  console.log(`🛑 Received ${signal}. Closing server gracefully...`);
+
+  server.close(() => {
+    console.log("✅ HTTP server closed");
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    console.error("❌ Force shutdown");
+    process.exit(1);
+  }, 10000);
+};
+
+// Handle termination signals
+process.on("SIGINT", gracefulShutdown);   // Ctrl + C
+process.on("SIGTERM", gracefulShutdown);  // Server stop / deploy
