@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { isPostSaved, toggleSavePost } from "../utils/bookmark";
 import SkeletonPost from "../components/SkeletonPost";
 
 const Home = () => {
@@ -9,6 +10,8 @@ const Home = () => {
   const [expandedPosts, setExpandedPosts] = useState({});
   const [showComments, setShowComments] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [savedPosts, setSavedPosts] = useState([]);
+
   const shareMenuRef = useRef(null);
 
   const MAX_CAPTION_LENGTH = 150;
@@ -51,18 +54,23 @@ const Home = () => {
   ];
 
   // Close dropdown when clicking outside
+  
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target)) {
-        setShareMenuOpen(null);
-      }
-    };
+    setSavedPosts(JSON.parse(localStorage.getItem("saved_posts")) || []);
+    }, []);
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (shareMenuRef.current && !shareMenuRef.current.contains(event.target)) {
+      setShareMenuOpen(null);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -348,6 +356,15 @@ const Home = () => {
       [postId]: !prev[postId]
     }));
   };
+
+  const handleSavePost = (postId) => {
+  const updated = toggleSavePost(postId);
+  setSavedPosts(updated);
+};
+
+
+  
+
 
   return (
     <div className="space-y-6" ref={shareMenuRef}>
@@ -655,21 +672,29 @@ const Home = () => {
                 </div>
 
                 {/* Bookmark Button */}
-                <button className="group">
-                  <svg
-                    className="w-6 h-6 text-gray-600 group-hover:text-indigo-600 transition-colors duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    viewBox="0 0 24 24"
+                <button
+                  onClick={() => handleSavePost(post.id)}
+                  className="group"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                    />
-                  </svg>
-                </button>
+                  <svg
+                  className={`w-6 h-6 transition-colors duration-300 ${
+                    savedPosts.includes(post.id)
+                      ? "fill-indigo-600 text-indigo-600"
+                      : "text-gray-600 group-hover:text-indigo-600"
+                  }`}
+                  fill={savedPosts.includes(post.id) ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                />
+              </svg>
+</button>
+
               </div>
 
               {/* ===== COMMENTS SECTION ===== */}
