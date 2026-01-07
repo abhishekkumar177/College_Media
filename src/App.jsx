@@ -8,10 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 /* ===== Pages ===== */
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
-import ForgotPassword from './pages/ForgotPassword'; // 🔹 ADD
-
-<Route path="/forgot-password" element={<ForgotPassword />} />
-
+import ForgotPassword from './pages/ForgetPassword';
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
@@ -33,7 +30,6 @@ import Layout from "./components/Layout";
 import LoginForm from "./components/Auth/LoginForm";
 import SignupForm from "./components/Auth/SignupForm";
 import ProfileEditForm from "./components/Auth/ProfileEditForm";
-import './App.css'
 
 /**
  * App Component - Main container and state management
@@ -75,6 +71,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup" element={<SignupForm />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Layout Routes */}
       <Route
