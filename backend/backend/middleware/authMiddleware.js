@@ -21,7 +21,7 @@ const authMiddleware = (req, res, next) => {
     // 4️⃣ User info + ROLE attach to request (IMPORTANT FOR RBAC)
     req.user = {
       userId: decoded.userId,
-      role: decoded.role
+      role: decoded.role || 'user' // Default to 'user' if role is missing
     };
 
     next();
