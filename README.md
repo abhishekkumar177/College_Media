@@ -177,17 +177,39 @@ VITE_LOG_LEVEL=debug
 ## �📁 Project Structure
 ## 🔐 Environment Variables
 
-This project uses environment variables for configuration and future backend integration.
+The application uses environment variables for configuration. Create a `.env.local` file in the project root by copying `.env.example`:
 
-### Local Setup
+### Available Variables
 
-1. Create a local environment file by copying the example:
-   ```bash
-   cp .env.example .env
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `VITE_APP_NAME` | string | College Media | Application display name |
+| `VITE_ENV` | string | development | Environment mode (development/production) |
+| `VITE_API_BASE_URL` | string | http://localhost:3000/api | Backend API endpoint (for future use) |
+| `VITE_ENABLE_MOCK_DATA` | boolean | true | Use mock data or fetch from API |
+| `VITE_DEBUG_MODE` | boolean | false | Enable debug logging and errors |
+| `VITE_LOG_LEVEL` | string | debug | Log verbosity (debug/info/warn/error) |
+| `VITE_PORT` | number | 5173 | Development server port |
+
+### Example .env.local
+
+```env
+VITE_ENV=development
+VITE_ENABLE_MOCK_DATA=true
+VITE_DEBUG_MODE=true
+VITE_LOG_LEVEL=debug
+```
+
+### Important Notes
+
+- **Never commit `.env.local`** to git - it may contain sensitive information
+- Only `.env.example` should be committed
+- Environment variables must start with `VITE_` to be exposed to the client
+- Variables are processed at build time, not runtime
 
 ---
 
-## 📁 Project Structure
+## �📁 Project Structure
 
 ```
 College_Media/
