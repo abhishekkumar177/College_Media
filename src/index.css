@@ -1,8 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* keep your existing CSS BELOW this */
+/* Pro tier entrance animation base */
+.pro-entrance {
+  opacity: 0;
+  filter: blur(16px);
+  transform: translateY(12px) scale(0.98);
+  will-change: transform, opacity, filter;
+}
 
 
 /* Custom utilities used in App.jsx */
