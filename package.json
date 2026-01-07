@@ -12,7 +12,6 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.13.2",
     "@iconify/react": "^6.0.2",
-    "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/vite": "^4.1.18",
     "canvas-confetti": "^1.9.4",
     "gsap": "^3.14.2",
