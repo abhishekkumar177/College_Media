@@ -26,17 +26,9 @@ import SignupForm from "./components/Auth/SignupForm";
 
 import Layout from "./components/Layout";
 
-const App = () => {
-import ContactUs from "./pages/ContactUs";
-import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage";
-import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage";
-import Navbar from "./components/Navbar";
-import LeftSidebar from "./components/LeftSidebar";
-import Layout from "./components/Layout";
-import LoginForm from "./components/Auth/LoginForm";
-import SignupForm from "./components/Auth/SignupForm";
-import ProfileEditForm from "./components/Auth/ProfileEditForm";
-import CertificatePage from "./pages/CertificatePage";
+import React, { useState, useEffect } from "react";
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
 import './App.css'
 
 /**
