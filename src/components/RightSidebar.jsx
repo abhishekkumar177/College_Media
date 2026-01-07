@@ -50,10 +50,10 @@ function RightSidebar() {
   return (
     <div className="lg:col-span-1 space-y-6">
       {/* Friend Suggestions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-800 text-lg">Friend Suggestions</h3>
-          <button className="text-indigo-600 text-sm font-medium hover:text-indigo-700 flex items-center">
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">Friend Suggestions</h3>
+          <button className="text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center">
             See All
             <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -70,16 +70,16 @@ function RightSidebar() {
                   className="w-10 h-10 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
                 />
                 <div>
-                  <p className="font-semibold text-gray-800 text-sm cursor-pointer hover:text-indigo-600 transition-colors duration-300">
+                  <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
                     {friend.name}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-gray-600 dark:text-gray-300 text-xs">
                     {friend.followers} followers
                   </p>
                 </div>
               </div>
-              <button className="p-1.5 rounded-md hover:bg-gray-100 transition-colors duration-300">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </button>
@@ -89,18 +89,18 @@ function RightSidebar() {
       </div>
 
       {/* Trending Now */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
         <div className="flex items-center mb-4">
           <svg className="w-5 h-5 text-orange-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
-          <h3 className="font-bold text-gray-800 text-lg">Trending Now</h3>
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg">Trending Now</h3>
         </div>
         <div className="flex flex-wrap gap-2">
           {trendingHashtags.map((hashtag, index) => (
             <span
               key={index}
-              className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all duration-300 cursor-pointer"
+              className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 cursor-pointer"
             >
               {hashtag}
             </span>
@@ -133,8 +133,8 @@ function RightSidebar() {
       </div>
 
       {/* Online Friends */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
-        <h3 className="font-bold text-gray-800 text-lg mb-4">Online Friends</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg mb-4">Online Friends</h3>
         <div className="flex items-center space-x-3">
           {onlineFriends.map((friend, index) => (
             <div
@@ -149,7 +149,7 @@ function RightSidebar() {
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
           ))}
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-600 font-semibold text-sm cursor-pointer hover:bg-gray-200 transition-colors duration-300">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-semibold text-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300">
             +12
           </div>
         </div>
