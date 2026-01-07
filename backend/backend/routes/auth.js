@@ -1,6 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
 // jwt token implemented
 const router = express.Router(); // 🔥 THIS WAS MISSING
 
@@ -11,38 +13,68 @@ router.get('/test', (req, res) => {
 
 // LOGIN ROUTE
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  try{
+    // require email and password
+    const {email,password}=req.body;
 
-  // TEMP MOCK USER
-  const mockUser = {
-    id: '123',
-    email: 'test@example.com',
-    password: await bcrypt.hash('Password123', 10)
-  };
-
-  if (email !== mockUser.email) {
-    return res.status(401).json({success: false, message: 'Invalid credentials' });
-  }
-
-  const isMatch = await bcrypt.compare(password, mockUser.password);
-  if (!isMatch) {
-    return res.status(401).json({ success: false, message: 'Invalid credentials' });
-  }
-
-  const token = jwt.sign(
-    { userId: mockUser.id },
-    process.env.JWT_SECRET || 'your-secret-key',
-    { expiresIn: '15m' }
-  );
-
-  res.json({
-    success: true,
-    data: {
-      token,
-      id: mockUser.id,
-      email: mockUser.email
+    if(!email || !password){
+      return res.status(400).json({
+        success:false,
+        message:'Please provide email and password'
+      });
     }
-  });
+
+    // find user by email
+    const user=await User.findOne({email});
+
+    if(!user ||!user.isActive ){
+      return res.status(401).json({
+        success:false,
+        message:'Invalid credentials'
+      });
+    }
+
+    // compare password
+    const isMatch=await bcrypt.compare(password,user.password);
+
+    if(!isMatch){
+      return res.status(401).json({
+        success:false,
+        message:'Invalid credentials'
+      });
+    }
+    // update last login
+    user.lastLogin=new Date();
+    await user.save();
+
+    // generate token
+    const token=jwt.sign(
+      {
+        userId:user._id,
+        role:user.role
+      },
+      process.env.JWT_SECRET || 'your-secret-key',
+      {expiresIn:'7d'}
+    );
+
+    res.json({
+      success:true,
+      token,
+      data:{
+        id:user.id,
+        email:user.email,
+        username:user.username,
+        role:user.role
+      }
+    });
+        
+  } catch(err){
+    res.status(500).json({
+      success:false,
+      message:'Login failed. Please try again.'
+    });
+  }
+
 });
 
 // REGISTER ROUTE
@@ -58,35 +90,53 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    //  check if user already exists
+    const existingUser=await User.findOne({
+      $or:[{email},{username}]
+    });
+
+    if(existingUser){
+      return res.status(400).json({
+        success:false,
+        message:'User already exists'
+      });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create mock user (in real app, save to database)
-    const newUser = {
-      id: Date.now().toString(),
-      username,
-      email,
-      firstName: firstName || '',
-      lastName: lastName || '',
-      password: hashedPassword
-    };
-
+  //  create user
+  const newUser=new User({
+    username,
+    email,
+    password:hashedPassword,
+    firstName,
+    lastName
+  });
+  
+    // 🔥 CRITICAL: Save user to database
+    await newUser.save();
+  
     // Generate token
     const token = jwt.sign(
-      { userId: newUser.id },
+      { 
+        userId: newUser._id,
+        role: newUser.role
+      },
       process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      { expiresIn: '7d' }
     );
 
     res.json({
       success: true,
+      token,
       data: {
-        token,
-        id: newUser.id,
+        id: newUser._id,
         username: newUser.username,
         email: newUser.email,
         firstName: newUser.firstName,
-        lastName: newUser.lastName
+        lastName: newUser.lastName,
+        role: newUser.role
       }
     });
   } catch (error) {

@@ -1,33 +1,99 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
+  const { user, token } = useAuth();
   const [activeTab, setActiveTab] = useState('posts');
-  const [userStats, setUserStats] = useState({
-    posts: 0,
-    followers: 0,
-    following: 0,
-  });
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [profileData, setProfileData] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
 
-  useEffect(() => {
-    // mock data (replace later with API)
-    setUserStats({
-      posts: 12,
-      followers: 234,
-      following: 180,
-    });
+  const fetchUserProfile = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    setUserPosts([
-      { id: 1, imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=400&fit=crop', likes: 45, comments: 12 },
-      { id: 2, imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=400&fit=crop', likes: 67, comments: 23 },
-      { id: 3, imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&h=400&fit=crop', likes: 89, comments: 15 },
-      { id: 4, imageUrl: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=400&h=400&fit=crop', likes: 34, comments: 8 },
-      { id: 5, imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop', likes: 56, comments: 19 },
-      { id: 6, imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=400&fit=crop', likes: 78, comments: 25 },
-    ]);
-  }, []);
+      const data = await response.json();
+      
+      if (data.success) {
+        setProfileData(data.data);
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      console.error('Profile fetch error:', err);
+      setError('Failed to load profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUserPosts = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+      const response = await fetch(`${API_BASE_URL}/api/v1/posts`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Filter posts by current user - Post model uses 'user' field, not 'author'
+        const myPosts = data.data.filter(post => {
+          const postUserId = post.user?._id || post.user;
+          const currentUserId = profileData?._id || user?.id;
+          return postUserId?.toString() === currentUserId?.toString();
+        });
+        setUserPosts(myPosts);
+      }
+    } catch (err) {
+      console.error('Posts fetch error:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchUserProfile();
+      fetchUserPosts();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayUser = profileData || user;
+  const userStats = {
+    posts: displayUser?.postCount || userPosts.length || 0,
+    followers: displayUser?.followerCount || 0,
+    following: displayUser?.followingCount || 0,
+  };
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -38,7 +104,7 @@ const Profile = () => {
           <div className="flex justify-center md:justify-start">
             <div className="w-32 h-32 md:w-40 md:h-40">
               <img 
-                src="https://placehold.co/200x200/4F46E5/FFFFFF?text=U" 
+                src={displayUser?.profilePicture || `https://ui-avatars.com/api/?name=${displayUser?.username || 'User'}&size=200&background=4F46E5&color=fff&bold=true`}
                 alt="Profile" 
                 className="w-full h-full rounded-full object-cover border-4 border-gray-100 dark:border-gray-700"
               />
@@ -49,7 +115,7 @@ const Profile = () => {
           <div className="flex-1 space-y-6">
             {/* Username and Edit Button */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">johndoe_2026</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{displayUser?.username || 'User'}</h2>
               <Link 
                 to="/edit-profile"
                 className="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
@@ -76,10 +142,17 @@ const Profile = () => {
 
             {/* Bio */}
             <div>
-              <p className="font-bold text-gray-900 dark:text-gray-100 mb-1">John Doe</p>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Computer Science Student 🎓</p>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Love coding, music, and photography 📸</p>
-              <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-1">www.johndoe.com</p>
+              <p className="font-bold text-gray-900 dark:text-gray-100 mb-1">
+                {displayUser?.firstName || displayUser?.lastName 
+                  ? `${displayUser?.firstName || ''} ${displayUser?.lastName || ''}`.trim()
+                  : displayUser?.username || 'User'}
+              </p>
+              {displayUser?.bio && (
+                <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">{displayUser.bio}</p>
+              )}
+              {displayUser?.email && (
+                <p className="text-indigo-600 dark:text-indigo-400 text-sm mt-1">{displayUser.email}</p>
+              )}
             </div>
           </div>
         </div>
@@ -138,33 +211,45 @@ const Profile = () => {
         {/* Posts Grid */}
         <div className="p-6">
           {activeTab === 'posts' && (
-            <div className="grid grid-cols-3 gap-1 md:gap-2">
-              {userPosts.map((post) => (
-                <div key={post.id} className="relative aspect-square group cursor-pointer">
-                  <img 
-                    src={post.imageUrl} 
-                    alt="Post" 
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
-                    <div className="flex space-x-6 text-white">
-                      <span className="flex items-center space-x-2">
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="font-bold">{post.likes}</span>
-                      </span>
-                      <span className="flex items-center space-x-2">
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        <span className="font-bold">{post.comments}</span>
-                      </span>
-                    </div>
-                  </div>
+            <>
+              {userPosts.length === 0 ? (
+                <div className="text-center py-12">
+                  <svg className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="text-gray-600 dark:text-gray-400 font-medium">No posts yet</p>
+                  <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">Start sharing your moments</p>
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-1 md:gap-2">
+                  {userPosts.map((post) => (
+                    <div key={post._id} className="relative aspect-square group cursor-pointer">
+                      <img 
+                        src={post.imageUrl || post.image || 'https://via.placeholder.com/400'} 
+                        alt="Post" 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg flex items-center justify-center">
+                        <div className="flex space-x-6 text-white">
+                          <span className="flex items-center space-x-2">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span className="font-bold">{post.likes || post.likeCount || 0}</span>
+                          </span>
+                          <span className="flex items-center space-x-2">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            <span className="font-bold">{post.comments?.length || post.commentCount || 0}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
           
           {activeTab === 'saved' && (
