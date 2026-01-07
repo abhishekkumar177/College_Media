@@ -85,6 +85,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const resetPassword = async (email) => {
+    try {
+      // Mock password reset - replace with actual implementation
+      console.log('Password reset requested for:', email);
+      return Promise.resolve();
+    } catch (error) {
+      throw new Error('Password reset failed');
+    }
+  };
+
   const register = async (formData) => {
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
@@ -140,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     token,
     login,
     register,
+    resetPassword,
     logout,
     loading,
     error,

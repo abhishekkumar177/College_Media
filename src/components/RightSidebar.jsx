@@ -73,7 +73,7 @@ function RightSidebar() {
                   <p className="font-semibold text-gray-800 dark:text-gray-100 text-sm cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
                     {friend.name}
                   </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                  <p className="text-gray-600 dark:text-gray-300 text-xs">
                     {friend.followers} followers
                   </p>
                 </div>

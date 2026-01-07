@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 /* ===== Pages ===== */
 import Landing from "./pages/Landing";
 import Home from "./pages/Home";
+import ForgotPassword from './pages/ForgetPassword';
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
@@ -21,6 +22,8 @@ import Settings from "./pages/Settings";
 import Reels from "./pages/Reels";
 import CreatePost from "./pages/CreatePost";
 import ContactUs from "./pages/ContactUs";
+import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage";
+import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import Layout from "./components/Layout";
@@ -70,6 +73,7 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<LoginForm />} />
       <Route path="/signup" element={<SignupForm />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Layout Routes */}
       <Route
@@ -235,6 +239,9 @@ const AppContent = ({ searchQuery, setSearchQuery, activeTab, setActiveTab }) =>
       
       <Route path="/contact" element={<ContactUs />} />
       <Route path="/certificate" element={<CertificatePage />} />
+      <Route path="/assessment" element={<GamifiedAssessmentPage />} />
+      
+      <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
     </Routes>
   );
 };
