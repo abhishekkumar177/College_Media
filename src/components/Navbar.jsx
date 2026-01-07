@@ -35,7 +35,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
                 placeholder="Search for friends, groups, pages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-800 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 text-sm"
+                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-800 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
           </div>
@@ -96,9 +96,8 @@ function Navbar({ searchQuery, setSearchQuery }) {
                     />
                   </svg>
                 </button>
-
                 {isProfileOpen && (
-                  <div className="absolute top-14 right-0">
+                  <div className="absolute top-14 right-2">
                     <ProfileMenu setIsProfileOpen={setIsProfileOpen} />
                   </div>
                 )}

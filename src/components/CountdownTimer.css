@@ -1,0 +1,115 @@
+.countdown-timer-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.timer-circle-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  top: 0;
+  left: 0;
+}
+
+.timer-circle-bg {
+  fill: none;
+  stroke: #e5e7eb;
+  stroke-width: 4;
+}
+
+.timer-circle {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
+.timer-text {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  z-index: 10;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.timer-label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* Color variations */
+.text-green-500 {
+  color: #22c55e;
+}
+
+.text-amber-500 {
+  color: #f59e0b;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+}
+
+.countdown-timer-container.warning {
+  animation: pulse 1.5s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .countdown-timer-container {
+    width: 100px;
+    height: 100px;
+  }
+
+  .timer-text {
+    font-size: 1.5rem;
+  }
+
+  .timer-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .countdown-timer-container {
+    width: 80px;
+    height: 80px;
+  }
+
+  .timer-text {
+    font-size: 1.25rem;
+  }
+
+  .timer-label {
+    font-size: 0.65rem;
+  }
+}
