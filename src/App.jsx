@@ -27,6 +27,7 @@ import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage.jsx";
 import LeftSidebar from "./components/LeftSidebar.jsx";
 import Navbar from "./components/Navbar.jsx";
 import CreatePost from "./components/CreatePost.jsx";
+import CoursesLanding from "./pages/CoursesLanding.jsx";
 
 /**
  * App Component - Main container and state management
@@ -481,7 +482,7 @@ const App = () => {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/certificate" element={<CertificatePage />} />
         <Route path="/assessment" element={<GamifiedAssessmentPage />} />
-        
+        <Route path="/courses" element={<CoursesLanding />} />
         <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
       </Routes>
     </div>
