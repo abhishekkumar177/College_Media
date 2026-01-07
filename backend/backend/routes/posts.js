@@ -3,7 +3,6 @@ const router = express.Router();
 
 const Post = require('../models/Post');
 const authMiddleware = require('../middleware/authMiddleware');
-const authorize = require('../middleware/authorize');
 
 /**
  * ✅ CREATE POST
@@ -15,7 +14,9 @@ router.post('/', authMiddleware, async (req, res) => {
     const { caption } = req.body;
 
     if (!caption) {
-      return res.status(400).json({ message: 'Caption is required' });
+      return res.status(400).json({
+        success: false,
+        message: 'Caption is required' });
     }
 
     const post = await Post.create({
@@ -28,7 +29,9 @@ router.post('/', authMiddleware, async (req, res) => {
       data: post
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to create post' });
+    res.status(500).json({
+        success: false,
+         message: 'Failed to create post' });
   }
 });
 
@@ -49,7 +52,32 @@ router.get('/feed', async (req, res) => {
       data: posts
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch feed' });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch feed' });
+  }
+});
+
+/**
+ * ✅ GET ALL POSTS
+ * GET /api/v1/posts
+ * Access: Authenticated (returns user's own posts and public posts)
+ */
+router.get('/', authMiddleware, async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate('user', 'username email firstName lastName profilePicture');
+
+    res.json({
+      success: true,
+      data: posts
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch posts'
+    });
   }
 });
 
@@ -88,7 +116,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       message: 'Post deleted successfully'
     });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete post' });
+    res.status(500).json({
+     success: false,
+      message: 'Failed to delete post' });
   }
 });
 

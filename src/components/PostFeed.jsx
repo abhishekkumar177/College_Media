@@ -204,8 +204,8 @@ const PostFeed = () => {
               className="w-10 h-10 rounded-full object-cover mr-3"
             />
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{post.user.username}</h3>
-              <p className="text-xs text-gray-500">{post.timestamp}</p>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{post.user.username}</h3>
+              <p className="text-xs text-gray-600 dark:text-gray-300">{post.timestamp}</p>
             </div>
           </div>
 
@@ -348,7 +348,7 @@ const PostFeed = () => {
 
             {/* Comments */}
             {post.comments > 0 && (
-              <button className="text-gray-500 text-sm mb-2 mt-3">
+              <button className="text-gray-600 dark:text-gray-300 text-sm mb-2 mt-3 hover:text-gray-800 dark:hover:text-gray-100">
                 View all {post.comments} comments
               </button>
             )}
