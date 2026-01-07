@@ -1,0 +1,15 @@
+{
+  "blank_issues_enabled": true,
+  "contact_links": [
+    {
+      "name": "GitHub Discussions",
+      "url": "https://github.com/abhishekkumar177/College_Media/discussions",
+      "about": "Join community discussions and share ideas"
+    },
+    {
+      "name": "Troubleshooting Guide",
+      "url": "https://github.com/abhishekkumar177/College_Media#-troubleshooting",
+      "about": "Check the troubleshooting section in README for common issues"
+    }
+  ]
+}
