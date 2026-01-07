@@ -13,6 +13,17 @@ const app = express();
 app.use(express.json());
 app.use(morgan("dev"));
 
+// ⏱️ API Timeout Middleware (10 seconds)
+app.use((req, res, next) => {
+  res.setTimeout(10000, () => {
+    return res.status(503).json({
+      success: false,
+      message: "Request timeout. Please try again.",
+    });
+  });
+  next();
+});
+
 // Routes
 app.use("/api/v1/posts", postsRoutes);
 app.use("/api/v1/auth", authRoutes);
@@ -22,7 +33,7 @@ app.get("/", (req, res) => {
   res.json({ ok: true });
 });
 
-// 🔥 PORT MUST BE DECLARED BEFORE USE
+// 🔥 PORT
 const PORT = process.env.PORT || 5001;
 
 // ✅ Start server
@@ -39,7 +50,6 @@ const gracefulShutdown = (signal) => {
     process.exit(0);
   });
 
-  // Force shutdown after 10 seconds
   setTimeout(() => {
     console.error("❌ Force shutdown");
     process.exit(1);
@@ -47,5 +57,5 @@ const gracefulShutdown = (signal) => {
 };
 
 // Handle termination signals
-process.on("SIGINT", gracefulShutdown);   // Ctrl + C
-process.on("SIGTERM", gracefulShutdown);  // Server stop / deploy
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
