@@ -429,7 +429,27 @@ const Footer = () => {
                 </div>
             </div>
 
-            
+            {/* Enhanced Back to Top Button with Animation */}
+            <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className={`fixed bottom-4 right-4 w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-300 z-50 group/backtop overflow-hidden ${showBackToTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`}
+                aria-label="Back to top"
+            >
+                {/* Button Background Animation */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-700 to-pink-700 opacity-0 group-hover/backtop:opacity-100 transition-opacity duration-300"></div>
+
+                {/* Arrow Icon with Animation */}
+                <FaArrowUp
+                    size={14}
+                    className="relative z-10 group-hover/backtop:scale-110 group-hover/backtop:-translate-y-1 transition-transform duration-300"
+                />
+
+                {/* Glow Effect */}
+                <div className="absolute -inset-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-0 group-hover/backtop:opacity-30 transition-opacity duration-500"></div>
+
+                {/* Bounce Animation */}
+                <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 group-hover/backtop:animate-ping opacity-0 group-hover/backtop:opacity-20 transition-opacity duration-300`}></div>
+            </button>
 
             {/* Custom Animations */}
             <style jsx>{`
