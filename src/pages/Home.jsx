@@ -1,24 +1,99 @@
-import React, { useState, useEffect, useRef } from "react";
-import SkeletonPost from "../components/SkeletonPost";
-import { sortByLatest, sortByLikes } from "../utils/feedSort";
+import { useState, useEffect } from "react";
+import './App.css'
+import { Route, Routes } from "react-router-dom";
+import Reels from "./pages/Reels.jsx";
+import ContactUs from "./pages/ContactUs.jsx";
+import CertificatePage from "./pages/CertificatePage.jsx";
+import GamifiedAssessmentPage from "./pages/GamifiedAssessmentPage.jsx";
+import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage.jsx";
+import LeftSidebar from "./components/LeftSidebar.jsx";
+import Navbar from "./components/Navbar.jsx";
+import CreatePost from "./components/CreatePost.jsx";
+import CoursesLanding from "./pages/CoursesLanding.jsx";
 
-const Home = () => {
+const Home = ({ likedPosts, toggleLike, currentStoryIndex, setCurrentStoryIndex, stories, posts, suggestedAccounts, trendingHashtags, onlineFriends }) => {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-2 space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+            {stories.map((story, index) => (
+              <div
+                key={story.id}
+                className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-transform duration-300"
+                onClick={() => setCurrentStoryIndex(index)}
+              >
+                <div className={`relative w-16 h-16 rounded-full border-2 transition-all duration-500 ${index === currentStoryIndex ? "border-gradient-to-r" : "border-gray-300"}`}>
+                  <img src={story.avatar} alt={story.username} className="w-full h-full rounded-full object-cover" />
+                </div>
+                <span className="text-xs text-gray-600 truncate w-16 text-center">{story.username}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {posts.map((post) => (
+          <div key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+            <div className="flex items-center p-4 border-b border-gray-100">
+              <img src={post.user.avatar} alt={post.user.username} className="w-10 h-10 rounded-full mr-3" />
+              <span className="font-semibold text-gray-800">{post.user.username}</span>
+            </div>
+            <img src={post.media} alt="Post content" className="w-full object-cover" />
+            <div className="p-4">
+              <div className="flex items-center space-x-4 mb-3">
+                <button onClick={() => toggleLike(post.id)} className="flex items-center space-x-1 group">
+                   <svg className={`w-6 h-6 transition-all duration-300 ${likedPosts[post.id] ? "fill-pink-500 text-pink-500" : "text-gray-600"}`} fill={likedPosts[post.id] ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                   </svg>
+                   <span>{likedPosts[post.id] ? post.likes + 1 : post.likes}</span>
+                </button>
+              </div>
+              <p className="text-gray-800"><span className="font-semibold mr-2">{post.user.username}</span>{post.caption}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="hidden lg:block lg:col-span-1 space-y-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <h3 className="font-bold text-gray-800 mb-4">Suggested for you</h3>
+          <div className="space-y-3">
+            {suggestedAccounts.map((account, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <img src={account.avatar} alt={account.username} className="w-8 h-8 rounded-full" />
+                  <div>
+                    <p className="font-medium text-gray-800 text-sm">{account.username}</p>
+                    <p className="text-gray-500 text-xs">{account.followers}</p>
+                  </div>
+                </div>
+                <button className="text-blue-500 text-sm font-semibold">Follow</button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+           <h3 className="font-bold text-gray-800 mb-4">Trending</h3>
+           <div className="flex flex-wrap gap-2">
+             {trendingHashtags.map((tag, i) => <span key={i} className="text-purple-700 bg-purple-50 px-2 py-1 rounded text-sm">{tag}</span>)}
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const App = () => {
   const [likedPosts, setLikedPosts] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [shareMenuOpen, setShareMenuOpen] = useState(null);
-  const [copiedLink, setCopiedLink] = useState(null);
-  const [expandedPosts, setExpandedPosts] = useState({});
-  const [showComments, setShowComments] = useState({});
-  const [commentInputs, setCommentInputs] = useState({});
-  const [sortType, setSortType] = useState("latest");
-  const shareMenuRef = useRef(null);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("Home");
 
-  const MAX_CAPTION_LENGTH = 150;
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  const stories = [
+    { id: 1, username: "user1", avatar: "https://placehold.co/100x100/FF6B6B/FFFFFF?text=U1" },
+    { id: 2, username: "user2", avatar: "https://placehold.co/100x100/4ECDC4/FFFFFF?text=U2" },
+    // Add more stories
+  ];
 
   const posts = [
     {
@@ -77,123 +152,72 @@ const Home = () => {
     },
   ];
 
-  const sortedPosts =
-    sortType === "likes" ? sortByLikes(posts) : sortByLatest(posts);
+  const suggestedAccounts = [
+    { username: "tech_guru", avatar: "https://placehold.co/32x32/FF6B6B/FFFFFF?text=TG", followers: "1.2M" },
+  ];
 
-  // 🔥 TRENDING POSTS LOGIC
-  const trendingPosts = [...posts]
-    .sort((a, b) => {
-      const scoreA = a.likes + a.comments + a.shares;
-      const scoreB = b.likes + b.comments + b.shares;
-      return scoreB - scoreA;
-    })
-    .slice(0, 3);
+  const trendingHashtags = ["#photography", "#travel", "#fashion"];
+  const onlineFriends = [];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStoryIndex((prev) => (prev + 1) % stories.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [stories.length]);
 
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
   };
 
   return (
-    <div className="space-y-6" ref={shareMenuRef}>
-      {/* Sort Buttons */}
-      <div className="flex gap-3">
-        <button
-          onClick={() => setSortType("latest")}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            sortType === "latest"
-              ? "bg-indigo-600 text-white"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-          }`}
-        >
-          Latest
-        </button>
-        <button
-          onClick={() => setSortType("likes")}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            sortType === "likes"
-              ? "bg-indigo-600 text-white"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
-          }`}
-        >
-          Most Liked
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+      
+      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          
+          <div className="lg:col-span-1">
+            <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          </div>
+
+          <main className="lg:col-span-3">
+             <Routes>
+                <Route path="/" element={
+                  <Home 
+                    likedPosts={likedPosts}
+                    toggleLike={toggleLike}
+                    currentStoryIndex={currentStoryIndex}
+                    setCurrentStoryIndex={setCurrentStoryIndex}
+                    stories={stories}
+                    posts={posts}
+                    suggestedAccounts={suggestedAccounts}
+                    trendingHashtags={trendingHashtags}
+                    onlineFriends={onlineFriends}
+                  />
+                } />
+                
+                <Route path="/reels" element={<Reels />} />
+                <Route path="/create-post" element={<CreatePost />} />
+                <Route path="/contact" element={<ContactUs />} />
+                <Route path="/certificate" element={<CertificatePage />} />
+                <Route path="/assessment" element={<GamifiedAssessmentPage />} />
+                <Route path="/courses" element={<CoursesLanding />} />
+                <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
+             </Routes>
+          </main>
+        </div>
       </div>
 
-      {/* 🔥 TRENDING POSTS SECTION */}
-      {!loading && trendingPosts.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-          <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">🔥 Trending Now</h2>
-          <div className="space-y-4">
-            {trendingPosts.map((post) => (
-              <div
-                key={post.id}
-                className="flex gap-4 items-center p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <img
-                  src={post.media}
-                  alt="Trending"
-                  className="w-24 h-16 object-cover rounded-lg"
-                />
-                <div className="flex-1">
-                  <p className="font-semibold line-clamp-2 text-gray-900 dark:text-gray-100">{post.caption}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    ❤️ {post.likes} · 💬 {post.comments} · 🔁 {post.shares}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* POSTS FEED */}
-      {loading ? (
-        <>
-          <SkeletonPost />
-          <SkeletonPost />
-          <SkeletonPost />
-        </>
-      ) : (
-        sortedPosts.map((post) => (
-          <div
-            key={post.id}
-            className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src={post.user.avatar}
-                alt={post.user.username}
-                className="w-12 h-12 rounded-full"
-              />
-              <div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">{post.user.username}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{post.user.time}</p>
-              </div>
-            </div>
-
-            <p className="mt-4 text-gray-900 dark:text-gray-100">{post.caption}</p>
-
-            <img
-              src={post.media}
-              alt="Post"
-              className="mt-4 rounded-xl w-full"
-            />
-
-            <div className="flex gap-6 mt-4 text-sm text-gray-700 dark:text-gray-200">
-              <button 
-                onClick={() => toggleLike(post.id)}
-                className="hover:text-red-500 transition-colors duration-200"
-              >
-                ❤️ {likedPosts[post.id] ? post.likes + 1 : post.likes}
-              </button>
-              <span className="hover:text-blue-500 transition-colors duration-200 cursor-pointer">💬 {post.comments}</span>
-              <span className="hover:text-green-500 transition-colors duration-200 cursor-pointer">🔁 {post.shares}</span>
-            </div>
-          </div>
-        ))
-      )}
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .border-gradient-to-r { background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316); border: 2px solid transparent; background-clip: padding-box, border-box; background-origin: padding-box, border-box; }
+      `}</style>
     </div>
   );
 };
 
-export default Home;
+export default App;
