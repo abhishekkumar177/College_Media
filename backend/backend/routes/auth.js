@@ -1,44 +1,94 @@
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-// jwt token implemented
-const router = express.Router(); // 🔥 THIS WAS MISSING
+import { Router } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { body, validationResult } from "express-validator";
 
-// TEST ROUTE
-router.get('/test', (req, res) => {
+const router = Router();
+
+/* ======================
+   TEST ROUTE
+====================== */
+router.get("/test", (req, res) => {
   res.json({ ok: true });
 });
 
-// LOGIN ROUTE
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+/* ======================
+   LOGIN ROUTE
+====================== */
+router.post(
+  "/login",
 
-  // TEMP MOCK USER
-  const mockUser = {
-    id: '123',
-    email: 'test@example.com',
-    password: await bcrypt.hash('Password123', 10)
-  };
+  // 🔒 INPUT VALIDATION
+  [
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
 
-  if (email !== mockUser.email) {
-    return res.status(401).json({ message: 'Invalid credentials' });
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required")
+  ],
+
+  async (req, res) => {
+    try {
+      // 🚫 VALIDATION RESULT CHECK
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          success: false,
+          errors: errors.array().map(err => err.msg) // ✅ FIXED
+        });
+      }
+
+      const { email, password } = req.body;
+
+      // 🧪 TEMP MOCK USER
+      const mockUser = {
+        id: "123",
+        email: "test@example.com",
+        password: await bcrypt.hash("Password123", 10),
+        role: "user"
+      };
+
+      // ❌ INVALID EMAIL
+      if (email !== mockUser.email) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials"
+        });
+      }
+
+      // ❌ INVALID PASSWORD
+      const isMatch = await bcrypt.compare(password, mockUser.password);
+      if (!isMatch) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials"
+        });
+      }
+
+      // 🔑 JWT TOKEN
+      const token = jwt.sign(
+        {
+          userId: mockUser.id,
+          role: mockUser.role
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "15m" }
+      );
+
+      return res.status(200).json({
+        success: true,
+        token
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Login failed"
+      });
+    }
   }
+);
 
-  const isMatch = await bcrypt.compare(password, mockUser.password);
-  if (!isMatch) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
-  const token = jwt.sign(
-    { userId: mockUser.id },
-    process.env.JWT_SECRET,
-    { expiresIn: '15m' }
-  );
-
-  res.json({
-    success: true,
-    token
-  });
-});
-
-module.exports = router;
+export default router;

@@ -3,36 +3,10 @@ const UserMongo = require('../models/User');
 const UserMock = require('../mockdb/userDB');
 const { validateProfileUpdate, checkValidation } = require('../middleware/validationMiddleware');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const path = require('path');
+const authMiddleware = require('../middleware/authMiddleware');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
-
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Bearer TOKEN
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      data: null,
-      message: 'Access denied. No token provided.'
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      data: null,
-      message: 'Invalid token.'
-    });
-  }
-};
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -59,14 +33,14 @@ const upload = multer({
 });
 
 // Get current user profile
-router.get('/profile', verifyToken, async (req, res, next) => {
+router.get('/profile', authMiddleware, async (req, res, next) => {
   try {
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
     
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
-      const user = await UserMongo.findById(req.userId).select('-password');
+      const user = await UserMongo.findById(req.user.userId).select('-password');
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -82,7 +56,7 @@ router.get('/profile', verifyToken, async (req, res, next) => {
       });
     } else {
       // Use mock database
-      const user = await UserMock.findById(req.userId);
+      const user = await UserMock.findById(req.user.userId);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -104,7 +78,7 @@ router.get('/profile', verifyToken, async (req, res, next) => {
 });
 
 // Update user profile
-router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, async (req, res, next) => {
+router.put('/profile', authMiddleware, validateProfileUpdate, checkValidation, async (req, res, next) => {
   try {
     const { firstName, lastName, bio } = req.body;
     
@@ -114,7 +88,7 @@ router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, asyn
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const updatedUser = await UserMongo.findByIdAndUpdate(
-        req.userId,
+        req.user.userId,
         { firstName, lastName, bio },
         { new: true, runValidators: true }
       ).select('-password');
@@ -135,7 +109,7 @@ router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, asyn
     } else {
       // Use mock database
       const updatedUser = await UserMock.update(
-        req.userId,
+        req.user.userId,
         { firstName, lastName, bio }
       );
 
@@ -160,7 +134,7 @@ router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, asyn
 });
 
 // Upload profile picture
-router.post('/profile-picture', verifyToken, upload.single('profilePicture'), async (req, res, next) => {
+router.post('/profile-picture', authMiddleware, upload.single('profilePicture'), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -176,7 +150,7 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const updatedUser = await UserMongo.findByIdAndUpdate(
-        req.userId,
+        req.user.userId,
         { profilePicture: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` },
         { new: true, runValidators: true }
       ).select('-password');
@@ -197,9 +171,9 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
         message: 'Profile picture uploaded successfully'
       });
     } else {
-      // Use mock database
+      // use D
       const updatedUser = await UserMock.updateProfilePicture(
-        req.userId,
+        req.user.userId,
         `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
       );
 
