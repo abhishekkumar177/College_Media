@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import postsRoutes from "./routes/posts.js";
 import authRoutes from "./routes/auth.js";
 import errorHandler from "./middleware/errorHandler.js";
+import protectedRoutes from "./routes/protected.js";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const app = express();
    🌐 GLOBAL MIDDLEWARES
 ======================= */
 app.use(express.json());
+app.use("/api/v1/protected", protectedRoutes);
 
 // morgan only in development
 if (process.env.NODE_ENV === "development") {
