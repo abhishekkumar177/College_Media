@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import './App.css'
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import Reels from "./pages/Reels.jsx";
 import ContactUs from "./pages/ContactUs.jsx";
 import CertificatePage from "./pages/CertificatePage.jsx";
@@ -11,6 +12,8 @@ import LeftSidebar from "./components/LeftSidebar.jsx";
 import Navbar from "./components/Navbar.jsx";
 import CreatePost from "./components/CreatePost.jsx";
 import CoursesLanding from "./pages/CoursesLanding.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import { ErrorProvider } from "./context/ErrorContext.jsx";
 
 const App = () => {
   const [likedPosts, setLikedPosts] = useState({});
@@ -74,9 +77,67 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-      
-      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+    <ErrorProvider>
+      <ErrorBoundary>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">{/* ========== NAVIGATION BAR ========== */}
+      <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex-shrink-0">
+              <div className="w-24 h-8 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 rounded-lg flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity duration-300">
+                <span className="text-white font-bold text-xl">InstaClone</span>
+              </div>
+            </div>
+
+            <div className="flex-1 max-w-lg mx-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white transition-all duration-300"
+                />
+                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <button className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300">
+                <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
@@ -120,6 +181,8 @@ const App = () => {
         .border-gradient-to-r { background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316); border: 2px solid transparent; background-clip: padding-box, border-box; background-origin: padding-box, border-box; }
       `}</style>
     </div>
+      </ErrorBoundary>
+    </ErrorProvider>
   );
 };
 
