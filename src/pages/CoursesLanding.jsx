@@ -215,7 +215,7 @@ const CoursesLanding = () => {
               <Icon icon="lucide:atom" className="absolute -bottom-6 -right-6 text-slate-800 w-40 h-40 group-hover:rotate-12 transition-transform duration-700" />
             </div>
 
-            <div className="md:row-span-2 bg-gradient-to-b from-coral-400 to-coral-600 rounded-3xl p-8 text-white flex flex-col items-center text-center justify-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-on-scroll">
+            <div className="md:row-span-2 bg-gradient-to-b from-orange-300 to-red-300 rounded-3xl p-8 text-white flex flex-col items-center text-center justify-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 animate-on-scroll">
                <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm">
                  <Icon icon="lucide:trophy" width="40" />
                </div>
