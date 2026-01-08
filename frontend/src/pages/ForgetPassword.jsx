@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { resetPassword } = useAuth(); // 🔹 MUST exist in AuthContext
@@ -14,14 +14,14 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setMessage('');
+    setError("");
+    setMessage("");
 
     try {
       await resetPassword(email); // 🔹 Send reset link
-      setMessage('Password reset link sent to your email.');
-    } catch (err) {
-      setError('Failed to send reset email. Try again.');
+      setMessage("Password reset link sent to your email.");
+    } catch {
+      setError("Failed to send reset email. Try again.");
     }
 
     setLoading(false);
@@ -30,9 +30,7 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
       <div className="bg-white rounded-2xl p-8 w-full max-w-md border border-gray-200 shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-4">
-          Forgot Password
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-4">Forgot Password</h1>
 
         <p className="text-center text-gray-600 mb-6">
           Enter your email and we’ll send you a reset link
@@ -65,13 +63,13 @@ const ForgotPassword = () => {
             disabled={loading}
             className="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold"
           >
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
 
         <div className="mt-4 text-center">
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate("/login")}
             className="text-purple-600 text-sm"
           >
             Back to Login

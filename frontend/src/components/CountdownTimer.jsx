@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import './CountdownTimer.css';
+import React, { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
+import "./CountdownTimer.css";
 
 const CountdownTimer = ({ duration = 30, onTimeUp = () => {} }) => {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isActive, setIsActive] = useState(true);
-  const timerRef = useRef(null);
   const circleRef = useRef(null);
 
   useEffect(() => {
@@ -18,7 +17,7 @@ const CountdownTimer = ({ duration = 30, onTimeUp = () => {} }) => {
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft(prev => {
+        setTimeLeft((prev) => {
           if (prev <= 1) {
             setIsActive(false);
             onTimeUp();
@@ -36,43 +35,38 @@ const CountdownTimer = ({ duration = 30, onTimeUp = () => {} }) => {
     if (circleRef.current) {
       const circumference = 2 * Math.PI * 45; // radius of 45
       const offset = circumference - (timeLeft / duration) * circumference;
-      
+
       // Calculate color based on time remaining
       const percentage = (timeLeft / duration) * 100;
-      let color = '#22c55e'; // green
-      
+      let color = "#22c55e"; // green
+
       if (percentage <= 33) {
-        color = '#ef4444'; // red
+        color = "#ef4444"; // red
       } else if (percentage <= 66) {
-        color = '#f59e0b'; // amber
+        color = "#f59e0b"; // amber
       }
 
       gsap.to(circleRef.current, {
         strokeDashoffset: offset,
         stroke: color,
         duration: 0.5,
-        ease: 'linear'
+        ease: "linear",
       });
     }
   }, [timeLeft, duration]);
 
   const getTimeColor = () => {
     const percentage = (timeLeft / duration) * 100;
-    if (percentage <= 33) return 'text-red-500';
-    if (percentage <= 66) return 'text-amber-500';
-    return 'text-green-500';
+    if (percentage <= 33) return "text-red-500";
+    if (percentage <= 66) return "text-amber-500";
+    return "text-green-500";
   };
 
   return (
     <div className="countdown-timer-container">
       <div className="timer-circle-wrapper">
         <svg className="timer-svg" viewBox="0 0 100 100">
-          <circle
-            className="timer-circle-bg"
-            cx="50"
-            cy="50"
-            r="45"
-          />
+          <circle className="timer-circle-bg" cx="50" cy="50" r="45" />
           <circle
             ref={circleRef}
             className="timer-circle"

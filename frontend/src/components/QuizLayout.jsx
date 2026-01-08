@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import gsap from 'gsap';
-import CountdownTimer from './CountdownTimer';
-import AnimatedFeedback from './AnimatedFeedback';
-import './QuizLayout.css';
+import React, { useState, useRef } from "react";
+import gsap from "gsap";
+import CountdownTimer from "./CountdownTimer";
+import AnimatedFeedback from "./AnimatedFeedback";
+import "./QuizLayout.css";
 
 const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -16,7 +16,7 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
 
   const handleAnswerSelect = (isCorrect) => {
     // Show feedback
-    setFeedback(isCorrect ? 'correct' : 'incorrect');
+    setFeedback(isCorrect ? "correct" : "incorrect");
 
     // Animate quiz container
     if (isCorrect) {
@@ -38,8 +38,9 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
         setTimeout(() => {
           onComplete({
             totalQuestions,
-            correctAnswers: answers.filter(a => a).length + (isCorrect ? 1 : 0),
-            answers
+            correctAnswers:
+              answers.filter((a) => a).length + (isCorrect ? 1 : 0),
+            answers,
           });
         }, 1000);
       }
@@ -50,14 +51,14 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
     gsap.to(quizContainerRef.current, {
       duration: 0.5,
       y: -20,
-      ease: 'back.out(2)',
+      ease: "back.out(2)",
       onComplete: () => {
         gsap.to(quizContainerRef.current, {
           duration: 0.3,
           y: 0,
-          ease: 'back.out(2)'
+          ease: "back.out(2)",
         });
-      }
+      },
     });
   };
 
@@ -67,13 +68,13 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
       x: -10,
       repeat: 5,
       yoyo: true,
-      ease: 'power1.inOut',
+      ease: "power1.inOut",
       onComplete: () => {
         gsap.to(quizContainerRef.current, {
           duration: 0.1,
-          x: 0
+          x: 0,
         });
-      }
+      },
     });
   };
 
@@ -82,10 +83,12 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
       {/* Step-based Progress Bar */}
       <div className="progress-section">
         <div className="progress-info">
-          <span className="progress-text">Question {currentQuestion + 1} of {totalQuestions}</span>
+          <span className="progress-text">
+            Question {currentQuestion + 1} of {totalQuestions}
+          </span>
         </div>
         <div className="progress-bar-container">
-          <div 
+          <div
             className="progress-bar"
             style={{ width: `${progressPercentage}%` }}
           />
@@ -101,9 +104,10 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
       <div className="quiz-content-wrapper" ref={quizContainerRef}>
         <div className="quiz-question-container">
           <h2 className="question-title">
-            {questions[currentQuestion]?.question || `Question ${currentQuestion + 1}`}
+            {questions[currentQuestion]?.question ||
+              `Question ${currentQuestion + 1}`}
           </h2>
-          
+
           <div className="options-container">
             {questions[currentQuestion]?.options ? (
               questions[currentQuestion].options.map((option, index) => (
@@ -117,10 +121,30 @@ const QuizLayout = ({ questions = [], onComplete = () => {} }) => {
               ))
             ) : (
               <>
-                <button className="option-button" onClick={() => handleAnswerSelect(false)}>Option A</button>
-                <button className="option-button" onClick={() => handleAnswerSelect(false)}>Option B</button>
-                <button className="option-button" onClick={() => handleAnswerSelect(true)}>Option C</button>
-                <button className="option-button" onClick={() => handleAnswerSelect(false)}>Option D</button>
+                <button
+                  className="option-button"
+                  onClick={() => handleAnswerSelect(false)}
+                >
+                  Option A
+                </button>
+                <button
+                  className="option-button"
+                  onClick={() => handleAnswerSelect(false)}
+                >
+                  Option B
+                </button>
+                <button
+                  className="option-button"
+                  onClick={() => handleAnswerSelect(true)}
+                >
+                  Option C
+                </button>
+                <button
+                  className="option-button"
+                  onClick={() => handleAnswerSelect(false)}
+                >
+                  Option D
+                </button>
               </>
             )}
           </div>

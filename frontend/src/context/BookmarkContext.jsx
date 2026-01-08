@@ -1,11 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const BookmarkContext = createContext();
 
 export const useBookmark = () => {
   const context = useContext(BookmarkContext);
   if (!context) {
-    throw new Error('useBookmark must be used within a BookmarkProvider');
+    throw new Error("useBookmark must be used within a BookmarkProvider");
   }
   return context;
 };
@@ -14,10 +15,10 @@ export const BookmarkProvider = ({ children }) => {
   // Initialize saved posts from localStorage
   const [savedPosts, setSavedPosts] = useState(() => {
     try {
-      const saved = localStorage.getItem('savedPosts');
+      const saved = localStorage.getItem("savedPosts");
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error('Error loading saved posts:', error);
+      console.error("Error loading saved posts:", error);
       return [];
     }
   });
@@ -25,18 +26,18 @@ export const BookmarkProvider = ({ children }) => {
   // Persist saved posts to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('savedPosts', JSON.stringify(savedPosts));
+      localStorage.setItem("savedPosts", JSON.stringify(savedPosts));
     } catch (error) {
-      console.error('Error saving posts:', error);
+      console.error("Error saving posts:", error);
     }
   }, [savedPosts]);
 
   // Toggle bookmark status for a post
   const toggleBookmark = (postId) => {
-    setSavedPosts(prev => {
+    setSavedPosts((prev) => {
       if (prev.includes(postId)) {
         // Remove bookmark
-        return prev.filter(id => id !== postId);
+        return prev.filter((id) => id !== postId);
       } else {
         // Add bookmark
         return [...prev, postId];
@@ -64,7 +65,7 @@ export const BookmarkProvider = ({ children }) => {
     toggleBookmark,
     isBookmarked,
     getSavedCount,
-    clearAllBookmarks
+    clearAllBookmarks,
   };
 
   return (

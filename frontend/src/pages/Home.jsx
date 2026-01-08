@@ -1,18 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import { isPostSaved, toggleSavePost } from "../utils/bookmark";
+import React, { useState, useEffect } from "react";
+
 import SkeletonPost from "../components/SkeletonPost";
 import { sortByLatest, sortByLikes } from "../utils/feedSort";
 
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
   const [loading, setLoading] = useState(true);
-  const [shareMenuOpen, setShareMenuOpen] = useState(null);
-  const [copiedLink, setCopiedLink] = useState(null);
-  const [expandedPosts, setExpandedPosts] = useState({});
-  const [showComments, setShowComments] = useState({});
-  const [commentInputs, setCommentInputs] = useState({});
+
   const [sortType, setSortType] = useState("latest");
-  const shareMenuRef = useRef(null);
 
   const MAX_CAPTION_LENGTH = 150;
 
@@ -51,8 +46,7 @@ const Home = () => {
       },
       media:
         "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop",
-      caption:
-        "Late night study session at the library with amazing friends!",
+      caption: "Late night study session at the library with amazing friends!",
       hashtags: ["#studynight"],
       likes: 89,
       comments: 23,
@@ -69,8 +63,7 @@ const Home = () => {
       },
       media:
         "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=600&h=400&fit=crop",
-      caption:
-        "Experimenting with new recipes in the dorm kitchen!",
+      caption: "Experimenting with new recipes in the dorm kitchen!",
       hashtags: ["#foodie"],
       likes: 156,
       comments: 34,
@@ -94,17 +87,8 @@ const Home = () => {
     setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
   };
 
-  const handleSavePost = (postId) => {
-  const updated = toggleSavePost(postId);
-  setSavedPosts(updated);
-};
-
-
-  
-
-
   return (
-    <div className="space-y-6" ref={shareMenuRef}>
+    <div className="space-y-6">
       {/* Sort Buttons */}
       <div className="flex gap-3">
         <button
@@ -112,7 +96,7 @@ const Home = () => {
           className={`px-4 py-2 rounded-full text-sm font-medium ${
             sortType === "latest"
               ? "bg-indigo-600 text-white"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
           }`}
         >
           Latest
@@ -122,7 +106,7 @@ const Home = () => {
           className={`px-4 py-2 rounded-full text-sm font-medium ${
             sortType === "likes"
               ? "bg-indigo-600 text-white"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
           }`}
         >
           Most Liked
@@ -131,13 +115,15 @@ const Home = () => {
 
       {/* 🔥 TRENDING POSTS SECTION */}
       {!loading && trendingPosts.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
-          <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">🔥 Trending Now</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5">
+          <h2 className="text-lg font-bold mb-4 text-slate-900 dark:text-slate-100">
+            🔥 Trending Now
+          </h2>
           <div className="space-y-4">
             {trendingPosts.map((post) => (
               <div
                 key={post.id}
-                className="flex gap-4 items-center p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="flex gap-4 items-center p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700"
               >
                 <img
                   src={post.media}
@@ -145,8 +131,10 @@ const Home = () => {
                   className="w-24 h-16 object-cover rounded-lg"
                 />
                 <div className="flex-1">
-                  <p className="font-semibold line-clamp-2 text-gray-900 dark:text-gray-100">{post.caption}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="font-semibold line-clamp-2 text-slate-900 dark:text-slate-100">
+                    {post.caption}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">
                     ❤️ {post.likes} · 💬 {post.comments} · 🔁 {post.shares}
                   </p>
                 </div>
@@ -167,7 +155,7 @@ const Home = () => {
         sortedPosts.map((post) => (
           <div
             key={post.id}
-            className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5"
+            className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5"
           >
             <div className="flex items-center gap-3">
               <img
@@ -176,12 +164,18 @@ const Home = () => {
                 className="w-12 h-12 rounded-full"
               />
               <div>
-                <p className="font-bold text-gray-900 dark:text-gray-100">{post.user.username}</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{post.user.time}</p>
+                <p className="font-bold text-slate-900 dark:text-slate-100">
+                  {post.user.username}
+                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  {post.user.time}
+                </p>
               </div>
             </div>
 
-            <p className="mt-4 text-gray-900 dark:text-gray-100">{post.caption}</p>
+            <p className="mt-4 text-slate-900 dark:text-slate-100">
+              {post.caption}
+            </p>
 
             <img
               src={post.media}
@@ -189,15 +183,19 @@ const Home = () => {
               className="mt-4 rounded-xl w-full"
             />
 
-            <div className="flex gap-6 mt-4 text-sm text-gray-700 dark:text-gray-200">
-              <button 
+            <div className="flex gap-6 mt-4 text-sm text-slate-700 dark:text-slate-200">
+              <button
                 onClick={() => toggleLike(post.id)}
                 className="hover:text-red-500 transition-colors duration-200"
               >
                 ❤️ {likedPosts[post.id] ? post.likes + 1 : post.likes}
               </button>
-              <span className="hover:text-blue-500 transition-colors duration-200 cursor-pointer">💬 {post.comments}</span>
-              <span className="hover:text-green-500 transition-colors duration-200 cursor-pointer">🔁 {post.shares}</span>
+              <span className="hover:text-blue-500 transition-colors duration-200 cursor-pointer">
+                💬 {post.comments}
+              </span>
+              <span className="hover:text-green-500 transition-colors duration-200 cursor-pointer">
+                🔁 {post.shares}
+              </span>
             </div>
           </div>
         ))

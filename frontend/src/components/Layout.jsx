@@ -31,40 +31,43 @@ const Layout = ({ searchQuery, setSearchQuery }) => {
 
       <div className="flex relative z-10">
         {/* LEFT SIDEBAR */}
-        <aside className="
+        <aside
+          className="
           hidden lg:block
           fixed left-0 top-0 bottom-0
           w-64 z-40
           backdrop-blur-xl bg-black/40
           border-r border-white/10
-        ">
+        "
+        >
           <LeftSidebar />
         </aside>
 
         {/* MAIN */}
         <div className="flex-1 lg:ml-64">
           {/* NAVBAR */}
-          <header className="
+          <header
+            className="
             fixed top-0 left-0 lg:left-64 right-0
             h-20 z-50
             backdrop-blur-xl bg-black/40
             border-b border-white/10
-          ">
-            <Navbar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
+          "
+          >
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           </header>
 
           {/* CONTENT */}
           <main className="pt-24 px-6 pb-10 relative pro-entrance">
-            <div className="
+            <div
+              className="
               max-w-7xl mx-auto
               bg-[#0F1118]/90 backdrop-blur-xl
               border border-white/10
               rounded-2xl shadow-2xl
               p-6
-            ">
+            "
+            >
               <div className="flex gap-6">
                 <div className="flex-1 max-w-3xl mx-auto">
                   <Outlet />
@@ -72,28 +75,6 @@ const Layout = ({ searchQuery, setSearchQuery }) => {
                 <div className="hidden xl:block w-80">
                   <RightSidebar />
                 </div>
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      
-      {/* Main container with proper spacing */}
-      <div className="flex pt-16">
-        {/* Fixed Left Sidebar */}
-        <div className="hidden lg:block w-64 fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-30">
-          <LeftSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-        </div>
-        
-        {/* Main Content Area */}
-        <main className="flex-1 lg:ml-64">
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="flex gap-6">
-              {/* Center Feed Area */}
-              <div className="flex-1 max-w-2xl mx-auto">
-                <Outlet />
-              </div>
-              
-              {/* Right Sidebar - hidden on mobile */}
-              <div className="w-80 hidden xl:block">
-                <RightSidebar />
               </div>
             </div>
           </main>

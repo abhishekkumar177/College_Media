@@ -69,7 +69,7 @@ const Footer = () => {
       name: "X (Twitter)",
       color: "bg-black",
       hover: "hover:shadow-black/40 hover:bg-black",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -77,7 +77,7 @@ const Footer = () => {
       name: "Facebook",
       color: "bg-blue-600",
       hover: "hover:shadow-blue-600/40 hover:bg-blue-600",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -86,7 +86,7 @@ const Footer = () => {
       color: "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400",
       hover:
         "hover:shadow-purple-500/40 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-orange-400",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -94,7 +94,7 @@ const Footer = () => {
       name: "LinkedIn",
       color: "bg-blue-700",
       hover: "hover:shadow-blue-700/40 hover:bg-blue-700",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -102,7 +102,7 @@ const Footer = () => {
       name: "YouTube",
       color: "bg-red-600",
       hover: "hover:shadow-red-600/40 hover:bg-red-600",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -110,7 +110,7 @@ const Footer = () => {
       name: "GitHub",
       color: "bg-gray-800",
       hover: "hover:shadow-gray-800/40 hover:bg-gray-800",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
     {
@@ -118,7 +118,7 @@ const Footer = () => {
       name: "Discord",
       color: "bg-indigo-500",
       hover: "hover:shadow-indigo-500/40 hover:bg-indigo-500",
-      textColor: "text-gray-800",
+      textColor: "text-gray-800 dark:text-slate-200",
       hoverTextColor: "text-white",
     },
   ];
@@ -188,18 +188,18 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative bg-gradient-to-br from-gray-50 via-white to-purple-50 border-t border-gray-200/70 py-2">
+    <footer className="relative bg-gradient-to-br from-gray-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 border-t border-gray-200/70 dark:border-slate-800/70 py-2 transition-colors duration-300">
       {/* Background Container - Handles Overflow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Creative Background Elements with Animation */}
         <div className="absolute inset-0">
           {/* Gradient Orbs - Smaller with Animation */}
-          <div className="absolute top-1/4 -left-8 w-24 h-24 bg-gradient-to-r from-purple-300/15 to-pink-300/15 rounded-full blur-2xl animate-float-slow"></div>
-          <div className="absolute bottom-1/4 -right-8 w-24 h-24 bg-gradient-to-r from-blue-300/15 to-cyan-300/15 rounded-full blur-2xl animate-float"></div>
+          <div className="absolute top-1/4 -left-8 w-24 h-24 bg-gradient-to-r from-purple-300/15 via-pink-300/15 to-transparent dark:from-purple-900/10 dark:via-pink-900/10 rounded-full blur-2xl animate-float-slow"></div>
+          <div className="absolute bottom-1/4 -right-8 w-24 h-24 bg-gradient-to-r from-blue-300/15 via-cyan-300/15 to-transparent dark:from-blue-900/10 dark:via-cyan-900/10 rounded-full blur-2xl animate-float"></div>
 
           {/* Animated Grid Pattern */}
           <div
-            className="absolute inset-0 opacity-10"
+            className="absolute inset-0 opacity-10 dark:opacity-5"
             style={{
               backgroundImage: `linear-gradient(to right, #9333ea 1px, transparent 1px),
                                       linear-gradient(to bottom, #9333ea 1px, transparent 1px)`,
@@ -231,7 +231,7 @@ const Footer = () => {
               <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-700 group-hover:via-pink-600 group-hover:to-blue-600 transition-all duration-500">
                 UniHub
               </h2>
-              <p className="text-xs text-gray-600 flex items-center gap-1 mt-0.5 group-hover:text-gray-800 transition-colors duration-300">
+              <p className="text-xs text-gray-600 dark:text-slate-400 flex items-center gap-1 mt-0.5 group-hover:text-gray-800 dark:group-hover:text-slate-200 transition-colors duration-300">
                 <FaCheckCircle className="text-green-500 text-xs group-hover:scale-125 transition-transform duration-500" />
                 <span>Trusted by 50K+ Students</span>
               </p>
@@ -250,7 +250,7 @@ const Footer = () => {
                 >
                   <a
                     href="#"
-                    className={`w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center transition-all duration-300 ${social.hover} shadow-sm hover:shadow-xl hover:-translate-y-1 relative overflow-hidden`}
+                    className={`w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-center transition-all duration-300 ${social.hover} shadow-sm hover:shadow-xl hover:-translate-y-1 relative overflow-hidden`}
                   >
                     {/* Icon with proper color transition */}
                     <div
@@ -291,7 +291,7 @@ const Footer = () => {
           <div className="flex gap-1.5">
             <a
               href="#"
-              className="px-2 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 flex items-center gap-1.5 group hover:scale-105 hover:shadow-lg active:scale-95"
+              className="px-2 py-1.5 bg-black dark:bg-slate-900 border border-transparent dark:border-slate-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-slate-800 transition-all duration-300 flex items-center gap-1.5 group hover:scale-105 hover:shadow-lg active:scale-95"
             >
               <FaApple className="text-sm group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500" />
               <div className="text-left">
@@ -302,7 +302,7 @@ const Footer = () => {
             </a>
             <a
               href="#"
-              className="px-2 py-1.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-all duration-300 flex items-center gap-1.5 group hover:scale-105 hover:shadow-lg active:scale-95"
+              className="px-2 py-1.5 bg-black dark:bg-slate-900 border border-transparent dark:border-slate-700 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-slate-800 transition-all duration-300 flex items-center gap-1.5 group hover:scale-105 hover:shadow-lg active:scale-95"
             >
               <FaGooglePlay className="text-sm group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500" />
               <div className="text-left">
@@ -318,7 +318,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mb-2">
           {/* Description Column - Enhanced Hover */}
           <div
-            className="bg-white/50 backdrop-blur-sm rounded-lg p-2 border border-gray-200/50 hover:border-purple-300/50 hover:bg-white/70 hover:shadow-lg transition-all duration-500 group cursor-pointer"
+            className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-lg p-2 border border-gray-200/50 dark:border-slate-700/50 hover:border-purple-300/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:shadow-lg transition-all duration-500 group cursor-pointer"
             onMouseEnter={() => setHoveredLink("description")}
             onMouseLeave={() => setHoveredLink(null)}
           >
@@ -333,11 +333,11 @@ const Footer = () => {
                   size={12}
                 />
               </div>
-              <h3 className="text-xs font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-300">
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors duration-300">
                 Why Choose UniHub?
               </h3>
             </div>
-            <p className="text-xs text-gray-600 leading-relaxed group-hover:text-gray-800 transition-colors duration-300">
+            <p className="text-xs text-gray-600 dark:text-slate-400 leading-relaxed group-hover:text-gray-800 dark:group-hover:text-slate-200 transition-colors duration-300">
               The ultimate platform connecting students worldwide with
               AI-powered tools.
             </p>
@@ -351,11 +351,11 @@ const Footer = () => {
               {footerLinks.map((section, sectionIndex) => (
                 <div
                   key={section.title}
-                  className="bg-white/50 backdrop-blur-sm rounded-lg p-2 border border-gray-200/50 hover:border-purple-200 hover:bg-white/70 hover:shadow-lg transition-all duration-500 group"
+                  className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-lg p-2 border border-gray-200/50 dark:border-slate-700/50 hover:border-purple-200 dark:hover:border-purple-900 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:shadow-lg transition-all duration-500 group"
                 >
                   <div className="flex items-center gap-2 mb-1.5 group-hover:gap-3 transition-all duration-500">
                     {section.icon}
-                    <h4 className="text-xs font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-300">
+                    <h4 className="text-xs font-semibold text-gray-900 dark:text-white group-hover:text-purple-700 dark:group-hover:text-purple-400 transition-colors duration-300">
                       {section.title}
                     </h4>
                   </div>
@@ -364,7 +364,7 @@ const Footer = () => {
                       <li key={link.text}>
                         <a
                           href="#"
-                          className="flex items-center justify-between text-xs text-gray-600 hover:text-purple-600 transition-all duration-300 group/link py-1"
+                          className="flex items-center justify-between text-xs text-gray-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 group/link py-1"
                           onMouseEnter={() =>
                             setHoveredLink(`${sectionIndex}-${linkIndex}`)
                           }
@@ -417,7 +417,7 @@ const Footer = () => {
         {/* Newsletter Section - Enhanced Hover and Animation */}
         <div className="relative mb-2 group/newsletter">
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/3 via-pink-500/3 to-blue-500/3 rounded-xl blur-sm group-hover/newsletter:blur-md transition-all duration-500"></div>
-          <div className="relative bg-gradient-to-r from-white to-purple-50/30 border border-purple-100 rounded-lg p-2 shadow-sm group-hover/newsletter:shadow-lg group-hover/newsletter:border-purple-300 transition-all duration-500">
+          <div className="relative bg-gradient-to-r from-white to-purple-50/30 dark:from-slate-900 dark:to-slate-800/30 border border-purple-100 dark:border-slate-700 rounded-lg p-2 shadow-sm group-hover/newsletter:shadow-lg group-hover/newsletter:border-purple-300 dark:group-hover/newsletter:border-purple-700 transition-all duration-500">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-2 group/icon">
                 <div className="relative">
@@ -431,10 +431,10 @@ const Footer = () => {
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500/30 to-pink-500/30 opacity-0 group-hover/icon:opacity-100 group-hover/icon:animate-ping transition-opacity duration-500"></div>
                 </div>
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-900 group-hover/newsletter:text-purple-700 transition-colors duration-300">
+                  <h4 className="text-xs font-semibold text-gray-900 dark:text-white group-hover/newsletter:text-purple-700 dark:group-hover/newsletter:text-purple-400 transition-colors duration-300">
                     Stay Updated
                   </h4>
-                  <p className="text-[10px] text-gray-600 group-hover/newsletter:text-gray-800 transition-colors duration-300">
+                  <p className="text-[10px] text-gray-600 dark:text-slate-400 group-hover/newsletter:text-gray-800 dark:group-hover/newsletter:text-slate-200 transition-colors duration-300">
                     Weekly campus updates
                   </p>
                 </div>
@@ -462,7 +462,7 @@ const Footer = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Your email"
-                      className="w-full px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 outline-none transition-all duration-300 group-hover/form:border-purple-400"
+                      className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 outline-none transition-all duration-300 group-hover/form:border-purple-400 text-slate-900 dark:text-white"
                     />
                     {/* Focus/Hover Effect */}
                     <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500/0 to-pink-500/0 group-hover/form:from-purple-500/5 group-hover/form:to-pink-500/5 transition-all duration-500 pointer-events-none"></div>
@@ -486,17 +486,17 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar - Enhanced Hover Effects */}
-        <div className="border-t border-gray-200/50 pt-1 group/bottom">
+        <div className="border-t border-gray-200/50 dark:border-slate-700/50 pt-1 group/bottom">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
             {/* Copyright with Hover Effect */}
             <div className="text-center sm:text-left group/copyright cursor-pointer">
               <div className="flex items-center gap-1.5 mb-0.5 justify-center sm:justify-start">
                 <FaHeart className="text-red-500 text-xs group-hover/copyright:scale-125 group-hover/copyright:animate-pulse transition-all duration-300" />
-                <p className="text-xs text-gray-700 group-hover/copyright:text-purple-700 transition-colors duration-300">
+                <p className="text-xs text-gray-700 dark:text-slate-400 group-hover/copyright:text-purple-700 dark:group-hover/copyright:text-purple-400 transition-colors duration-300">
                   Crafted with passion
                 </p>
               </div>
-              <p className="text-[10px] text-gray-500 group-hover/copyright:text-gray-700 transition-colors duration-300">
+              <p className="text-[10px] text-gray-500 dark:text-slate-500 group-hover/copyright:text-gray-700 dark:group-hover/copyright:text-slate-300 transition-colors duration-300">
                 © {currentYear} UniHub. All rights reserved.
               </p>
             </div>
@@ -508,7 +508,7 @@ const Footer = () => {
                   <a
                     key={link}
                     href="#"
-                    className="text-[10px] text-gray-600 hover:text-purple-600 transition-all duration-300 relative group/link-item"
+                    className="text-[10px] text-gray-600 dark:text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 relative group/link-item"
                   >
                     <span className="relative z-10 group-hover/link-item:font-medium">
                       {link}

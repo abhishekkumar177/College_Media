@@ -2,10 +2,11 @@
  * Posts Context
  * Global posts state management
  */
+/* eslint-disable react-refresh/only-export-components */
 
-import React, { createContext, useReducer, useCallback } from 'react';
-import { postsReducer, initialPostsState } from '../reducers/postsReducer';
-import { POSTS_ACTIONS } from '../reducers/actionTypes';
+import React, { createContext, useReducer, useCallback } from "react";
+import { postsReducer, initialPostsState } from "../reducers/postsReducer";
+import { POSTS_ACTIONS } from "../reducers/actionTypes";
 
 export const PostsContext = createContext(null);
 
@@ -267,5 +268,7 @@ export const PostsProvider = ({ children }) => {
     clearPostsError,
   };
 
-  return <PostsContext.Provider value={value}>{children}</PostsContext.Provider>;
+  return (
+    <PostsContext.Provider value={value}>{children}</PostsContext.Provider>
+  );
 };

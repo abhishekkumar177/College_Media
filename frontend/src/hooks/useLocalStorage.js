@@ -3,7 +3,7 @@
  * Custom hook for persistent state in localStorage
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 /**
  * Hook to manage state synced with localStorage
@@ -14,7 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 export const useLocalStorage = (key, initialValue) => {
   // State to store our value
   const [storedValue, setStoredValue] = useState(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return initialValue;
     }
 
@@ -33,13 +33,14 @@ export const useLocalStorage = (key, initialValue) => {
     (value) => {
       try {
         // Allow value to be a function so we have same API as useState
-        const valueToStore = value instanceof Function ? value(storedValue) : value;
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
 
         // Save state
         setStoredValue(valueToStore);
 
         // Save to localStorage
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
         }
       } catch (error) {
@@ -53,8 +54,8 @@ export const useLocalStorage = (key, initialValue) => {
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
-      
-      if (typeof window !== 'undefined') {
+
+      if (typeof window !== "undefined") {
         window.localStorage.removeItem(key);
       }
     } catch (error) {
@@ -74,8 +75,8 @@ export const useLocalStorage = (key, initialValue) => {
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [key]);
 
   return [storedValue, setValue, removeValue];
@@ -123,7 +124,7 @@ export const useLocalStorageObject = (key, initialValue = {}) => {
  * @returns {[Array, Function, Function, Function, Function]} [value, setValue, addItem, removeItem, clearArray]
  */
 export const useLocalStorageArray = (key, initialValue = []) => {
-  const [value, setValue, removeValue] = useLocalStorage(key, initialValue);
+  const [value, setValue] = useLocalStorage(key, initialValue);
 
   const addItem = useCallback(
     (item) => {

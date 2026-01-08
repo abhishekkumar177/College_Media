@@ -4,9 +4,9 @@
  */
 
 const STORAGE_KEYS = {
-  AUTH: 'college_media_auth',
-  THEME: 'college_media_theme',
-  UI_PREFERENCES: 'college_media_ui_prefs',
+  AUTH: "college_media_auth",
+  THEME: "college_media_theme",
+  UI_PREFERENCES: "college_media_ui_prefs",
 };
 
 // ============================================
@@ -22,7 +22,7 @@ export const getStoredAuth = () => {
     const stored = localStorage.getItem(STORAGE_KEYS.AUTH);
     return stored ? JSON.parse(stored) : null;
   } catch (error) {
-    console.error('Error reading auth from storage:', error);
+    console.error("Error reading auth from storage:", error);
     return null;
   }
 };
@@ -35,7 +35,7 @@ export const setStoredAuth = (authData) => {
   try {
     localStorage.setItem(STORAGE_KEYS.AUTH, JSON.stringify(authData));
   } catch (error) {
-    console.error('Error storing auth data:', error);
+    console.error("Error storing auth data:", error);
   }
 };
 
@@ -46,7 +46,7 @@ export const clearStoredAuth = () => {
   try {
     localStorage.removeItem(STORAGE_KEYS.AUTH);
   } catch (error) {
-    console.error('Error clearing auth data:', error);
+    console.error("Error clearing auth data:", error);
   }
 };
 
@@ -62,7 +62,7 @@ export const getStoredTheme = () => {
   try {
     return localStorage.getItem(STORAGE_KEYS.THEME);
   } catch (error) {
-    console.error('Error reading theme from storage:', error);
+    console.error("Error reading theme from storage:", error);
     return null;
   }
 };
@@ -75,7 +75,7 @@ export const setStoredTheme = (theme) => {
   try {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
   } catch (error) {
-    console.error('Error storing theme:', error);
+    console.error("Error storing theme:", error);
   }
 };
 
@@ -92,7 +92,7 @@ export const getStoredUIPreferences = () => {
     const stored = localStorage.getItem(STORAGE_KEYS.UI_PREFERENCES);
     return stored ? JSON.parse(stored) : null;
   } catch (error) {
-    console.error('Error reading UI preferences from storage:', error);
+    console.error("Error reading UI preferences from storage:", error);
     return null;
   }
 };
@@ -103,9 +103,12 @@ export const getStoredUIPreferences = () => {
  */
 export const setStoredUIPreferences = (preferences) => {
   try {
-    localStorage.setItem(STORAGE_KEYS.UI_PREFERENCES, JSON.stringify(preferences));
+    localStorage.setItem(
+      STORAGE_KEYS.UI_PREFERENCES,
+      JSON.stringify(preferences)
+    );
   } catch (error) {
-    console.error('Error storing UI preferences:', error);
+    console.error("Error storing UI preferences:", error);
   }
 };
 
@@ -120,11 +123,7 @@ export const setStoredUIPreferences = (preferences) => {
  */
 export const isValidUser = (user) => {
   return (
-    user &&
-    typeof user === 'object' &&
-    user.id &&
-    user.username &&
-    user.email
+    user && typeof user === "object" && user.id && user.username && user.email
   );
 };
 
@@ -134,12 +133,7 @@ export const isValidUser = (user) => {
  * @returns {boolean} Whether post is valid
  */
 export const isValidPost = (post) => {
-  return (
-    post &&
-    typeof post === 'object' &&
-    post.id &&
-    post.content
-  );
+  return post && typeof post === "object" && post.id && post.content;
 };
 
 /**
@@ -148,7 +142,7 @@ export const isValidPost = (post) => {
  * @returns {boolean} Whether token is valid
  */
 export const isValidToken = (token) => {
-  return typeof token === 'string' && token.length > 0;
+  return typeof token === "string" && token.length > 0;
 };
 
 // ============================================
@@ -165,11 +159,11 @@ export const normalizeUser = (user) => {
 
   return {
     id: user.id || user._id,
-    username: user.username || '',
-    email: user.email || '',
-    fullName: user.fullName || user.full_name || '',
+    username: user.username || "",
+    email: user.email || "",
+    fullName: user.fullName || user.full_name || "",
     avatar: user.avatar || user.profilePicture || null,
-    bio: user.bio || '',
+    bio: user.bio || "",
     followers: user.followers || 0,
     following: user.following || 0,
     createdAt: user.createdAt || user.created_at || new Date().toISOString(),
@@ -186,7 +180,7 @@ export const normalizePost = (post) => {
 
   return {
     id: post.id || post._id,
-    content: post.content || '',
+    content: post.content || "",
     author: normalizeUser(post.author || post.user),
     likes: post.likes || post.likeCount || 0,
     comments: post.comments || [],
@@ -220,7 +214,7 @@ export const clearAllStoredState = () => {
       localStorage.removeItem(key);
     });
   } catch (error) {
-    console.error('Error clearing stored state:', error);
+    console.error("Error clearing stored state:", error);
   }
 };
 
@@ -246,7 +240,7 @@ export const deepClone = (obj) => {
   try {
     return JSON.parse(JSON.stringify(obj));
   } catch (error) {
-    console.error('Error deep cloning object:', error);
+    console.error("Error deep cloning object:", error);
     return obj;
   }
 };
@@ -257,11 +251,11 @@ export const deepClone = (obj) => {
  */
 export const isLocalStorageAvailable = () => {
   try {
-    const test = '__localStorage_test__';
+    const test = "__localStorage_test__";
     localStorage.setItem(test, test);
     localStorage.removeItem(test);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 };

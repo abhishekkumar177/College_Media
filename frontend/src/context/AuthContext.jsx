@@ -1,11 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -14,10 +15,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
+    const storedToken = localStorage.getItem("token");
     if (storedToken) {
       fetchUserData(storedToken);
     } else {
@@ -28,9 +29,14 @@ export const AuthProvider = ({ children }) => {
   const fetchUserData = async (token) => {
     try {
       setError(null);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
+        }/api/users/profile`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Session expired. Please login again.");
@@ -41,7 +47,7 @@ export const AuthProvider = ({ children }) => {
       setToken(token);
     } catch (err) {
       console.error(err);
-      localStorage.removeItem('token');
+      localStorage.removeItem("token");
       setToken(null);
       setUser(null);
 
@@ -57,18 +63,23 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
+        }/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await response.json();
 
       if (data.success) {
         // Backend now sends token at root level, user data in data object
         const { token, data: userData } = data;
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
         setToken(token);
         setUser(userData);
         setError(null);
@@ -81,7 +92,7 @@ export const AuthProvider = ({ children }) => {
         success: false,
         message: !navigator.onLine
           ? "No internet connection."
-          : "Login failed. Please try again."
+          : "Login failed. Please try again.",
       };
     }
   };
@@ -89,60 +100,64 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email) => {
     try {
       // Mock password reset - replace with actual implementation
-      console.log('Password reset requested for:', email);
+      console.log("Password reset requested for:", email);
       return Promise.resolve();
-    } catch (error) {
-      throw new Error('Password reset failed');
+    } catch {
+      throw new Error("Password reset failed");
     }
   };
 
   const register = async (formData) => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-      
+      const API_BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+
       const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       let data;
       try {
         data = await response.json();
-      } catch (parseError) {
-        throw new Error('Server returned an invalid response. Please try again later.');
+      } catch {
+        throw new Error(
+          "Server returned an invalid response. Please try again later."
+        );
       }
 
       if (data.success) {
         // Backend now sends token at root level, user data in data object
         const { token, data: userData } = data;
-        
-        localStorage.setItem('token', token);
+
+        localStorage.setItem("token", token);
         setToken(token);
         setUser(userData);
         setError(null);
-        
+
         return { success: true, user: userData };
       } else {
-        return { 
-          success: false, 
-          message: data.message || 'Registration failed.' 
+        return {
+          success: false,
+          message: data.message || "Registration failed.",
         };
       }
     } catch (err) {
       console.error("Registration Error:", err);
-      
+
       return {
         success: false,
         message: !navigator.onLine
           ? "No internet connection."
-          : err.message || "Registration failed. Please check your server connection."
+          : err.message ||
+            "Registration failed. Please check your server connection.",
       };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
@@ -162,14 +177,16 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={value}>
       {error && (
-        <div style={{
-          background: "#fee",
-          color: "#900",
-          padding: "12px",
-          margin: "10px",
-          borderRadius: "6px",
-          textAlign: "center"
-        }}>
+        <div
+          style={{
+            background: "#fee",
+            color: "#900",
+            padding: "12px",
+            margin: "10px",
+            borderRadius: "6px",
+            textAlign: "center",
+          }}
+        >
           ⚠️ {error}
         </div>
       )}

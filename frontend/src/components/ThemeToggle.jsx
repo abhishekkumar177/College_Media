@@ -1,7 +1,7 @@
-import { useTheme } from '../context/ThemeContext';
-import { FiSun, FiMoon } from 'react-icons/fi';
+import { useTheme } from "../context/ThemeContext";
+import { FiSun, FiMoon } from "react-icons/fi";
 
-const ThemeToggle = ({ className = '' }) => {
+const ThemeToggle = ({ className = "" }) => {
   const { isDarkMode, toggleTheme } = useTheme();
 
   return (
@@ -20,23 +20,23 @@ const ThemeToggle = ({ className = '' }) => {
         {/* Sun Icon (Show when Light) */}
         <div
           className={`absolute inset-0 transform transition-all duration-500 ${
-            isDarkMode 
-              ? 'rotate-90 opacity-0 scale-50' 
-              : 'rotate-0 opacity-100 scale-100'
+            isDarkMode
+              ? "rotate-90 opacity-0 scale-50"
+              : "rotate-0 opacity-100 scale-100"
           }`}
         >
-          <FiSun className="w-5 h-5 text-gray-700 hover:text-coral-500 transition-colors" />
+          <FiSun className="w-5 h-5 text-amber-500 hover:text-amber-600 transition-colors" />
         </div>
 
         {/* Moon Icon (Show when Dark) */}
         <div
           className={`absolute inset-0 transform transition-all duration-500 ${
-            isDarkMode 
-              ? 'rotate-0 opacity-100 scale-100' 
-              : '-rotate-90 opacity-0 scale-50'
+            isDarkMode
+              ? "rotate-0 opacity-100 scale-100"
+              : "-rotate-90 opacity-0 scale-50"
           }`}
         >
-          <FiMoon className="w-5 h-5 text-gray-200 hover:text-coral-300 transition-colors" />
+          <FiMoon className="w-5 h-5 text-indigo-400 hover:text-indigo-300 transition-colors" />
         </div>
       </div>
     </button>

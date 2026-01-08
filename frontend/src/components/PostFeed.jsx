@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+
 import CreatePost from "./CreatePost";
 import Post from "../components/Post";
 import SkeletonPost from "../components/SkeletonPost";
 
 const PostFeed = () => {
-  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,29 +18,31 @@ const PostFeed = () => {
           user: {
             id: 2,
             username: "college_friend",
-            profilePicture: "https://placehold.co/40x40/4F46E5/FFFFFF?text=CF"
+            profilePicture: "https://placehold.co/40x40/4F46E5/FFFFFF?text=CF",
           },
-          imageUrl: "https://placehold.co/600x600/6366F1/FFFFFF?text=Campus+Life",
+          imageUrl:
+            "https://placehold.co/600x600/6366F1/FFFFFF?text=Campus+Life",
           caption: "Enjoying the beautiful campus weather!",
           likes: 24,
           comments: 5,
           timestamp: "2 hours ago",
-          liked: false
+          liked: false,
         },
         {
           id: 2,
           user: {
             id: 3,
             username: "study_buddy",
-            profilePicture: "https://placehold.co/40x40/EC4899/FFFFFF?text=SB"
+            profilePicture: "https://placehold.co/40x40/EC4899/FFFFFF?text=SB",
           },
-          imageUrl: "https://placehold.co/600x600/EC4899/FFFFFF?text=Study+Group",
+          imageUrl:
+            "https://placehold.co/600x600/EC4899/FFFFFF?text=Study+Group",
           caption: "Group study session in the library",
           likes: 42,
           comments: 8,
           timestamp: "4 hours ago",
-          liked: true
-        }
+          liked: true,
+        },
       ];
       setPosts(mockPosts);
       setLoading(false);
@@ -55,15 +56,14 @@ const PostFeed = () => {
           ? {
               ...post,
               liked: !post.liked,
-              likes: post.liked ? post.likes - 1 : post.likes + 1
+              likes: post.liked ? post.likes - 1 : post.likes + 1,
             }
           : post
       )
     );
   };
 
-  const getPostUrl = (post) =>
-    `https://collegemedia.com/post/${post.id}`;
+  const getPostUrl = (post) => `https://collegemedia.com/post/${post.id}`;
 
   const getShareText = (post) =>
     `Check out this post from ${post.user.username}: ${post.caption}`;

@@ -9,10 +9,9 @@ function Navbar({ searchQuery, setSearchQuery }) {
   const { user } = useAuth();
 
   return (
-    <nav className="top-0 z-50 ml-20">
+    <nav className="sticky top-0 z-50 ml-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <div className="px-6 py-4">
         <div className="flex items-center justify-center gap-6">
-
           {/* SEARCH BAR */}
           <div className="flex-1 max-w-2xl mx-auto">
             <div className="relative">
@@ -42,7 +41,6 @@ function Navbar({ searchQuery, setSearchQuery }) {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-3">
-
             {/* Create Post */}
             <Link
               to="/create-post"
@@ -104,7 +102,6 @@ function Navbar({ searchQuery, setSearchQuery }) {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </nav>

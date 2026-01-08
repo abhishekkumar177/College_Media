@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import './AdvancedSyllabus.css';
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import "./AdvancedSyllabus.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,10 +16,18 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
     const scrollContainer = containerRef.current;
     if (!scrollContainer) return;
 
+    const updateActiveModule = (progress) => {
+      const moduleCount = courseMaterial.length;
+      const activeIndex = Math.floor(progress * moduleCount);
+      if (activeIndex < moduleCount) {
+        setActiveModule(activeIndex);
+      }
+    };
+
     // Create SVG path for progress line animation
-    const svg = progressLineRef.current?.querySelector('svg');
+    const svg = progressLineRef.current?.querySelector("svg");
     if (svg) {
-      const path = svg.querySelector('path');
+      const path = svg.querySelector("path");
       if (path) {
         const pathLength = path.getTotalLength();
         path.style.strokeDasharray = pathLength;
@@ -31,13 +39,13 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
           scrollTrigger: {
             trigger: scrollContainer,
             scroller: window,
-            start: 'top top',
-            end: 'bottom bottom',
+            start: "top top",
+            end: "bottom bottom",
             scrub: 1,
             onUpdate: (self) => {
               updateActiveModule(self.progress);
-            }
-          }
+            },
+          },
         });
       }
     }
@@ -50,7 +58,7 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
         header,
         {
           y: 0,
-          opacity: 1
+          opacity: 1,
         },
         {
           y: -100,
@@ -59,16 +67,16 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
           scrollTrigger: {
             trigger: header,
             scroller: window,
-            start: 'top 60px',
-            end: 'top -100px',
+            start: "top 60px",
+            end: "top -100px",
             markers: false,
             onEnter: () => {
               setActiveModule(index);
             },
             onEnterBack: () => {
               setActiveModule(index);
-            }
-          }
+            },
+          },
         }
       );
     });
@@ -77,7 +85,7 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
     lessonItemsRef.current.forEach((item) => {
       if (!item) return;
 
-      const chars = item.querySelectorAll('.lesson-char');
+      const chars = item.querySelectorAll(".lesson-char");
       if (chars.length === 0) return;
 
       gsap.fromTo(
@@ -87,7 +95,7 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
           yPercent: 120,
           scaleY: 2.3,
           scaleX: 0.7,
-          transformOrigin: '50% 50%'
+          transformOrigin: "50% 50%",
         },
         {
           opacity: 1,
@@ -96,14 +104,14 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
           scaleX: 1,
           duration: 0.8,
           stagger: 0.02,
-          ease: 'back.out(2)',
+          ease: "back.out(2)",
           scrollTrigger: {
             trigger: item,
             scroller: window,
-            start: 'center bottom+=50%',
-            end: 'bottom bottom-=40%',
-            scrub: true
-          }
+            start: "center bottom+=50%",
+            end: "bottom bottom-=40%",
+            scrub: true,
+          },
         }
       );
     });
@@ -113,24 +121,19 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
     };
   }, [courseMaterial]);
 
-  const updateActiveModule = (progress) => {
-    const moduleCount = courseMaterial.length;
-    const activeIndex = Math.floor(progress * moduleCount);
-    if (activeIndex < moduleCount) {
-      setActiveModule(activeIndex);
-    }
-  };
-
   const renderLessonDescription = (text) => {
     if (!text) return null;
-    return text.split('').map((char, index) => (
+    return text.split("").map((char, index) => (
       <span key={index} className="lesson-char">
-        {char === ' ' ? '\u00A0' : char}
+        {char === " " ? "\u00A0" : char}
       </span>
     ));
   };
 
-  const totalLessons = courseMaterial.reduce((sum, module) => sum + (module.lessons?.length || 0), 0);
+  const totalLessons = courseMaterial.reduce(
+    (sum, module) => sum + (module.lessons?.length || 0),
+    0
+  );
   const svgHeight = 200 + totalLessons * 80;
 
   return (
@@ -138,9 +141,20 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
       <div className="syllabus-container">
         {/* Progress Line with SVG */}
         <div ref={progressLineRef} className="progress-line-container">
-          <svg width="4" height={svgHeight} viewBox={`0 0 4 ${svgHeight}`} preserveAspectRatio="none">
+          <svg
+            width="4"
+            height={svgHeight}
+            viewBox={`0 0 4 ${svgHeight}`}
+            preserveAspectRatio="none"
+          >
             <defs>
-              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient
+                id="progressGradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
                 <stop offset="100%" stopColor="#8b5cf6" stopOpacity="1" />
               </linearGradient>
@@ -162,7 +176,9 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
               {/* Sticky Module Header */}
               <div
                 ref={(el) => (sectionHeadersRef.current[moduleIndex] = el)}
-                className={`module-header ${activeModule === moduleIndex ? 'active' : ''}`}
+                className={`module-header ${
+                  activeModule === moduleIndex ? "active" : ""
+                }`}
               >
                 <h2 className="module-title">{module.title}</h2>
                 <p className="module-subtitle">{module.subtitle}</p>
@@ -174,7 +190,7 @@ const AdvancedSyllabus = ({ courseMaterial = [] }) => {
                   module.lessons.map((lesson, lessonIndex) => (
                     <div
                       key={lessonIndex}
-                      ref={(el) => (lessonItemsRef.current.push(el))}
+                      ref={(el) => lessonItemsRef.current.push(el)}
                       className="lesson-item"
                     >
                       <div className="lesson-header">
