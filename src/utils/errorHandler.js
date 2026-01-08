@@ -78,7 +78,7 @@ export const getErrorMessage = (error) => {
  * Log error to console in development and to service in production
  */
 export const logError = (error, errorInfo = {}) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.MODE === 'development') {
     console.error('Error occurred:', {
       error,
       errorInfo,
@@ -87,7 +87,7 @@ export const logError = (error, errorInfo = {}) => {
   }
 
   // In production, send to error reporting service
-  if (process.env.NODE_ENV === 'production' && window.errorReportingService) {
+  if (import.meta.env.MODE === 'production' && window.errorReportingService) {
     window.errorReportingService.logError(error, errorInfo);
   }
 };

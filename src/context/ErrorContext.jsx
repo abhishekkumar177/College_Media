@@ -1,15 +1,7 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-const ErrorContext = createContext();
-
-export const useError = () => {
-  const context = useContext(ErrorContext);
-  if (!context) {
-    throw new Error('useError must be used within ErrorProvider');
-  }
-  return context;
-};
+export const ErrorContext = createContext();
 
 export const ErrorProvider = ({ children }) => {
   const [error, setError] = useState(null);
