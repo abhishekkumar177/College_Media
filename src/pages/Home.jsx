@@ -9,6 +9,7 @@ const Home = () => {
   const [expandedPosts, setExpandedPosts] = useState({});
   const [showComments, setShowComments] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
   const shareMenuRef = useRef(null);
 
   const MAX_CAPTION_LENGTH = 150;
@@ -342,6 +343,16 @@ const Home = () => {
     },
   ];
 
+  const filteredPosts = posts.filter((post) => {
+  const query = searchQuery.toLowerCase();
+
+  return (
+    post.user.username.toLowerCase().includes(query) ||
+    post.caption.toLowerCase().includes(query) ||
+    post.hashtags.some(tag => tag.toLowerCase().includes(query))
+  );
+});
+
   const toggleLike = (postId) => {
     setLikedPosts(prev => ({
       ...prev,
@@ -403,6 +414,17 @@ const Home = () => {
         </div>
       </div>
 
+      {/* Search Bar */}
+<div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+  <input
+    type="text"
+    placeholder="Search posts by username, caption or hashtags..."
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+    className="w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  />
+</div>
+
       {/* Posts Feed */}
       {loading ? (
         <>
@@ -411,7 +433,7 @@ const Home = () => {
           <SkeletonPost />
         </>
       ) : (
-        posts.map((post) => (
+        filteredPosts.map((post) => (
           <div
             key={post.id}
             className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 overflow-hidden"
