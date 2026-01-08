@@ -57,7 +57,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "vite": "^7.1.6",
-    "vite-plugin-imagemin": "^0.6.1",
     "vitest": "^1.6.1"
   }
 }

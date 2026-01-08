@@ -10,6 +10,7 @@ function LeftSidebar() {
     { label: "Trending", path: "/trending" },
     { label: "Explore", path: "/explore" },
     { label: "Stories", path: "/stories" },
+    { label: "Learning", path: "/learning" },
     { label: "Reels", path: "/reels" },
     { label: "Messages", path: "/messages" },
     { label: "Profile", path: "/profile" },
