@@ -19,6 +19,7 @@
 import React, { useState, useEffect } from "react";
 import './App.css'
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import Reels from "./pages/Reels.jsx";
 import ContactUs from "./pages/ContactUs.jsx";
 import CertificatePage from "./pages/CertificatePage.jsx";
@@ -27,6 +28,8 @@ import AdvancedSyllabusPage from "./pages/AdvancedSyllabusPage.jsx";
 import LeftSidebar from "./components/LeftSidebar.jsx";
 import Navbar from "./components/Navbar.jsx";
 import CreatePost from "./components/CreatePost.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
+import { ErrorProvider } from "./context/ErrorContext.jsx";
 
 /**
  * App Component - Main container and state management
@@ -200,8 +203,33 @@ const App = () => {
   // ============= RENDER =============
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-      {/* ========== NAVIGATION BAR ========== */}
+    <ErrorProvider>
+      <ErrorBoundary>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10B981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 4000,
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">{/* ========== NAVIGATION BAR ========== */}
       <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -485,6 +513,8 @@ const App = () => {
         <Route path="/advanced-syllabus" element={<AdvancedSyllabusPage />} />
       </Routes>
     </div>
+      </ErrorBoundary>
+    </ErrorProvider>
   );
 };
 
