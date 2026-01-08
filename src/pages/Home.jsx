@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { isPostSaved, toggleSavePost } from "../utils/bookmark";
 import SkeletonPost from "../components/SkeletonPost";
 import { sortByLatest, sortByLikes } from "../utils/feedSort";
 
@@ -92,6 +93,15 @@ const Home = () => {
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
   };
+
+  const handleSavePost = (postId) => {
+  const updated = toggleSavePost(postId);
+  setSavedPosts(updated);
+};
+
+
+  
+
 
   return (
     <div className="space-y-6" ref={shareMenuRef}>

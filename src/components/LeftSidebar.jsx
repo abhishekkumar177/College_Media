@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import collegeMediaLogo from "../assets/logos.png";
+import Settings from "../pages/Settings";
 
 function LeftSidebar() {
   const location = useLocation();
@@ -60,20 +61,20 @@ function LeftSidebar() {
       {/* FOOTER */}
       <div className="p-4 border-t border-white/10 text-white/50">
         <Link to="/settings" className="hover:text-white transition">
-          Settings
+          <Settings
               className={`w-full flex items-center space-x-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative ${
                 location.pathname === item.path
                   ? "bg-gray-100 dark:bg-gray-800 font-semibold"
                   : "hover:bg-gray-50 dark:hover:bg-gray-800 font-normal"
               }`}
-            >
+            />
               <div className="relative">
-                <span className={location.pathname === item.path ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100"}>
-                  {item.icon}
+                <span className={location.pathname === items.path ? "text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100"}>
+                  {items.icon}
                 </span>
-                {item.badge && (
+                {items.badge && (
                   <span className="absolute -top-2 -right-2 px-1.5 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] text-center">
-                    {item.badge}
+                    {items.badge}
                   </span>
                 )}
               </div>
@@ -82,10 +83,10 @@ function LeftSidebar() {
                   ? "text-gray-900 dark:text-gray-100 font-semibold" 
                   : "text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100"
               }`}>
-                {item.label}
+                {items.label}
               </span>
             </Link>
-          ))}
+          ))
         </div>
 
         <hr className="my-4 border-gray-200 dark:border-gray-700" />
@@ -98,7 +99,7 @@ function LeftSidebar() {
             <span className="text-base text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">More</span>
           </Link>
         </div>
-      </nav>
+      </aside>
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
@@ -110,6 +111,7 @@ function LeftSidebar() {
           <span className="text-base text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">Settings</span>
         </Link>
       </div>
+    </div>
     </div>
   );
 }

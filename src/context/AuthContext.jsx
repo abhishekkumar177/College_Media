@@ -66,7 +66,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        const { token, ...userData } = data.data;
+        // Backend now sends token at root level, user data in data object
+        const { token, data: userData } = data;
         localStorage.setItem('token', token);
         setToken(token);
         setUser(userData);
@@ -113,7 +114,8 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (data.success) {
-        const { token, ...userData } = data.data;
+        // Backend now sends token at root level, user data in data object
+        const { token, data: userData } = data;
         
         localStorage.setItem('token', token);
         setToken(token);
