@@ -1,3 +1,18 @@
+<<<<<<< HEAD
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Icon } from '@iconify/react';
+import SearchBar from '../components/SearchBar';
+import SearchFilters from '../components/SearchFilters';
+import SearchResultItem from '../components/SearchResultItem';
+import { searchApi } from '../api/endpoints';
+import { addToSearchHistory } from '../utils/searchHistory';
+
+const SearchResults = () => {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get('q') || '';
+  
+=======
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -11,6 +26,7 @@ const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
+>>>>>>> origin/main
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -23,13 +39,7 @@ const SearchResults = () => {
   const [totalResults, setTotalResults] = useState(0);
 
   // Fetch search results
-  useEffect(() => {
-    if (query) {
-      fetchResults(1);
-      addToSearchHistory(query);
-    }
-  }, [query, filters]);
-
+  
   const fetchResults = async (pageNum) => {
     if (!query.trim()) return;
 
@@ -69,6 +79,13 @@ const SearchResults = () => {
       fetchResults(page + 1);
     }
   };
+
+useEffect(() => {
+    if (query) {
+      fetchResults(1);
+      addToSearchHistory(query);
+    }
+  }, [query, filters]);
 
   // Infinite scroll
   useEffect(() => {

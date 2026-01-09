@@ -1,41 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { stories } from '../data/stories';
 
 const Stories = () => {
-  const allStories = [
-    {
-      id: 1,
-      user: {
-        name: 'Alex Johnson',
-        avatar: 'https://placehold.co/60x60/EF4444/FFFFFF?text=A',
-      },
-      stories: [
-        { id: 1, type: 'image', content: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=600&fit=crop', timestamp: '2h ago' },
-        { id: 2, type: 'image', content: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?w=400&h=600&fit=crop', timestamp: '3h ago' },
-      ],
-    },
-    {
-      id: 2,
-      user: {
-        name: 'Sarah Chen',
-        avatar: 'https://placehold.co/60x60/F59E0B/FFFFFF?text=S',
-      },
-      stories: [
-        { id: 1, type: 'image', content: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&h=600&fit=crop', timestamp: '5h ago' },
-      ],
-    },
-    {
-      id: 3,
-      user: {
-        name: 'Mike Davis',
-        avatar: 'https://placehold.co/60x60/10B981/FFFFFF?text=M',
-      },
-      stories: [
-        { id: 1, type: 'image', content: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=600&fit=crop', timestamp: '6h ago' },
-        { id: 2, type: 'image', content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=400&h=600&fit=crop', timestamp: '7h ago' },
-      ],
-    },
-  ];
 
   return (
     <div className="space-y-6">
@@ -70,7 +37,7 @@ const Stories = () => {
 
       {/* All Stories */}
       <div className="space-y-4">
-        {allStories.map((userStory) => (
+        {stories && stories.map((userStory) => (
           <div key={userStory.id} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="flex items-center space-x-3 mb-4">
               <div className="relative">

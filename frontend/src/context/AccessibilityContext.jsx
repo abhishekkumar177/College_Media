@@ -3,17 +3,10 @@
  * Issue #246: A11y Provider for user preferences
  */
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
 const AccessibilityContext = createContext();
 
-export const useAccessibility = () => {
-  const context = useContext(AccessibilityContext);
-  if (!context) {
-    throw new Error('useAccessibility must be used within AccessibilityProvider');
-  }
-  return context;
-};
 
 export const AccessibilityProvider = ({ children }) => {
   const [preferences, setPreferences] = useState(() => {
