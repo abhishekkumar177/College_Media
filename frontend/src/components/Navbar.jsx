@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import ProfileMenu from "./ProfileMenu";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
+import SearchBar from "./SearchBar";
 
 function Navbar({ searchQuery, setSearchQuery }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -15,29 +16,7 @@ function Navbar({ searchQuery, setSearchQuery }) {
         <div className="flex items-center justify-center gap-6">
           {/* SEARCH BAR */}
           <div className="flex-1 max-w-2xl mx-auto">
-            <div className="relative">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-
-              <input
-                type="text"
-                placeholder="Search for friends, groups, pages..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border-2 border-gray-800 dark:border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
-              />
-            </div>
+            <SearchBar />
           </div>
 
           {/* ACTIONS */}

@@ -94,6 +94,13 @@ export const notificationsApi = {
   clearAll: () => apiClient.delete('/notifications/clear-all'),
 };
 
+// Search endpoints
+export const searchApi = {
+  search: (query, params) => apiClient.get('/search', { params: { q: query, ...params } }),
+  getSuggestions: (query) => apiClient.get('/search/suggestions', { params: { q: query } }),
+  getTrending: () => apiClient.get('/search/trending'),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -102,4 +109,5 @@ export default {
   users: usersApi,
   upload: uploadApi,
   notifications: notificationsApi,
+  search: searchApi,
 };
