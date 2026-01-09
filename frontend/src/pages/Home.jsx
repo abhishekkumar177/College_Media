@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { posts } from "../data/post";
 
 import SkeletonPost from "../components/SkeletonPost";
 import { sortByLatest, sortByLikes } from "../utils/feedSort";

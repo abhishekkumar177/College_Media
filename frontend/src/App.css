@@ -44,3 +44,31 @@
 .animation-delay-4000 {
   animation-delay: 4s;
 }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.border-gradient-to-r {
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
+  border: 2px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+}
+
+/* PWA Animation */
+@keyframes slide-down {
+  from {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}

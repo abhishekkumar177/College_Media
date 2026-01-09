@@ -176,21 +176,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {error && (
-        <div
-          style={{
-            background: "#fee",
-            color: "#900",
-            padding: "12px",
-            margin: "10px",
-            borderRadius: "6px",
-            textAlign: "center",
-          }}
-        >
-          ⚠️ {error}
-        </div>
-      )}
-      {!loading && !error && children}
+          {children}
     </AuthContext.Provider>
   );
 };

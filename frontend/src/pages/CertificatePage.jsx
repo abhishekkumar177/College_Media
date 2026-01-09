@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import CertificateCard from '../components/CertificateCard'
 import AchievementTimeline from '../components/AchievementTimeline'
 import ConfettiExplosion from '../components/ConfettiExplosion'
-
+import './certificatePage.css'
 const CertificatePage = () => {
   // Example data - in a real app, this would come from props/context/API
   const [certificateData] = useState({
@@ -164,45 +164,6 @@ const CertificatePage = () => {
           </div>
         </section>
       </div>
-
-      {/* CSS Animations */}
-      <style>{`
-        @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-        }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2s {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4s {
-          animation-delay: 4s;
-        }
-
-        @keyframes gradient-shift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-      `}</style>
     </div>
   )
 }
