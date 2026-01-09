@@ -1,0 +1,37 @@
+[33m095f2fd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/instructor-dashboard-clean[m[33m, [m[1;31mupstream/main[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature/AmazingFeature[m[33m, [m[1;32mdocs/pr-template-29[m[33m, [m[1;32mdocs/pr-template[m[33m)[m Merge pull request #38 from suhaib-ilahi/LandingPage
+[33m408719b[m Merge branch 'main' of https://github.com/suhaib-ilahi/College_Media into LandingPage
+[33mfd0ea03[m Merge pull request #35 from squirrelk6755-ctrl/docs/pull-request-template
+[33mf94daa9[m Merge pull request #36 from squirrelk6755-ctrl/docs/bug-report-template
+[33m9a70cf9[m feat: Add remaining CSS
+[33mdd6fd12[m feat:Make the page and add it in the routes
+[33m668ff04[m feat: Make the sections for the landing page
+[33mcff1dad[m Add CSS for the existing UI
+[33m4527e3f[m feat: create a landing navbar
+[33m1b7c546[m feat: add Footer component to enhance landing page layout
+[33maac8006[m feat: add Hero component for landing page
+[33m42964a4[m[33m ([m[1;31morigin/docs/bug-report-template[m[33m, [m[1;32mdocs/bug-report-template[m[33m)[m docs: add bug report issue template
+[33m83ed994[m Fixed breaking bugs
+[33m5b3f9b9[m[33m ([m[1;31morigin/docs/pull-request-template[m[33m, [m[1;32mdocs/pull-request-template[m[33m)[m docs: add pull request template
+[33m787faac[m Merge pull request #23 from GauravKarakoti/Logos
+[33m014b639[m Logos
+[33m884bfbc[m Merge pull request #22 from squirrelk6755-ctrl/docs/phase1-backend-roadmap
+[33m45f3f7a[m[33m ([m[1;31morigin/docs/phase1-backend-roadmap[m[33m, [m[1;32mdocs/phase1-backend-roadmap[m[33m)[m docs: clarify backend direction for Phase 1 roadmap
+[33m1d39b3c[m Merge pull request #21 from squirrelk6755-ctrl/docs/env-setup-guide
+[33m386d07e[m Merge pull request #20 from GRICHChaimae/refactor/routing-layout
+[33md3ddd9f[m Merge branch 'main' into refactor/routing-layout
+[33m06dfda4[m refactor: implement react-router layout wrapper and directory structure
+[33m67e41d3[m docs: add .env.example and environment setup guide
+[33m808568d[m Merge pull request #19 from LostSkyWalker-1401/feature/user-profile-page
+[33m3d9ca17[m feat: Create user profile page with post grid
+[33mbc26077[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #6 from aaryapoyrekar/main
+[33m60bdad4[m feat: add skeleton loader for feed posts
+[33m34e855b[m Merge pull request #5 from Aditya8369/#2
+[33mb418231[m Updated README.md file with extra feature
+[33meea685f[m Merge pull request #4 from GauravKarakoti/README
+[33m26cc2ff[m Merge branch 'main' into README
+[33mabb07f4[m Update README.md
+[33m0001bdd[m Readme
+[33m3872474[m Update package.json
+[33m2c39a46[m Update package.json
+[33m9c107d1[m init
+[33m58150bb[m init
