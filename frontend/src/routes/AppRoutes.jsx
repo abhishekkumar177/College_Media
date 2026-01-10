@@ -35,6 +35,7 @@ const More = lazy(() => import("../pages/More.jsx"));
 const Stories = lazy(() => import("../pages/Stories.jsx"));
 const Explore = lazy(() => import("../pages/Explore.jsx"));
 const Trending = lazy(() => import("../pages/Trending.jsx"));
+const Feed = lazy(() => import("../pages/Feed.jsx"));
 
 const AppRoutes = ({
     activeTab,
@@ -75,6 +76,15 @@ const AppRoutes = ({
       >
         <Route
           index
+          element={
+            <LazyWrapper>
+              <Feed />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="home"
           element={
             <LazyWrapper>
               <Home />
@@ -231,6 +241,15 @@ const AppRoutes = ({
           element={
             <LazyWrapper>
               <Trending />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="feed"
+          element={
+            <LazyWrapper>
+              <Feed />
             </LazyWrapper>
           }
         />

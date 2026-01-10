@@ -13,7 +13,7 @@ function LeftSidebar() {
       ),
       label: "Feed",
       badge: "10",
-      path: "/home"
+      path: "/"
     },
     { 
       icon: (
