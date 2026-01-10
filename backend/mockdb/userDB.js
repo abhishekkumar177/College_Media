@@ -126,6 +126,62 @@ const updatePassword = (id, hashedPassword) => {
   return true;
 };
 
+// Soft delete user account
+const softDelete = (id, reason = null) => {
+  const users = readUsers();
+  const userIndex = users.findIndex(user => user._id === id);
+  
+  if (userIndex === -1) {
+    return null;
+  }
+  
+  users[userIndex].isDeleted = true;
+  users[userIndex].deletedAt = new Date().toISOString();
+  users[userIndex].deletionReason = reason;
+  users[userIndex].isActive = false;
+  users[userIndex].scheduledDeletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  users[userIndex].updatedAt = new Date().toISOString();
+  
+  writeUsers(users);
+  
+  return true;
+};
+
+// Restore deleted account
+const restore = (id) => {
+  const users = readUsers();
+  const userIndex = users.findIndex(user => user._id === id);
+  
+  if (userIndex === -1) {
+    return null;
+  }
+  
+  users[userIndex].isDeleted = false;
+  users[userIndex].deletedAt = null;
+  users[userIndex].deletionReason = null;
+  users[userIndex].scheduledDeletionDate = null;
+  users[userIndex].isActive = true;
+  users[userIndex].updatedAt = new Date().toISOString();
+  
+  writeUsers(users);
+  
+  return true;
+};
+
+// Permanently delete user account
+const permanentDelete = (id) => {
+  const users = readUsers();
+  const filteredUsers = users.filter(user => user._id !== id);
+  
+  if (users.length === filteredUsers.length) {
+    return null; // User not found
+  }
+  
+  writeUsers(filteredUsers);
+  
+  return true;
+};
+
 module.exports = {
   findByEmail,
   findByUsername,
@@ -133,5 +189,8 @@ module.exports = {
   create,
   update,
   updateProfilePicture,
-  updatePassword
+  updatePassword,
+  softDelete,
+  restore,
+  permanentDelete
 };

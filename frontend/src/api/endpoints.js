@@ -112,6 +112,15 @@ export const messagesApi = {
   getUnreadCount: () => apiClient.get('/messages/unread/count'),
 };
 
+// Account endpoints
+export const accountApi = {
+  deleteAccount: (data) => apiClient.delete('/account', { data }),
+  restoreAccount: () => apiClient.post('/account/restore'),
+  permanentDelete: (data) => apiClient.delete('/account/permanent', { data }),
+  getDeletionStatus: () => apiClient.get('/account/deletion-status'),
+  exportData: () => apiClient.post('/account/export-data'),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -122,4 +131,5 @@ export default {
   notifications: notificationsApi,
   search: searchApi,
   messages: messagesApi,
+  account: accountApi,
 };

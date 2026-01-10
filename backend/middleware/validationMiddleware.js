@@ -142,11 +142,35 @@ const validateMessageId = [
     .withMessage('Message ID must be a valid string')
 ];
 
+/**
+ * Validation middleware for account deletion
+ */
+const validateAccountDeletion = [
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required to delete account'),
+
+  body('confirmDeletion')
+    .notEmpty()
+    .withMessage('Confirmation is required')
+    .isBoolean()
+    .withMessage('Confirmation must be a boolean')
+    .custom((value) => value === true)
+    .withMessage('You must confirm account deletion'),
+
+  body('reason')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Reason must not exceed 500 characters')
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
   validateProfileUpdate,
   validateMessage,
   validateMessageId,
+  validateAccountDeletion,
   checkValidation
 };
