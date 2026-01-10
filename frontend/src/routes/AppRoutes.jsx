@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { PostSkeleton } from "../components/SkeletonLoader";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import MainLayout from "../layout/MainLayout.jsx";
 
 const LazyWrapper = ({ children }) => (
@@ -25,11 +26,15 @@ const CreatePost = lazy(() => import("../components/CreatePost.jsx"));
 const CoursesLanding = lazy(() => import("../pages/CoursesLanding.jsx"));
 const LearningMode = lazy(() => import("../pages/LearningMode.jsx"));
 const Landing = lazy(() => import("../pages/Landing.jsx"));
+const Login = lazy(() => import("../pages/Login.jsx"));
+const Signup = lazy(() => import("../pages/Signup.jsx"));
+const ForgotPassword = lazy(() => import("../pages/ForgotPassword.jsx"));
 const NotificationCenter = lazy(() => import("../components/NotificationCenter.jsx"));
 const NotificationPreferences = lazy(() => import("../components/NotificationPreferences.jsx"));
 const SearchResults = lazy(() => import("../pages/SearchResults.jsx"));
 const Settings = lazy(() => import("../pages/Settings.jsx"));
 const Profile = lazy(() => import("../pages/Profile.jsx"));
+const EditProfile = lazy(() => import("../pages/EditProfile.jsx"));
 const Messages = lazy(() => import("../pages/Messages.jsx"));
 const More = lazy(() => import("../pages/More.jsx"));
 const Stories = lazy(() => import("../pages/Stories.jsx"));
@@ -37,20 +42,73 @@ const Explore = lazy(() => import("../pages/Explore.jsx"));
 const Trending = lazy(() => import("../pages/Trending.jsx"));
 const Feed = lazy(() => import("../pages/Feed.jsx"));
 
+// Protected Route wrapper
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <PostSkeleton />;
+  }
+  
+  if (!user) {
+    return <Navigate to="/landing" replace />;
+  }
+  
+  return children;
+};
+
 const AppRoutes = ({
     activeTab,
     setActiveTab,
     searchQuery,
     setSearchQuery,
 }) => {
+    const { user } = useAuth();
+    
     return (
         <Routes>
+      {/* Public Routes */}
       <Route
         path="/landing"
         element={
-          <LazyWrapper>
-            <Landing />
-          </LazyWrapper>
+          user ? <Navigate to="/" replace /> : (
+            <LazyWrapper>
+              <Landing />
+            </LazyWrapper>
+          )
+        }
+      />
+      
+      <Route
+        path="/login"
+        element={
+          user ? <Navigate to="/" replace /> : (
+            <LazyWrapper>
+              <Login />
+            </LazyWrapper>
+          )
+        }
+      />
+      
+      <Route
+        path="/signup"
+        element={
+          user ? <Navigate to="/" replace /> : (
+            <LazyWrapper>
+              <Signup />
+            </LazyWrapper>
+          )
+        }
+      />
+      
+      <Route
+        path="/forgot-password"
+        element={
+          user ? <Navigate to="/" replace /> : (
+            <LazyWrapper>
+              <ForgotPassword />
+            </LazyWrapper>
+          )
         }
       />
 
@@ -63,15 +121,18 @@ const AppRoutes = ({
         }
       />
 
+      {/* Protected Routes */}
       <Route
         path="/*"
         element={
-          <MainLayout
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
+          <ProtectedRoute>
+            <MainLayout
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+          </ProtectedRoute>
         }
       >
         <Route
@@ -196,6 +257,15 @@ const AppRoutes = ({
           element={
             <LazyWrapper>
               <Profile />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="edit-profile"
+          element={
+            <LazyWrapper>
+              <EditProfile />
             </LazyWrapper>
           }
         />

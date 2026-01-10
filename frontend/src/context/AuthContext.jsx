@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await fetch(
         `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
         }/api/users/profile`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -65,8 +65,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await fetch(
         `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5001"
-        }/api/v1/auth/login`,
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+        }/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -77,8 +77,11 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        // Backend now sends token at root level, user data in data object
-        const { token, data: userData } = data;
+        // Backend sends token inside data object
+        const token = data.data.token || data.token;
+        const userData = { ...data.data };
+        delete userData.token; // Remove token from user object
+        
         localStorage.setItem("token", token);
         setToken(token);
         setUser(userData);
@@ -110,9 +113,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (formData) => {
     try {
       const API_BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:5001";
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -128,8 +131,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (data.success) {
-        // Backend now sends token at root level, user data in data object
-        const { token, data: userData } = data;
+        // Backend sends token inside data object
+        const token = data.data.token || data.token;
+        const userData = { ...data.data };
+        delete userData.token; // Remove token from user object
 
         localStorage.setItem("token", token);
         setToken(token);
@@ -162,6 +167,86 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUserProfile = async (profileData) => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const authToken = token || localStorage.getItem("token");
+
+      if (!authToken) {
+        throw new Error("Authentication required");
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(profileData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update profile");
+      }
+
+      if (data.success) {
+        setUser(data.data);
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      console.error("Profile update error:", err);
+      return {
+        success: false,
+        message: err.message || "Failed to update profile",
+      };
+    }
+  };
+
+  const uploadProfilePicture = async (imageFile) => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const authToken = token || localStorage.getItem("token");
+
+      if (!authToken) {
+        throw new Error("Authentication required");
+      }
+
+      const formData = new FormData();
+      formData.append("profilePicture", imageFile);
+
+      const response = await fetch(`${API_BASE_URL}/api/users/profile-picture`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to upload profile picture");
+      }
+
+      if (data.success) {
+        setUser({ ...user, profilePicture: data.data.profilePicture });
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (err) {
+      console.error("Profile picture upload error:", err);
+      return {
+        success: false,
+        message: err.message || "Failed to upload profile picture",
+      };
+    }
+  };
+
   const value = {
     user,
     token,
@@ -169,6 +254,8 @@ export const AuthProvider = ({ children }) => {
     register,
     resetPassword,
     logout,
+    updateUserProfile,
+    uploadProfilePicture,
     loading,
     error,
     setError,

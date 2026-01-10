@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('posts');
+  const { user } = useAuth();
   
-  // Mock user data
-  const displayUser = {
+  // Use actual user data from AuthContext
+  const displayUser = user || {
     username: 'john_doe',
     firstName: 'John',
     lastName: 'Doe',
