@@ -12,6 +12,31 @@ const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
 // In-memory OTP storage (use Redis in production)
 const otpStore = new Map();
 
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      data: null,
+      message: 'Access denied. No token provided.'
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      data: null,
+      message: 'Invalid token.'
+    });
+  }
+};
+
 // Register a new user
 router.post('/register', validateRegister, checkValidation, async (req, res, next) => {
   try {
@@ -422,6 +447,98 @@ router.post('/logout', async (req, res, next) => {
     });
   } catch (error) {
     console.error('Logout error:', error);
+    next(error);
+  }
+});
+
+// Change password endpoint (requires authentication)
+router.post('/change-password', verifyToken, async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ 
+        success: false,
+        data: null,
+        message: 'Current password and new password are required' 
+      });
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        success: false,
+        data: null,
+        message: 'New password must be at least 6 characters long' 
+      });
+    }
+
+    // Get database connection from app
+    const dbConnection = req.app.get('dbConnection');
+    
+    let user;
+    if (dbConnection && dbConnection.useMongoDB) {
+      // Use MongoDB
+      user = await UserMongo.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false,
+          data: null,
+          message: 'User not found' 
+        });
+      }
+    } else {
+      // Use Mock DB
+      user = await UserMock.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false,
+          data: null,
+          message: 'User not found' 
+        });
+      }
+    }
+
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ 
+        success: false,
+        data: null,
+        message: 'Current password is incorrect' 
+      });
+    }
+
+    // Check if new password is same as current password
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({ 
+        success: false,
+        data: null,
+        message: 'New password must be different from current password' 
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password in database
+    if (dbConnection && dbConnection.useMongoDB) {
+      await UserMongo.findByIdAndUpdate(req.userId, { 
+        password: hashedPassword 
+      });
+    } else {
+      await UserMock.updatePassword(req.userId, hashedPassword);
+    }
+
+    res.json({
+      success: true,
+      data: null,
+      message: 'Password changed successfully'
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
     next(error);
   }
 });
