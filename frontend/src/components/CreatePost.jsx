@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { Icon } from '@iconify/react';
 import { useAuth } from '../context/AuthContext';
+import { useCreatePoll } from '../hooks/usePolls';
+import PollCreator from './PollCreator';
 
 const CreatePost = ({ onPostCreated }) => {
   const { user } = useAuth();
+  const { createPoll } = useCreatePoll();
   const [caption, setCaption] = useState('');
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [showPollCreator, setShowPollCreator] = useState(false);
+  const [pollData, setPollData] = useState(null);
   
   // Character counter configuration
   const maxLength = 500;
@@ -32,9 +38,18 @@ const CreatePost = ({ onPostCreated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!caption.trim() && !image) return;
+    if (!caption.trim() && !image && !pollData) return;
 
     setIsCreating(true);
+    
+    // Create poll if poll data exists
+    let createdPoll = null;
+    if (pollData) {
+      createdPoll = await createPoll({
+        ...pollData,
+        postId: Date.now(), // Temporary ID, should be actual post ID from backend
+      });
+    }
     
     // In a real app, this would be an API call to create a post
     // For now, we'll simulate the creation
@@ -46,20 +61,32 @@ const CreatePost = ({ onPostCreated }) => {
           username: user.username,
           profilePicture: user.profilePicture
         },
-        imageUrl: imagePreview || 'https://placehold.co/600x600/6366F1/FFFFFF?text=New+Post',
+        imageUrl: imagePreview || (pollData ? null : 'https://placehold.co/600x600/6366F1/FFFFFF?text=New+Post'),
         caption: caption,
         likes: 0,
         comments: 0,
         timestamp: 'Just now',
-        liked: false
+        liked: false,
+        poll: createdPoll || null
       };
       
       onPostCreated && onPostCreated(newPost);
       setCaption('');
       setImage(null);
       setImagePreview(null);
+      setPollData(null);
+      setShowPollCreator(false);
       setIsCreating(false);
     }, 1000);
+  };
+
+  const handlePollCreate = (poll) => {
+    setPollData(poll);
+    setShowPollCreator(false);
+  };
+
+  const handleRemovePoll = () => {
+    setPollData(null);
   };
 
   return (
@@ -121,12 +148,44 @@ const CreatePost = ({ onPostCreated }) => {
             </div>
           )}
 
+          {/* Poll Creator */}
+          {showPollCreator && (
+            <div className="mt-3">
+              <PollCreator
+                onPollCreate={handlePollCreate}
+                onCancel={() => setShowPollCreator(false)}
+              />
+            </div>
+          )}
+
+          {/* Poll Preview */}
+          {pollData && !showPollCreator && (
+            <div className="mt-3 bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2 flex-1">
+                  <Icon icon="mdi:poll" className="text-indigo-500 text-xl" />
+                  <div>
+                    <p className="font-medium text-gray-900">{pollData.question}</p>
+                    <p className="text-sm text-gray-600">
+                      {pollData.options.length} options • {pollData.duration && pollData.durationUnit ? `${pollData.duration} ${pollData.durationUnit}` : 'No expiry'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemovePoll}
+                  className="text-red-500 hover:text-red-700 p-1"
+                >
+                  <Icon icon="mdi:close" className="text-xl" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mt-3">
             <div className="flex space-x-2">
-              <label className="cursor-pointer text-gray-600 hover:text-purple-600 transition-colors p-1 rounded hover:bg-purple-50">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+              <label className="cursor-pointer text-gray-600 hover:text-purple-600 transition-colors p-1 rounded hover:bg-purple-50" title="Add image">
+                <Icon icon="mdi:image" className="w-6 h-6" />
                 <input
                   type="file"
                   accept="image/*"
@@ -134,11 +193,21 @@ const CreatePost = ({ onPostCreated }) => {
                   className="hidden"
                 />
               </label>
+              
+              <button
+                type="button"
+                onClick={() => setShowPollCreator(!showPollCreator)}
+                disabled={!!pollData}
+                className="text-gray-600 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Add poll"
+              >
+                <Icon icon="mdi:poll" className="w-6 h-6" />
+              </button>
             </div>
             
             <button
               type="submit"
-              disabled={isCreating || (!caption.trim() && !image)}
+              disabled={isCreating || (!caption.trim() && !image && !pollData)}
               className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-indigo-700 transition-all"
             >
               {isCreating ? 'Posting...' : 'Post'}

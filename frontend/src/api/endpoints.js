@@ -144,4 +144,5 @@ export default {
   notifications: notificationsApi,
   search: searchApi,
   moderation: moderationApi,
+  polls: pollsApi,
 };
