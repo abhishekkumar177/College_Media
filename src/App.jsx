@@ -8,6 +8,8 @@ import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSidebar from "./components/RightSidebar";
+import Pricing from "./pages/Pricing";
+
 
 const App = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +19,7 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/pricing" element={<Pricing />} /> 
         <Route path="/home" element={
           <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
             <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -41,3 +44,4 @@ const App = () => {
 };
 
 export default App;
+
