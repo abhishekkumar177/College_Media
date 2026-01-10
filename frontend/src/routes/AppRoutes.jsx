@@ -34,6 +34,7 @@ const Messages = lazy(() => import("../pages/Messages.jsx"));
 const More = lazy(() => import("../pages/More.jsx"));
 const Stories = lazy(() => import("../pages/Stories.jsx"));
 const Explore = lazy(() => import("../pages/Explore.jsx"));
+const Trending = lazy(() => import("../pages/Trending.jsx"));
 
 const AppRoutes = ({
     activeTab,
@@ -221,6 +222,15 @@ const AppRoutes = ({
           element={
             <LazyWrapper>
               <Explore />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="trending"
+          element={
+            <LazyWrapper>
+              <Trending />
             </LazyWrapper>
           }
         />

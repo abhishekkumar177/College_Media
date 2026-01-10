@@ -27,18 +27,18 @@ const Trending = () => {
   return (
     <div className="space-y-6">
       {/* Trending Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Trending Now
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-slate-400">
               Discover what's popular in your college community
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center space-x-1">
+            <div className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium flex items-center space-x-1">
               <span className="animate-pulse">●</span>
               <span>Live</span>
             </div>
@@ -54,7 +54,7 @@ const Trending = () => {
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                 timeRange === range.id
                   ? "bg-indigo-600 text-white shadow-md"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-600"
               }`}
             >
               <span className="mr-1">{range.icon}</span>
@@ -72,7 +72,7 @@ const Trending = () => {
               className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all duration-200 ${
                 selectedCategory === category.id
                   ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-600"
               }`}
             >
               <span className="mr-1">{category.icon}</span>
@@ -128,12 +128,12 @@ const Trending = () => {
               onClick={() =>
                 setSelectedTopic(selectedTopic?.id === topic.id ? null : topic)
               }
-              className="relative p-4 rounded-xl hover:bg-gray-50 transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-indigo-200"
+              className="relative p-4 rounded-xl bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-200 cursor-pointer border-2 border-transparent hover:border-indigo-200 dark:hover:border-indigo-700"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3 flex-1">
                   {/* Rank Badge */}
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 font-bold text-gray-700 text-sm">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-600 dark:to-slate-700 font-bold text-gray-700 dark:text-white text-sm">
                     {index + 1}
                   </div>
 
@@ -200,21 +200,21 @@ const Trending = () => {
                       )}
                     </div>
                     <div className="flex items-center space-x-3 mt-1">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">
                         {topic.posts} posts
                       </p>
                       <span
                         className={`text-sm font-medium ${
                           topic.trending === "up"
-                            ? "text-green-600"
+                            ? "text-green-600 dark:text-green-400"
                             : topic.trending === "down"
-                            ? "text-red-600"
-                            : "text-gray-600"
+                            ? "text-red-600 dark:text-red-400"
+                            : "text-gray-600 dark:text-slate-400"
                         }`}
                       >
                         {topic.change}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-slate-500">
                         • Peak: {topic.peakTime}
                       </span>
                     </div>
@@ -223,11 +223,11 @@ const Trending = () => {
 
                 {/* Engagement Score */}
                 <div className="flex flex-col items-end space-y-1">
-                  <div className="text-sm font-medium text-gray-700">
+                  <div className="text-sm font-medium text-gray-700 dark:text-slate-300">
                     Score: {topic.engagementScore.toLocaleString()}
                   </div>
                   <svg
-                    className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                    className={`w-5 h-5 text-gray-400 dark:text-slate-500 transition-transform duration-200 ${
                       selectedTopic?.id === topic.id ? "rotate-90" : ""
                     }`}
                     fill="none"
@@ -246,15 +246,15 @@ const Trending = () => {
 
               {/* Expanded Details */}
               {selectedTopic?.id === topic.id && (
-                <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-600 space-y-3">
                   {/* Reason */}
                   <div className="flex items-start space-x-2">
                     <span className="text-lg">💡</span>
                     <div>
-                      <p className="text-sm font-medium text-gray-700">
+                      <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
                         Why it's trending:
                       </p>
-                      <p className="text-sm text-gray-600">{topic.reason}</p>
+                      <p className="text-sm text-gray-600 dark:text-slate-400">{topic.reason}</p>
                     </div>
                   </div>
 
@@ -262,14 +262,14 @@ const Trending = () => {
                   <div className="flex items-start space-x-2">
                     <span className="text-lg">🏷️</span>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
+                      <p className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                         Related topics:
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {topic.relatedTags.map((tag, idx) => (
                           <span
                             key={idx}
-                            className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-medium hover:bg-indigo-100 cursor-pointer transition-colors"
+                            className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 cursor-pointer transition-colors"
                           >
                             {tag}
                           </span>
@@ -290,15 +290,15 @@ const Trending = () => {
       </div>
 
       {/* Trending in Your Circle */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl shadow-sm border border-purple-200 p-6">
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 rounded-2xl shadow-sm border border-purple-200 dark:border-purple-800 p-6">
         <div className="flex items-center space-x-2 mb-4">
           <span className="text-2xl">👥</span>
-          <h2 className="text-lg font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             Trending in Your Circle
           </h2>
         </div>
-        <div className="bg-white rounded-xl p-4">
-          <p className="text-gray-600 text-sm mb-3">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-4">
+          <p className="text-gray-600 dark:text-slate-400 text-sm mb-3">
             Your friends are talking about{" "}
             <span className="font-bold text-indigo-600">#hackathon2024</span>{" "}
             and <span className="font-bold text-indigo-600">#photography</span>
@@ -310,10 +310,10 @@ const Trending = () => {
       </div>
 
       {/* Trending Posts */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-gray-900">Popular Posts</h2>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Popular Posts</h2>
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-slate-400">
             <span className="animate-pulse text-green-500">●</span>
             <span>Updated 2m ago</span>
           </div>
@@ -322,7 +322,7 @@ const Trending = () => {
           {trendingPosts.map((post) => (
             <div
               key={post.id}
-              className="p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+              className="p-4 rounded-xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-700 hover:border-indigo-200 dark:hover:border-indigo-700 hover:shadow-md transition-all duration-200 cursor-pointer"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
@@ -333,7 +333,7 @@ const Trending = () => {
                   />
                   <div>
                     <div className="flex items-center space-x-2">
-                      <p className="font-bold text-gray-900">
+                      <p className="font-bold text-gray-900 dark:text-white">
                         {post.user.name}
                       </p>
                       {post.user.verified && (
@@ -350,18 +350,18 @@ const Trending = () => {
                         </svg>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-slate-400">
                       {post.user.handle} • {post.timestamp}
                     </p>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-800 mb-3">{post.content}</p>
+              <p className="text-gray-800 dark:text-slate-200 mb-3">{post.content}</p>
               <div className="flex items-center space-x-2 mb-3">
-                <span className="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                <span className="inline-block px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-full text-sm font-medium">
                   {post.tag}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-slate-400">
                   Engagement Score:{" "}
                   {(
                     post.likes +
@@ -370,8 +370,8 @@ const Trending = () => {
                   ).toLocaleString()}
                 </span>
               </div>
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <div className="flex items-center space-x-6 text-gray-500 text-sm">
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-600">
+                <div className="flex items-center space-x-6 text-gray-500 dark:text-slate-400 text-sm">
                   <button className="flex items-center space-x-1 hover:text-red-500 transition-colors">
                     <svg
                       className="w-5 h-5"
