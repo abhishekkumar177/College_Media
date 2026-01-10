@@ -1,82 +1,122 @@
-/**
- * Accessibility Context - WCAG 2.1 AA Compliance
- * Issue #246: A11y Provider for user preferences
- */
+import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 
-import { createContext, useState, useEffect } from 'react';
-
-const AccessibilityContext = createContext();
-
+// Exported for use with useContext(AccessibilityContext)
+export const AccessibilityContext = createContext();
 
 export const AccessibilityProvider = ({ children }) => {
-  const [preferences, setPreferences] = useState(() => {
-    const saved = localStorage.getItem('a11y-preferences');
-    return saved ? JSON.parse(saved) : {
-      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-      highContrast: false,
-      largeText: false,
-      keyboardOnly: false,
-    };
+  // 1. SSR-Safe Initialization
+  const [preferences, setPreferences] = useState({
+    reducedMotion: false,
+    highContrast: false,
+    largeText: false,
+    keyboardOnly: false,
   });
 
-  const [announcements, setAnnouncements] = useState([]);
+  const [politeMessage, setPoliteMessage] = useState('');
+  const [assertiveMessage, setAssertiveMessage] = useState('');
 
+  // 2. Load preferences on Mount only (Client-side)
+  useEffect(() => {
+    const saved = localStorage.getItem('a11y-preferences');
+    if (saved) {
+      setPreferences(JSON.parse(saved));
+    } else {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      setPreferences(prev => ({ ...prev, reducedMotion: prefersReduced }));
+    }
+  }, []);
+
+  // 3. Sync Preferences to DOM and LocalStorage
   useEffect(() => {
     localStorage.setItem('a11y-preferences', JSON.stringify(preferences));
     
-    // Apply preferences to document
-    document.documentElement.classList.toggle('reduced-motion', preferences.reducedMotion);
-    document.documentElement.classList.toggle('high-contrast', preferences.highContrast);
-    document.documentElement.classList.toggle('large-text', preferences.largeText);
-    document.documentElement.classList.toggle('keyboard-only', preferences.keyboardOnly);
+    const root = document.documentElement;
+    root.classList.toggle('reduced-motion', preferences.reducedMotion);
+    root.classList.toggle('high-contrast', preferences.highContrast);
+    root.classList.toggle('large-text', preferences.largeText);
+    root.classList.toggle('keyboard-only', preferences.keyboardOnly);
   }, [preferences]);
 
-  // Detect keyboard usage
+  // 4. Keyboard Usage Detection
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Tab') {
-        setPreferences(prev => ({ ...prev, keyboardOnly: true }));
-      }
+      if (e.key === 'Tab') setPreferences(prev => ({ ...prev, keyboardOnly: true }));
     };
-
     const handleMouseDown = () => {
       setPreferences(prev => ({ ...prev, keyboardOnly: false }));
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('mousedown', handleMouseDown);
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('mousedown', handleMouseDown);
     };
   }, []);
 
-  const updatePreference = (key, value) => {
+  const updatePreference = useCallback((key, value) => {
     setPreferences(prev => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
-  const announce = (message, priority = 'polite') => {
-    setAnnouncements(prev => [...prev, { id: Date.now(), message, priority }]);
+  // 5. Robust Announcement Handler
+  const announce = useCallback((message, priority = 'polite') => {
+    const setter = priority === 'assertive' ? setAssertiveMessage : setPoliteMessage;
+    
+    // Clear first to ensure screen reader detects a change even if message is identical
+    setter(''); 
     setTimeout(() => {
-      setAnnouncements(prev => prev.slice(1));
-    }, 3000);
-  };
+      setter(message);
+    }, 50);
+
+    // Auto-clear after reading to prevent "stale" content in DOM
+    setTimeout(() => {
+      setter('');
+    }, 5000);
+  }, []);
+
+  // Memoize value to prevent unnecessary re-renders of all consumers
+  const contextValue = useMemo(() => ({
+    preferences,
+    updatePreference,
+    announce
+  }), [preferences, updatePreference, announce]);
 
   return (
-    <AccessibilityContext.Provider value={{ preferences, updatePreference, announce }}>
+    <AccessibilityContext.Provider value={contextValue}>
       {children}
-      {/* Live Region for Screen Readers */}
-      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {announcements.filter(a => a.priority === 'polite').map(a => (
-          <div key={a.id}>{a.message}</div>
-        ))}
-      </div>
-      <div className="sr-only" role="alert" aria-live="assertive" aria-atomic="true">
-        {announcements.filter(a => a.priority === 'assertive').map(a => (
-          <div key={a.id}>{a.message}</div>
-        ))}
+      
+      {/* Live Regions: Must remain in DOM at all times. 
+          Only the inner text should change to trigger the Screen Reader. 
+      */}
+      <div className="sr-only" style={srOnlyStyle}>
+        <div 
+          role="status" 
+          aria-live="polite" 
+          aria-atomic="true"
+        >
+          {politeMessage}
+        </div>
+        <div 
+          role="alert" 
+          aria-live="assertive" 
+          aria-atomic="true"
+        >
+          {assertiveMessage}
+        </div>
       </div>
     </AccessibilityContext.Provider>
   );
+};
+
+// CSS-in-JS fallback for sr-only if the global class is missing
+const srOnlyStyle = {
+  position: 'absolute',
+  width: '1px',
+  height: '1px',
+  padding: '0',
+  margin: '-1px',
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  borderWidth: '0',
 };

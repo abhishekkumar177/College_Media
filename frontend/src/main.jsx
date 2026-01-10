@@ -33,11 +33,11 @@ createRoot(document.getElementById("root")).render(
           <NotificationProvider> 
             <ThemeProvider>
               <BookmarkProvider>
-                <SocketProvider>
+                {/* <SocketProvider> */}
                   <BrowserRouter>
                     <App />
                   </BrowserRouter>
-                </SocketProvider>
+                {/* </SocketProvider> */}
               </BookmarkProvider>
             </ThemeProvider>
           </NotificationProvider>
