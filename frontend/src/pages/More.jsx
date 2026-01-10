@@ -1,5 +1,5 @@
 import React from 'react';
-import { menuSections } from '../data/menuSection';
+import { menuSections } from '../data/menuSection.jsx';
 
 const More = () => {
 

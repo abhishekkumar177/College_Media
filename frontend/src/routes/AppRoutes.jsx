@@ -31,6 +31,7 @@ const SearchResults = lazy(() => import("../pages/SearchResults.jsx"));
 const Settings = lazy(() => import("../pages/Settings.jsx"));
 const Profile = lazy(() => import("../pages/Profile.jsx"));
 const Messages = lazy(() => import("../pages/Messages.jsx"));
+const More = lazy(() => import("../pages/More.jsx"));
 
 const AppRoutes = ({
     activeTab,
@@ -191,6 +192,15 @@ const AppRoutes = ({
           element={
             <LazyWrapper>
               <Messages />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="more"
+          element={
+            <LazyWrapper>
+              <More />
             </LazyWrapper>
           }
         />
