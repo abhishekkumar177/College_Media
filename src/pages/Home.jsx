@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import SkeletonPost from "../components/SkeletonPost";
+import {
+  getSavedPosts,
+  isPostSaved,
+  toggleSavePost
+} from "../utils/bookmark";
+
 
 const Home = () => {
   const [likedPosts, setLikedPosts] = useState({});
@@ -9,6 +15,8 @@ const Home = () => {
   const [expandedPosts, setExpandedPosts] = useState({});
   const [showComments, setShowComments] = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const [savedPosts, setSavedPosts] = useState([]);
+const [showSavedOnly, setShowSavedOnly] = useState(false);
   const shareMenuRef = useRef(null);
 
   const MAX_CAPTION_LENGTH = 150;
@@ -49,6 +57,10 @@ const Home = () => {
       likes: 7
     }
   ];
+
+  useEffect(() => {
+  setSavedPosts(getSavedPosts());
+}, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -342,6 +354,11 @@ const Home = () => {
     },
   ];
 
+
+  const displayedPosts = showSavedOnly
+  ? posts.filter(post => savedPosts.includes(post.id))
+  : posts;
+
   const toggleLike = (postId) => {
     setLikedPosts(prev => ({
       ...prev,
@@ -403,6 +420,37 @@ const Home = () => {
         </div>
       </div>
 
+{/* Saved Posts Toggle */}
+<div className="flex gap-3 bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+  <button
+    onClick={() => setShowSavedOnly(false)}
+    className={`px-4 py-2 rounded-full text-sm font-medium ${
+      !showSavedOnly
+        ? "bg-indigo-600 text-white"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    All Posts
+  </button>
+
+  <button
+    onClick={() => setShowSavedOnly(true)}
+    className={`px-4 py-2 rounded-full text-sm font-medium ${
+      showSavedOnly
+        ? "bg-indigo-600 text-white"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    Saved Posts
+  </button>
+</div>
+
+{showSavedOnly && displayedPosts.length === 0 && (
+  <p className="text-center text-gray-500 mt-6">
+    You have not saved any posts yet.
+  </p>
+)}
+
       {/* Posts Feed */}
       {loading ? (
         <>
@@ -411,11 +459,38 @@ const Home = () => {
           <SkeletonPost />
         </>
       ) : (
-        posts.map((post) => (
+        
+        displayedPosts.map((post) => (
           <div
             key={post.id}
             className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 overflow-hidden"
           >
+            <button
+  onClick={() => {
+    const updated = toggleSavePost(post.id);
+    setSavedPosts(updated);
+  }}
+  className="group"
+>
+  <svg
+    className={`w-6 h-6 transition-colors ${
+      isPostSaved(post.id)
+        ? "fill-indigo-600 text-indigo-600"
+        : "text-gray-600 group-hover:text-indigo-600"
+    }`}
+    fill={isPostSaved(post.id) ? "currentColor" : "none"}
+    stroke="currentColor"
+    strokeWidth={2}
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+    />
+  </svg>
+</button>
+
             {/* Post Header */}
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center space-x-3">
