@@ -6,6 +6,7 @@ import postsRoutes from "./routes/posts.js";
 import authRoutes from "./routes/auth.js";
 import errorHandler from "./middleware/errorHandler.js";
 import protectedRoutes from "./routes/protected.js";
+import { apiRateLimiter } from "./middleware/rateLimiter.js";
 
 dotenv.config();
 
@@ -15,6 +16,10 @@ const app = express();
    🌐 GLOBAL MIDDLEWARES
 ======================= */
 app.use(express.json());
+app.use("/api/v1/protected", protectedRoutes);
+
+// 🔥 GLOBAL RATE LIMITER (BYPASS FIX)
+app.use("/api/v1", apiRateLimiter);
 app.use("/api/v1/protected", protectedRoutes);
 
 // morgan only in development

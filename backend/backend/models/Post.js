@@ -8,10 +8,17 @@ const postSchema = new mongoose.Schema(
       trim: true,
       maxlength: 500,
     },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+
+    // ✅ SOFT DELETE FLAG
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

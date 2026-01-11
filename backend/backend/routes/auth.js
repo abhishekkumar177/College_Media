@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
+import { authRateLimiter } from "../middleware/rateLimiter.js";
 
 const router = Router();
 
@@ -13,10 +14,11 @@ router.get("/test", (req, res) => {
 });
 
 /* ======================
-   LOGIN ROUTE
+   LOGIN ROUTE (RATE LIMITED)
 ====================== */
 router.post(
   "/login",
+  authRateLimiter,
 
   // 🔒 INPUT VALIDATION
   [
@@ -26,7 +28,7 @@ router.post(
 
     body("password")
       .notEmpty()
-      .withMessage("Password is required")
+      .withMessage("Password is required"),
   ],
 
   async (req, res) => {
@@ -36,7 +38,7 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({
           success: false,
-          errors: errors.array().map(err => err.msg) // ✅ FIXED
+          errors: errors.array().map(err => err.msg),
         });
       }
 
@@ -47,14 +49,14 @@ router.post(
         id: "123",
         email: "test@example.com",
         password: await bcrypt.hash("Password123", 10),
-        role: "user"
+        role: "user",
       };
 
       // ❌ INVALID EMAIL
       if (email !== mockUser.email) {
         return res.status(401).json({
           success: false,
-          message: "Invalid credentials"
+          message: "Invalid credentials",
         });
       }
 
@@ -63,7 +65,7 @@ router.post(
       if (!isMatch) {
         return res.status(401).json({
           success: false,
-          message: "Invalid credentials"
+          message: "Invalid credentials",
         });
       }
 
@@ -71,7 +73,7 @@ router.post(
       const token = jwt.sign(
         {
           userId: mockUser.id,
-          role: mockUser.role
+          role: mockUser.role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "15m" }
@@ -79,13 +81,13 @@ router.post(
 
       return res.status(200).json({
         success: true,
-        token
+        token,
       });
 
     } catch (error) {
       return res.status(500).json({
         success: false,
-        message: "Login failed"
+        message: "Login failed",
       });
     }
   }

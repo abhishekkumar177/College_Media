@@ -10,8 +10,16 @@ const router = Router();
  * ✅ TEST ROUTE
  * GET /api/v1/posts
  */
-router.get("/", (req, res) => {
-  res.json({ message: "Posts route working" });
+router.get("/", async (req, res) => {
+  try {
+    const posts = await Post.find({ isDeleted: false });
+    res.json({
+      success: true,
+      data: posts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch posts" });
+  }
 });
 
 /**
@@ -62,8 +70,8 @@ router.get("/feed", async (req, res) => {
       });
     }
 
-    // 2️⃣ Fetch from DB
-    const posts = await Post.find()
+    // 2️⃣ Fetch from DB (❗ FILTER soft deleted posts)
+    const posts = await Post.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .limit(10)
       .populate("user", "username email");
@@ -86,7 +94,7 @@ router.get("/feed", async (req, res) => {
 });
 
 /**
- * ❌ DELETE POST
+ * ❌ DELETE POST (SOFT DELETE)
  * DELETE /api/v1/posts/:id
  *
  * Rules:
@@ -98,7 +106,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
-    if (!post) {
+    if (!post || post.isDeleted) {
       return res.status(404).json({ message: "Post not found" });
     }
 
@@ -113,14 +121,16 @@ router.delete("/:id", authMiddleware, async (req, res) => {
       });
     }
 
-    await post.deleteOne();
+    // ✅ SOFT DELETE (no DB removal)
+    post.isDeleted = true;
+    await post.save();
 
     // 🔥 Cache invalidate after delete
     await redisClient.del("posts:feed");
 
     res.json({
       success: true,
-      message: "Post deleted successfully",
+      message: "Post deleted successfully (soft delete)",
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete post" });
