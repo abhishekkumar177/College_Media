@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Icon } from '@iconify/react';
-import SearchBar from '../components/SearchBar';
-import SearchFilters from '../components/SearchFilters';
-import SearchResultItem from '../components/SearchResultItem';
-import { searchApi } from '../api/endpoints';
-import { addToSearchHistory } from '../utils/searchHistory';
-
-const SearchResults = () => {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
-  
-=======
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
@@ -26,7 +11,6 @@ const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
 
->>>>>>> origin/main
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({

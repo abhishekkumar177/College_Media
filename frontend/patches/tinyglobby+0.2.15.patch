@@ -1,0 +1,14 @@
+diff --git a/node_modules/tinyglobby/dist/index.mjs b/node_modules/tinyglobby/dist/index.mjs
+index 4f41787..dadea85 100644
+--- a/node_modules/tinyglobby/dist/index.mjs
++++ b/node_modules/tinyglobby/dist/index.mjs
+@@ -1,7 +1,8 @@
+ import nativeFs from "fs";
+ import path, { posix } from "path";
+ import { fileURLToPath } from "url";
+-import { fdir } from "fdir";
++import * as _fdir from "fdir";
++const fdir = _fdir.fdir ?? _fdir.default ?? _fdir;
+ import picomatch from "picomatch";
+ 
+ //#region src/utils.ts

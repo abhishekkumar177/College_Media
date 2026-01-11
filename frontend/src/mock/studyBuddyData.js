@@ -1,0 +1,48 @@
+// Mock Data for Study Buddy Matcher
+export const studyBuddyProfiles = [
+  {
+    id: 1,
+    name: "Alex Rivera",
+    major: "Computer Science",
+    avatar: "https://i.pravatar.cc/150?u=alex",
+    sharedInterests: ["React", "Machine Learning", "Gaming", "Coffee"],
+    compatibilityScore: 92,
+    active: true,
+  },
+  {
+    id: 2,
+    name: "Sarah Chen",
+    major: "Data Science",
+    avatar: "https://i.pravatar.cc/150?u=sarah",
+    sharedInterests: ["Python", "Statistics", "Hiking"],
+    compatibilityScore: 85,
+    active: false,
+  },
+  {
+    id: 3,
+    name: "Jordan Smith",
+    major: "UX Design",
+    avatar: "https://i.pravatar.cc/150?u=jordan",
+    sharedInterests: ["Figma", "Accessibility", "Art"],
+    compatibilityScore: 78,
+    active: true,
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    major: "Mathematics",
+    avatar: "https://i.pravatar.cc/150?u=emily",
+    sharedInterests: ["Calculus", "Chess", "Reading"],
+    compatibilityScore: 65,
+    active: false,
+  },
+  {
+    id: 5,
+    name: "Michael Brown",
+    major: "Physics",
+    avatar: "https://i.pravatar.cc/150?u=michael",
+    sharedInterests: ["Quantum Mechanics", "Sci-Fi", "Astronomy"],
+    compatibilityScore: 88,
+    active: true,
+  },
+];

@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
+  role: {
+    type: String,
+    enum: ['student', 'alumni', 'admin'],
+    default: 'student'
+  },
   firstName: {
     type: String,
     trim: true
@@ -33,6 +38,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
     maxlength: 500
+  },
+  alumniDetails: {
+    company: { type: String, trim: true },
+    designation: { type: String, trim: true },
+    industry: { type: String, trim: true },
+    graduationYear: { type: Number },
+    linkedinProfile: { type: String, trim: true },
+    isOpenToMentorship: { type: Boolean, default: true }
   },
   profilePicture: {
     type: String,

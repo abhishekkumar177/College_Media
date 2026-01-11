@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { initDB } = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const resumeRoutes = require('./routes/resume');
+const uploadRoutes = require('./routes/upload');
 
 dotenv.config();
 
@@ -50,6 +52,8 @@ const startServer = async () => {
   // Import and register routes
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/users', require('./routes/users'));
+  app.use('/api/resume', resumeRoutes);
+  app.use('/api/upload', uploadRoutes);
   app.use('/api/messages', require('./routes/messages'));
   app.use('/api/account', require('./routes/account'));
   

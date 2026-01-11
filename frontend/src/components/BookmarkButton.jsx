@@ -1,90 +1,107 @@
-import React, { useState } from 'react';
-import { useBookmark } from '../context/BookmarkContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { Icon } from '@iconify/react';
+import { useBookmark } from '../hooks/useCollections';
+import CollectionSelector from './CollectionSelector';
 
 /**
- * BookmarkButton Component
+ * BookmarkButton Component (Enhanced)
  * 
  * A reusable button component that allows users to save/unsave posts
- * Uses the BookmarkContext for state management
+ * Now supports saving to multiple collections with collection selector
  * 
  * @param {Object} props - Component props
  * @param {number|string} props.postId - Unique identifier for the post
  * @param {string} props.className - Optional additional CSS classes
+ * @param {boolean} props.showLabel - Show text label alongside icon
  * @returns {React.ReactElement} Bookmark button component
  */
-const BookmarkButton = ({ postId, className = '' }) => {
-  const { isBookmarked, toggleBookmark } = useBookmark();
-  const bookmarked = isBookmarked(postId);
-  const [showToast, setShowToast] = useState(false);
+const BookmarkButton = ({ postId, className = '', showLabel = false }) => {
+  const { isSaved, savedInCollections, toggleSave, isProcessing } = useBookmark(postId);
+  const [showSelector, setShowSelector] = useState(false);
+  const buttonRef = useRef(null);
 
-  const handleClick = (e) => {
-    // Prevent event bubbling to parent elements
+  // Quick save on single click, show selector on hold or right-click
+  const handleClick = async (e) => {
     e.stopPropagation();
-    toggleBookmark(postId);
     
-    // Show toast notification
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+    // If already saved and wants to choose collection, show selector
+    if (isSaved && e.shiftKey) {
+      setShowSelector(true);
+      return;
+    }
+    
+    // Quick toggle save to default collection
+    await toggleSave();
   };
 
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowSelector(!showSelector);
+  };
+
+  const handleLongPress = () => {
+    setShowSelector(true);
+  };
+
+  // Close selector when clicking outside
+  useEffect(() => {
+    if (!showSelector) return;
+
+    const handleClickOutside = (e) => {
+      if (buttonRef.current && !buttonRef.current.contains(e.target)) {
+        setShowSelector(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSelector]);
+
   return (
-    <>
+    <div className="relative" ref={buttonRef}>
       <button
         onClick={handleClick}
-        className={`bookmark-btn ${bookmarked ? 'bookmarked' : ''} ${className}`}
-        aria-label={bookmarked ? 'Remove bookmark' : 'Add bookmark'}
-        title={bookmarked ? 'Remove from saved' : 'Save for later'}
+        onContextMenu={handleContextMenu}
+        disabled={isProcessing}
+        className={`flex items-center gap-2 transition-colors ${
+          isSaved
+            ? 'text-blue-600 dark:text-blue-400'
+            : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
+        } ${className} disabled:opacity-50`}
+        aria-label={isSaved ? 'Saved' : 'Save post'}
+        title={isSaved ? `Saved in ${savedInCollections.length} collection(s)` : 'Save for later'}
       >
-        {bookmarked ? (
-          // Filled bookmark icon
-          <svg 
-            className="w-6 h-6 fill-current" 
-            viewBox="0 0 24 24"
-          >
-            <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
-          </svg>
+        {isProcessing ? (
+          <Icon icon="mdi:loading" className="w-6 h-6 animate-spin" />
+        ) : isSaved ? (
+          <Icon icon="mdi:bookmark" className="w-6 h-6" />
         ) : (
-          // Outlined bookmark icon
-          <svg 
-            className="w-6 h-6" 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" 
-            />
-          </svg>
+          <Icon icon="mdi:bookmark-outline" className="w-6 h-6" />
+        )}
+        
+        {showLabel && (
+          <span className="text-sm font-medium">
+            {isSaved ? 'Saved' : 'Save'}
+          </span>
+        )}
+        
+        {isSaved && savedInCollections.length > 1 && (
+          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full">
+            {savedInCollections.length}
+          </span>
         )}
       </button>
-      
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-20 right-6 z-50 animate-slide-in">
-          <div className="bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2">
-            <svg 
-              className="w-5 h-5 text-green-400" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M5 13l4 4L19 7" 
-              />
-            </svg>
-            <span className="text-sm font-medium">
-              {bookmarked ? 'Post saved!' : 'Post removed from saved'}
-            </span>
-          </div>
-        </div>
+
+      {/* Collection Selector Dropdown */}
+      {showSelector && (
+        <CollectionSelector
+          postId={postId}
+          onClose={() => setShowSelector(false)}
+          onSelect={() => setShowSelector(false)}
+        />
       )}
-    </>
+    </div>
   );
 };
 
