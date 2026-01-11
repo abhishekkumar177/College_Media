@@ -100,7 +100,13 @@ export const searchApi = {
   getSuggestions: (query) => apiClient.get('/search/suggestions', { params: { q: query } }),
   getTrending: () => apiClient.get('/search/trending'),
 };
-
+// Messages endpoints
+export const messagesApi = {
+  getConversations: () => apiClient.get('/messages/conversations'),
+  getConversation: (userId) => apiClient.get(`/messages/${userId}`),
+  send: (data) => apiClient.post('/messages/send', data),
+  markAllAsRead: (userId) => apiClient.put(`/messages/read/${userId}`),
+};
 // Moderation endpoints
 export const moderationApi = {
   // Submit a report (regular users)
@@ -125,6 +131,15 @@ export const moderationApi = {
   getStatistics: () => apiClient.get('/admin/statistics/reports'),
 };
 
+// Account endpoints
+export const accountApi = {
+  deleteAccount: (data) => apiClient.delete('/account', { data }),
+  restoreAccount: () => apiClient.post('/account/restore'),
+  permanentDelete: (data) => apiClient.delete('/account/permanent', { data }),
+  getDeletionStatus: () => apiClient.get('/account/deletion-status'),
+  exportData: () => apiClient.post('/account/export-data'),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -134,5 +149,7 @@ export default {
   upload: uploadApi,
   notifications: notificationsApi,
   search: searchApi,
+  messages: messagesApi,
   moderation: moderationApi,
+  polls: pollsApi,
 };

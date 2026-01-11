@@ -119,9 +119,46 @@ const userSchema = new mongoose.Schema({
   twoFactorSecret: {
     type: String,
     default: null
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  },
+  deletionReason: {
+    type: String,
+    default: null
+  },
+  scheduledDeletionDate: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
 });
+
+// Method to soft delete user account
+userSchema.methods.softDelete = async function(reason = null) {
+  this.isDeleted = true;
+  this.deletedAt = new Date();
+  this.deletionReason = reason;
+  this.isActive = false;
+  // Schedule permanent deletion after 30 days
+  this.scheduledDeletionDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  return this.save();
+};
+
+// Method to restore deleted account
+userSchema.methods.restore = async function() {
+  this.isDeleted = false;
+  this.deletedAt = null;
+  this.deletionReason = null;
+  this.scheduledDeletionDate = null;
+  this.isActive = true;
+  return this.save();
+};
 
 module.exports = mongoose.model('User', userSchema);

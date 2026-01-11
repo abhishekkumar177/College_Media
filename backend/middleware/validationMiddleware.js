@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 
 /**
  * Validation middleware for user registration
@@ -103,9 +103,74 @@ const checkValidation = (req, res, next) => {
   next();
 };
 
+/**
+ * Validation middleware for sending a message
+ */
+const validateMessage = [
+  body('receiver')
+    .notEmpty()
+    .withMessage('Receiver is required')
+    .isString()
+    .withMessage('Receiver must be a valid ID'),
+
+  body('content')
+    .notEmpty()
+    .withMessage('Message content is required')
+    .trim()
+    .isLength({ min: 1, max: 2000 })
+    .withMessage('Message content must be between 1 and 2000 characters'),
+
+  body('messageType')
+    .optional()
+    .isIn(['text', 'image', 'file'])
+    .withMessage('Message type must be text, image, or file'),
+
+  body('attachmentUrl')
+    .optional()
+    .isURL()
+    .withMessage('Attachment URL must be a valid URL')
+];
+
+/**
+ * Validation middleware for message ID parameter
+ */
+const validateMessageId = [
+  param('messageId')
+    .notEmpty()
+    .withMessage('Message ID is required')
+    .isString()
+    .withMessage('Message ID must be a valid string')
+];
+
+/**
+ * Validation middleware for account deletion
+ */
+const validateAccountDeletion = [
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required to delete account'),
+
+  body('confirmDeletion')
+    .notEmpty()
+    .withMessage('Confirmation is required')
+    .isBoolean()
+    .withMessage('Confirmation must be a boolean')
+    .custom((value) => value === true)
+    .withMessage('You must confirm account deletion'),
+
+  body('reason')
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Reason must not exceed 500 characters')
+];
+
 module.exports = {
   validateRegister,
   validateLogin,
   validateProfileUpdate,
+  validateMessage,
+  validateMessageId,
+  validateAccountDeletion,
   checkValidation
 };

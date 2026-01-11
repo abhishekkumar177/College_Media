@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertCircle, RefreshCw, Home } from 'lucide-react';
+import { AlertCircle, RefreshCw, Home, Wifi } from 'lucide-react';
+import { isRetryableError } from '../utils/apiErrorHandler';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -8,7 +9,9 @@ class ErrorBoundary extends React.Component {
       hasError: false,
       error: null,
       errorInfo: null,
-      errorCount: 0
+      errorCount: 0,
+      isApiError: false,
+      isRetryable: false,
     };
   }
 
@@ -18,11 +21,20 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
-    
+
+    // Check if this is an API error
+    const isApiError = error.name?.includes('Error') &&
+      (error.statusCode || error.response?.status);
+
+    // Check if error is retryable
+    const isRetryable = isApiError && isRetryableError(error);
+
     this.setState(prevState => ({
       error,
       errorInfo,
-      errorCount: prevState.errorCount + 1
+      errorCount: prevState.errorCount + 1,
+      isApiError,
+      isRetryable,
     }));
 
     // Log to error reporting service (e.g., Sentry)
@@ -99,6 +111,27 @@ class ErrorBoundary extends React.Component {
                   </ul>
                 </div>
 
+                {/* API Error Specific Guidance */}
+                {this.state.isApiError && (
+                  <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                    <div className="flex items-start gap-2">
+                      <Wifi className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <p className="text-blue-800 font-medium">
+                          {this.state.isRetryable
+                            ? 'Connection Issue Detected'
+                            : 'API Error Occurred'}
+                        </p>
+                        <p className="text-blue-700 text-sm mt-1">
+                          {this.state.isRetryable
+                            ? 'This appears to be a temporary connection issue. Retrying may resolve the problem.'
+                            : 'Please check your internet connection and try again.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-4">
                   <button
@@ -124,7 +157,7 @@ class ErrorBoundary extends React.Component {
                       <h3 className="text-lg font-semibold text-red-600 mb-3">
                         Error Details (Development Only)
                       </h3>
-                      
+
                       <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                         <h4 className="font-semibold text-red-800 mb-2">Error Message:</h4>
                         <p className="text-red-700 font-mono text-sm break-all">

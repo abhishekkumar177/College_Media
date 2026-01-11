@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaHeart, FaRegHeart, FaLink, FaEllipsisV } from "react-icons/fa";
 import ReportButton from "./ReportButton";
+import PollDisplay from "./PollDisplay";
+import { usePollByPost } from "../hooks/usePolls";
 
 const Post = ({
   post,
@@ -9,6 +11,7 @@ const Post = ({
   copiedLink
 }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const { poll, hasPoll } = usePollByPost(post.id);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -56,11 +59,20 @@ const Post = ({
       </div>
 
       {/* Image */}
-      <img
-        src={post.imageUrl}
-        alt="Post"
-        className="w-full object-cover"
-      />
+      {post.imageUrl && (
+        <img
+          src={post.imageUrl}
+          alt="Post"
+          className="w-full object-cover"
+        />
+      )}
+
+      {/* Poll */}
+      {(hasPoll || post.poll) && (
+        <div className="px-4">
+          <PollDisplay poll={poll || post.poll} />
+        </div>
+      )}
 
       {/* Actions */}
       <div className="p-4">

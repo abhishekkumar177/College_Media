@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { accountApi } from "../api/endpoints";
 
 // import { useTheme } from '../context/ThemeContext';
 
@@ -27,6 +28,12 @@ const Settings = () => {
   });
   const [passwordError, setPasswordError] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [twoFAStep, setTwoFAStep] = useState(1); // 1: QR Code, 2: Verify
@@ -251,6 +258,78 @@ const Settings = () => {
     setTwoFAError("");
   };
 
+  const handleDeleteAccountClick = () => {
+    setShowDeleteAccount(true);
+    setDeletePassword("");
+    setDeleteReason("");
+    setDeleteError("");
+  };
+
+  const handleDeleteAccountCancel = () => {
+    setShowDeleteAccount(false);
+    setDeletePassword("");
+    setDeleteReason("");
+    setDeleteError("");
+  };
+
+  const handleDeleteAccountSubmit = async (e) => {
+    e.preventDefault();
+    setDeleteError("");
+
+    if (!deletePassword) {
+      setDeleteError("Password is required to delete your account");
+      return;
+    }
+
+    if (!window.confirm("Are you absolutely sure? Your account will be scheduled for deletion in 30 days. You can restore it within this period.")) {
+      return;
+    }
+
+    setDeleteLoading(true);
+
+    try {
+      const response = await accountApi.deleteAccount({
+        password: deletePassword,
+        confirmDeletion: true,
+        reason: deleteReason || undefined,
+      });
+
+      if (response.data.success) {
+        // Check if account was already scheduled (idempotent response)
+        if (response.data.data.isDeleted) {
+          const deletionDate = new Date(response.data.data.scheduledDeletionDate).toLocaleDateString();
+          
+          if (window.confirm(`Your account is already scheduled for deletion on ${deletionDate}.\n\nWould you like to restore your account instead?`)) {
+            // Restore account
+            try {
+              const restoreResponse = await accountApi.restoreAccount();
+              if (restoreResponse.data.success) {
+                alert("Account restored successfully! You can continue using your account.");
+                setShowDeleteAccount(false);
+                window.location.reload();
+              }
+            } catch (restoreError) {
+              setDeleteError("Failed to restore account. Please try again.");
+            }
+          } else {
+            setShowDeleteAccount(false);
+          }
+        } else {
+          // Newly scheduled deletion
+          alert(`Account scheduled for deletion. You have 30 days to restore it before permanent deletion on ${new Date(response.data.data.scheduledDeletionDate).toLocaleDateString()}.`);
+          setShowDeleteAccount(false);
+          logout();
+          navigate("/login");
+        }
+      }
+    } catch (error) {
+      console.error("Delete account error:", error);
+      setDeleteError(error.response?.data?.message || "Failed to delete account. Please check your password and try again.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const settingsSections = [
     {
       title: "Account",
@@ -470,7 +549,10 @@ const Settings = () => {
               Temporarily disable your account
             </p>
           </button>
-          <button className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left">
+          <button 
+            onClick={handleDeleteAccountClick}
+            className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left"
+          >
             <p className="font-bold text-red-600 dark:text-red-400">
               Delete Account
             </p>
@@ -668,6 +750,76 @@ const Settings = () => {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {showDeleteAccount && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-red-600 dark:text-red-400 mb-4">
+              Delete Account
+            </h3>
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/50 rounded-lg p-4 mb-4">
+              <p className="text-sm text-red-800 dark:text-red-200 font-semibold mb-2">
+                ⚠️ Warning: This action will:
+              </p>
+              <ul className="text-sm text-red-700 dark:text-red-300 space-y-1 ml-4 list-disc">
+                <li>Schedule your account for deletion in 30 days</li>
+                <li>You can restore it within 30 days</li>
+                <li>After 30 days, all data will be permanently deleted</li>
+                <li>Your messages, posts, and profile will be removed</li>
+              </ul>
+            </div>
+            <form onSubmit={handleDeleteAccountSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Confirm Password *
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Reason for Deletion (Optional)
+                </label>
+                <textarea
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Help us improve by telling us why you're leaving..."
+                  rows="3"
+                />
+              </div>
+              {deleteError && (
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {deleteError}
+                </p>
+              )}
+              <div className="flex space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleDeleteAccountCancel}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={deleteLoading}
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-medium transition-colors duration-200"
+                >
+                  {deleteLoading ? "Deleting..." : "Delete Account"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

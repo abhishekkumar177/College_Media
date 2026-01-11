@@ -185,3 +185,21 @@
 .mute:active {
   scale: 0.95;
 }
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-in-from-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Ensure the reels-container allows for the side drawer on wide screens */
+.reels-container {
+  display: flex;
+  flex-direction: row; /* Allows modal to sit side-by-side if you wanted, but fixed handles it better */
+}
