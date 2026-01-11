@@ -23,6 +23,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+<<<<<<< HEAD
           cache-dependency-path: frontend/package-lock.json
 
       - name: 📦 Install dependencies
@@ -39,6 +40,19 @@ jobs:
 
       - name: 📊 Generate coverage report
         working-directory: frontend
+=======
+
+      - name: 📦 Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: 🔍 Run ESLint
+        run: npm run lint
+
+      - name: 🧪 Run tests
+        run: npm run test:run
+
+      - name: 📊 Generate coverage report
+>>>>>>> fc608099e44b486cca7b2391a3a7076acb5671e3
         run: npm run test:coverage
         continue-on-error: true
 
@@ -47,7 +61,11 @@ jobs:
         if: matrix.node-version == '20.x'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+<<<<<<< HEAD
           files: frontend/coverage/coverage-final.json
+=======
+          files: ./coverage/coverage-final.json
+>>>>>>> fc608099e44b486cca7b2391a3a7076acb5671e3
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
@@ -62,4 +80,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '✅ All tests passed successfully on Node ${{ matrix.node-version }}!'
+<<<<<<< HEAD
             })
+=======
+            })
+>>>>>>> fc608099e44b486cca7b2391a3a7076acb5671e3
