@@ -3,7 +3,7 @@ import { FaHeart, FaRegHeart, FaLink, FaEllipsisV } from "react-icons/fa";
 import ReportButton from "./ReportButton";
 import PollDisplay from "./PollDisplay";
 import { usePollByPost } from "../hooks/usePolls";
-import useOptimisticUpdate from "../hooks/useOptimisticUpdate";
+import ProgressiveImage from "./ProgressiveImage";
 
 const Post = ({
   post,
@@ -81,9 +81,10 @@ const Post = ({
 
       {/* Image */}
       {post.imageUrl && (
-        <img
+        <ProgressiveImage
           src={post.imageUrl}
-          alt="Post"
+          placeholder={post.thumbnailUrl} // Optional: use if available
+          alt={`Post by ${post.user.username}`}
           className="w-full object-cover"
         />
       )}
