@@ -55,6 +55,43 @@ export const SettingsProvider = ({ children }) => {
     localStorage.setItem("fontSize", fontSize);
   }, [fontSize]);
 
+  // Apply theme to document root
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const applyDarkMode = () => {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    };
+
+    const removeDarkMode = () => {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    };
+
+    if (theme === "auto") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mediaQuery.matches) {
+        applyDarkMode();
+      } else {
+        removeDarkMode();
+      }
+      const handler = (e) => {
+        if (e.matches) {
+          applyDarkMode();
+        } else {
+          removeDarkMode();
+        }
+      };
+      mediaQuery.addEventListener("change", handler);
+      return () => mediaQuery.removeEventListener("change", handler);
+    } else if (theme === "dark") {
+      applyDarkMode();
+    } else {
+      removeDarkMode();
+    }
+  }, [theme]);
+
   // Update settings on backend
   const updateFontSize = async (newSize) => {
     setFontSize(newSize);

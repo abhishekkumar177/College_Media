@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { accountApi } from "../api/endpoints";
 import FontSizeModal from "../components/FontSizeModal";
+import ThemeModal from "../components/ThemeModal";
 
 // import { useTheme } from '../context/ThemeContext';
 
@@ -23,6 +24,7 @@ const Settings = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showFontSizeModal, setShowFontSizeModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -484,16 +486,10 @@ const Settings = () => {
       title: "Appearance",
       items: [
         {
-          icon: "🌙",
-          label: "Dark Mode",
-          description: "Switch to dark theme",
-          type: "toggle",
-          key: "darkMode",
-        },
-        {
-          icon: "🎨",
+          icon: "�",
           label: "Theme",
-          description: "Customize your theme",
+          description: "Switch between light, dark, and system themes",
+          onClick: () => setShowThemeModal(true),
           type: "link",
         },
         {
@@ -892,6 +888,11 @@ const Settings = () => {
       <FontSizeModal 
         isOpen={showFontSizeModal} 
         onClose={() => setShowFontSizeModal(false)} 
+      />
+
+      <ThemeModal
+        isOpen={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
       />
     </div>
   );
