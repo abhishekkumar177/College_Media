@@ -141,7 +141,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Method to soft delete user account
-userSchema.methods.softDelete = async function(reason = null) {
+userSchema.methods.softDelete = async function (reason = null) {
   this.isDeleted = true;
   this.deletedAt = new Date();
   this.deletionReason = reason;
@@ -152,7 +152,7 @@ userSchema.methods.softDelete = async function(reason = null) {
 };
 
 // Method to restore deleted account
-userSchema.methods.restore = async function() {
+userSchema.methods.restore = async function () {
   this.isDeleted = false;
   this.deletedAt = null;
   this.deletionReason = null;
@@ -160,5 +160,35 @@ userSchema.methods.restore = async function() {
   this.isActive = true;
   return this.save();
 };
+
+// Indexes for query optimization
+// Single field indexes
+userSchema.index({ username: 1 }); // Already unique, but explicit
+userSchema.index({ email: 1 }); // Already unique, but explicit
+userSchema.index({ isDeleted: 1 }); // Filter deleted users
+userSchema.index({ isActive: 1 }); // Filter active users
+userSchema.index({ role: 1 }); // Filter by role
+userSchema.index({ createdAt: -1 }); // Sort by registration date
+
+// Compound indexes for common queries
+userSchema.index({ isDeleted: 1, isActive: 1 }); // Active non-deleted users
+userSchema.index({ role: 1, isActive: 1 }); // Active users by role
+userSchema.index({ username: 1, isDeleted: 1 }); // Username lookup excluding deleted
+
+// Text index for search functionality
+userSchema.index({
+  username: 'text',
+  firstName: 'text',
+  lastName: 'text',
+  bio: 'text'
+}, {
+  weights: {
+    username: 10,
+    firstName: 5,
+    lastName: 5,
+    bio: 1
+  },
+  name: 'user_text_search'
+});
 
 module.exports = mongoose.model('User', userSchema);
