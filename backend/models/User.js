@@ -163,8 +163,8 @@ userSchema.methods.restore = async function () {
 
 // Indexes for query optimization
 // Single field indexes
-userSchema.index({ username: 1 }); // Already unique, but explicit
-userSchema.index({ email: 1 }); // Already unique, but explicit
+// userSchema.index({ username: 1 }); // Removed to avoid duplicate index error
+// userSchema.index({ email: 1 }); // Removed to avoid duplicate index error
 userSchema.index({ isDeleted: 1 }); // Filter deleted users
 userSchema.index({ isActive: 1 }); // Filter active users
 userSchema.index({ role: 1 }); // Filter by role

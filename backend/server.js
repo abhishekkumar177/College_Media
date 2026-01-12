@@ -33,7 +33,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Apply global rate limiter
-app.use(globalLimiter);
+// conditional check for test environment to avoid rate limits during testing
+if (process.env.NODE_ENV !== 'test') {
+  app.use(globalLimiter);
+}
 
 // Apply input sanitization (XSS & NoSQL injection protection)
 app.use(sanitizeAll);
@@ -56,42 +59,47 @@ app.get('/', (req, res) => {
   });
 });
 
-// Initialize database connection and start server
-const startServer = async () => {
+// Import and register routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/account', require('./routes/account'));
+
+// 404 Not Found Handler (must be after all routes)
+app.use(notFound);
+
+// Global Error Handler (must be last)
+app.use(errorHandler);
+
+// Initialize database connection
+const connectDB = async () => {
   let dbConnection;
-
   try {
+    // Check if we are in test environment and using memory server
+    // In test env, db connection might be handled by test setup, OR we can init it here
+    // simpler to let test setup handle connection if it uses memory-server
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     dbConnection = await initDB();
-
-    // Set the database connection globally so routes can access it
     app.set('dbConnection', dbConnection);
-
     logger.info('Database initialized successfully');
   } catch (error) {
     logger.error('Database initialization error:', error);
-    // Don't exit, just use mock database
     dbConnection = { useMongoDB: false, mongoose: null };
     app.set('dbConnection', dbConnection);
-
     logger.warn('Using file-based database as fallback');
   }
-
-  // Import and register routes
-  app.use('/api/auth', require('./routes/auth'));
-  app.use('/api/users', require('./routes/users'));
-  app.use('/api/messages', require('./routes/messages'));
-  app.use('/api/account', require('./routes/account'));
-
-  // 404 Not Found Handler (must be after all routes)
-  app.use(notFound);
-
-  // Global Error Handler (must be last)
-  app.use(errorHandler);
-
-  // Start the server
-  app.listen(PORT, () => {
-    logger.info(`Server is running on port ${PORT}`);
-  });
 };
 
-startServer();
+// Start server only if run directly
+if (require.main === module) {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
+  });
+}
+
+module.exports = app;
