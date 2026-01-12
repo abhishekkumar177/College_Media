@@ -1,19 +1,44 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { accountApi } from "../api/endpoints";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('posts');
-  const { user } = useAuth();
+  const { user: contextUser } = useAuth();
+  const [profileData, setProfileData] = useState(null);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  // Refresh profile when context user changes (after editing)
+  useEffect(() => {
+    if (contextUser) {
+      setProfileData(contextUser);
+    }
+  }, [contextUser]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await accountApi.getProfile();
+      if (response.success) {
+        setProfileData(response.data);
+      }
+    } catch (error) {
+      // Fallback to context user
+      setProfileData(contextUser);
+    }
+  };
   
-  // Use actual user data from AuthContext
-  const displayUser = user || {
-    username: 'john_doe',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@college.edu',
-    bio: '🎓 Computer Science Student | 💻 Tech Enthusiast | 📸 Photography Lover\nLiving life one code at a time ✨',
-    profilePicture: 'https://placehold.co/200x200/4F46E5/FFFFFF?text=JD',
+  // Use fetched profile data or context user as fallback
+  const displayUser = profileData || contextUser || {
+    username: 'User',
+    firstName: '',
+    lastName: '',
+    email: '',
+    bio: '',
+    profilePicture: '',
   };
 
   // Mock posts data

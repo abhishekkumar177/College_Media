@@ -4,15 +4,14 @@ import InstallPWA from "../components/InstallPWA.jsx";
 import OfflineIndicator from "../components/OfflineIndicator.jsx";
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
 import { ErrorProvider } from "../context/ErrorContext.jsx";
-import { ModerationProvider } from "../context/ModerationContext.jsx";
-import { PollProvider } from "../context/PollContext.jsx";
+import { SettingsProvider } from "../context/SettingsContext.jsx";
 import Toaster from 'react-hot-toast'
 
 export const AppProviders = ({ children }) => {
     return (
-        <ErrorProvider>
-            <ModerationProvider>
-                <PollProvider>
+        <div style={{ margin: 0, padding: 0, width: '100%', overflow: 'hidden' }}>
+            <SettingsProvider>
+                <ErrorProvider>
                     <ErrorBoundary>
                         <Toaster
                             position="top-right"
@@ -33,12 +32,11 @@ export const AppProviders = ({ children }) => {
 
                         {children}
 
-
                         <InstallPWA />
                         <OfflineIndicator />
                     </ErrorBoundary>
-                </PollProvider>
-            </ModerationProvider>
-        </ErrorProvider>
+                </ErrorProvider>
+            </SettingsProvider>
+        </div>
     );
 };

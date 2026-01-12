@@ -5,6 +5,9 @@
     "dev:backend": "cd backend && npm start"
   },
   "dependencies": {
-    "framer-motion": "^12.25.0"
+    "express-rate-limit": "^8.2.1",
+    "framer-motion": "^12.25.0",
+    "ping": "^1.0.0",
+    "redis-cli": "^2.1.2"
   }
 }

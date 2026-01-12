@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import collegeMediaLogo from "../assets/logos.png";
+import { FilePlus, FileSearch } from 'lucide-react';
 
 function LeftSidebar() {
   const location = useLocation();
@@ -96,6 +97,16 @@ function LeftSidebar() {
       label: "Messages",
       badge: "3",
       path: "/messages"
+    },
+    {
+      label: "Build Resume",
+      path: "/resume/build",
+      icon: <FilePlus />
+    },
+    {
+      label: "Review Requests",
+      path: "/resume/review",
+      icon: <FileSearch />
     },
     {
       label: "Alumni Connect",

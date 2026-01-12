@@ -59,8 +59,6 @@ const validateLogin = [
   body('password')
     .notEmpty()
     .withMessage('Password is required')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long')
 ];
 
 /**
@@ -93,10 +91,14 @@ const checkValidation = (req, res, next) => {
   const errors = validationResult(req);
   
   if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map(err => err.msg).join(', ');
+    console.log('❌ Validation errors:', errorMessages);
+    
     return res.status(400).json({
       success: false,
       data: null,
-      message: errors.array().map(err => err.msg).join(', ')
+      message: errorMessages,
+      errors: errors.array() // Include detailed errors for debugging
     });
   }
   

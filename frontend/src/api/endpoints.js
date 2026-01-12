@@ -47,6 +47,10 @@ export const usersApi = {
   getFollowers: (id, params) => apiClient.get(`/users/${id}/followers`, { params }),
   getFollowing: (id, params) => apiClient.get(`/users/${id}/following`, { params }),
   search: (query, params) => apiClient.get('/users/search', { params: { q: query, ...params } }),
+  getBlockedUsers: () => apiClient.get('/users/blocked'),
+  blockUser: (userId) => apiClient.post(`/users/${userId}/block`),
+  unblockUser: (userId) => apiClient.delete(`/users/${userId}/block`),
+  isUserBlocked: (userId) => apiClient.get(`/users/${userId}/is-blocked`),
 };
 
 // Upload endpoints
@@ -133,11 +137,31 @@ export const moderationApi = {
 
 // Account endpoints
 export const accountApi = {
+  deactivateAccount: (data) => apiClient.post('/account/deactivate', data),
+  reactivateAccount: () => apiClient.post('/account/reactivate'),
   deleteAccount: (data) => apiClient.delete('/account', { data }),
   restoreAccount: () => apiClient.post('/account/restore'),
   permanentDelete: (data) => apiClient.delete('/account/permanent', { data }),
   getDeletionStatus: () => apiClient.get('/account/deletion-status'),
   exportData: () => apiClient.post('/account/export-data'),
+  getSettings: () => apiClient.get('/account/settings'),
+  updateSettings: (data) => apiClient.put('/account/settings', data),
+  getNotificationPreferences: () => apiClient.get('/account/notification-preferences'),
+  updateNotificationPreferences: (data) => apiClient.put('/account/notification-preferences', data),
+  getProfileVisibility: () => apiClient.get('/account/profile-visibility'),
+  updateProfileVisibility: (data) => apiClient.put('/account/profile-visibility', data),
+  getProfile: () => apiClient.get('/account/profile'),
+  updateProfile: (data) => apiClient.put('/account/profile', data),
+};
+
+// Polls endpoints
+export const pollsApi = {
+  getAll: (params) => apiClient.get('/polls', { params }),
+  getById: (id) => apiClient.get(`/polls/${id}`),
+  create: (data) => apiClient.post('/polls', data),
+  vote: (id, data) => apiClient.post(`/polls/${id}/vote`, data),
+  getResults: (id) => apiClient.get(`/polls/${id}/results`),
+  delete: (id) => apiClient.delete(`/polls/${id}`),
 };
 
 // Export all APIs

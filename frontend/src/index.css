@@ -16,6 +16,19 @@
     padding: 0;
   }
   
+  /* Font Size Settings */
+  html.text-small {
+    font-size: 14px;
+  }
+  
+  html.text-medium {
+    font-size: 16px;
+  }
+  
+  html.text-large {
+    font-size: 18px;
+  }
+  
   body {
     @apply bg-slate-50 text-slate-900 transition-colors duration-300;
     margin: 0 !important;

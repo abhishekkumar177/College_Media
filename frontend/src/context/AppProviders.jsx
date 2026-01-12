@@ -7,6 +7,7 @@ import React from 'react';
 import { AuthProvider } from './AuthContext';
 import { PostsProvider } from './PostsContext';
 import { UIProvider } from './UIContext';
+import { SettingsProvider } from './SettingsContext';
 
 /**
  * AppProviders component
@@ -14,17 +15,20 @@ import { UIProvider } from './UIContext';
  * 
  * Order matters:
  * 1. UIProvider - Independent, no dependencies
- * 2. AuthProvider - May use UI for notifications
- * 3. PostsProvider - May use Auth for user-specific data
+ * 2. SettingsProvider - Independent, manages font size and theme
+ * 3. AuthProvider - May use UI for notifications
+ * 4. PostsProvider - May use Auth for user-specific data
  */
 export const AppProviders = ({ children }) => {
   return (
     <UIProvider>
-      <AuthProvider>
-        <PostsProvider>
-          {children}
-        </PostsProvider>
-      </AuthProvider>
+      <SettingsProvider>
+        <AuthProvider>
+          <PostsProvider>
+            {children}
+          </PostsProvider>
+        </AuthProvider>
+      </SettingsProvider>
     </UIProvider>
   );
 };

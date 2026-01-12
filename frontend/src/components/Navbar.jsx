@@ -5,6 +5,7 @@ import ProfileMenu from "./ProfileMenu";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
 import SearchBar from "./SearchBar";
+import OfflineQueueIndicator from "./OfflineQueueIndicator";
 
 function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -21,6 +22,9 @@ function Navbar() {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-3">
+            {/* Offline Queue Indicator */}
+            <OfflineQueueIndicator />
+
             {/* Create Post */}
             <Link
               to="/create-post"

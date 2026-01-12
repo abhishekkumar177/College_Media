@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 
 import CreatePost from "./CreatePost";
 import Post from "../components/Post";
@@ -19,13 +19,45 @@ const PostFeed = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filterType, setFilterType] = useState("all");
 
+  // Simulate API fetch function
+  const fetchPosts = useCallback(async (startIndex) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // In a real app, you would pass filter/sort params to backend here.
+        // For mock data, we just slice the array.
+        const newChunk = mockPosts.slice(startIndex, startIndex + PAGE_SIZE);
+        resolve(newChunk);
+      }, 1000);
+    });
+  }, []);
+
+  // Initial Load
   useEffect(() => {
     setTimeout(() => {
 
       setPosts(mockPosts);
       setLoading(false);
-    }, 1000);
-  }, []);
+      if (initialPosts.length < PAGE_SIZE) setHasMore(false);
+    };
+    init();
+  }, [fetchPosts]);
+
+  // Infinite Scroll Callback
+  const loadMorePosts = useCallback(async () => {
+    const nextPosts = await fetchPosts(posts.length);
+    if (nextPosts.length === 0) {
+      setHasMore(false);
+    } else {
+      setPosts((prev) => [...prev, ...nextPosts]);
+      // If we fetched fewer than PAGE_SIZE, we reached the end
+      if (nextPosts.length < PAGE_SIZE) setHasMore(false);
+    }
+  }, [posts.length, fetchPosts]);
+
+  const { lastElementRef, isFetching } = useInfiniteScroll(loadMorePosts, {
+    hasMore,
+    rootMargin: '100px' // Start loading 100px before end
+  });
 
   // Infinite Scroll Handler with Throttle
   const handleLoadMore = () => {
@@ -204,10 +236,10 @@ const PostFeed = () => {
     return allPosts;
   }, [posts, newPosts, searchQuery, sortBy, filterType]);
 
-  if (loading) {
+  if (loading && !posts.length) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        <SkeletonPost />
+        <SkeletonPost count={3} />
       </div>
     );
   }
@@ -236,24 +268,44 @@ const PostFeed = () => {
           </p>
         </div>
       ) : (
-        filteredAndSortedPosts.map((post) => (
-          <Post
-            key={post.id}
-            post={post}
-            onLike={handleLike}
-            onShareWhatsApp={handleShareWhatsApp}
-            onShareTelegram={handleShareTelegram}
-            onShareTwitter={handleShareTwitter}
-            onShareFacebook={handleShareFacebook}
-            onShareLinkedIn={handleShareLinkedIn}
-            onShareEmail={handleShareEmail}
-            onCopyLink={handleCopyLink}
-            copiedLink={copiedLink}
-          />
-        ))
+        <>
+          {filteredAndSortedPosts.map((post, index) => {
+            // Attach ref to the last element
+            const isLast = index === filteredAndSortedPosts.length - 1;
+            return (
+              <div key={post.id} ref={isLast ? lastElementRef : null}>
+                <Post
+                  post={post}
+                  onLike={handleLike}
+                  onShareWhatsApp={handleShareWhatsApp}
+                  onShareTelegram={handleShareTelegram}
+                  onShareTwitter={handleShareTwitter}
+                  onShareFacebook={handleShareFacebook}
+                  onShareLinkedIn={handleShareLinkedIn}
+                  onShareEmail={handleShareEmail}
+                  onCopyLink={handleCopyLink}
+                  copiedLink={copiedLink}
+                />
+              </div>
+            );
+          })}
+
+          {/* Loading indicator for infinite scroll */}
+          {isFetching && (
+            <div className="py-4">
+              <SkeletonPost count={1} />
+            </div>
+          )}
+
+          {/* End of Feed Message */}
+          {!hasMore && posts.length > 0 && (
+            <div className="text-center py-8 text-gray-500 text-sm">
+              You've reached the end of the feed! 🎉
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 };
-
 export default PostFeed;

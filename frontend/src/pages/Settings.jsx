@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { accountApi } from "../api/endpoints";
+import FontSizeModal from "../components/FontSizeModal";
+import ThemeModal from "../components/ThemeModal";
+import NotificationPreferencesModal from "../components/NotificationPreferencesModal";
+import BlockedUsersModal from "../components/BlockedUsersModal";
+import ProfileVisibilityModal from "../components/ProfileVisibilityModal";
+import EditProfileModal from "../components/EditProfileModal";
 
 // import { useTheme } from '../context/ThemeContext';
 
@@ -21,6 +27,12 @@ const Settings = () => {
 
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showFontSizeModal, setShowFontSizeModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const [showNotificationPreferences, setShowNotificationPreferences] = useState(false);
+  const [showBlockedUsers, setShowBlockedUsers] = useState(false);
+  const [showProfileVisibility, setShowProfileVisibility] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -28,6 +40,12 @@ const Settings = () => {
   });
   const [passwordError, setPasswordError] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const [showDeactivateAccount, setShowDeactivateAccount] = useState(false);
+  const [deactivatePassword, setDeactivatePassword] = useState("");
+  const [deactivateReason, setDeactivateReason] = useState("");
+  const [deactivateError, setDeactivateError] = useState("");
+  const [deactivateLoading, setDeactivateLoading] = useState(false);
 
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
@@ -258,6 +276,58 @@ const Settings = () => {
     setTwoFAError("");
   };
 
+  const handleDeactivateAccountClick = () => {
+    setShowDeactivateAccount(true);
+    setDeactivatePassword("");
+    setDeactivateReason("");
+    setDeactivateError("");
+  };
+
+  const handleDeactivateAccountSubmit = async (e) => {
+    e.preventDefault();
+    setDeactivateError("");
+
+    if (!deactivatePassword) {
+      setDeactivateError("Password is required");
+      return;
+    }
+
+    setDeactivateLoading(true);
+
+    try {
+      const response = await accountApi.deactivateAccount({
+        password: deactivatePassword,
+        reason: deactivateReason
+      });
+
+      if (response.success) {
+        // Logout and redirect to login
+        logout();
+        navigate("/login", { 
+          state: { 
+            message: "Your account has been deactivated. You can reactivate it anytime by logging in again." 
+          }
+        });
+      } else {
+        setDeactivateError(response.message || "Failed to deactivate account");
+      }
+    } catch (error) {
+      console.error("Deactivate account error:", error);
+      setDeactivateError(
+        error.response?.data?.message || "An error occurred while deactivating your account"
+      );
+    } finally {
+      setDeactivateLoading(false);
+    }
+  };
+
+  const handleDeactivateAccountCancel = () => {
+    setShowDeactivateAccount(false);
+    setDeactivatePassword("");
+    setDeactivateReason("");
+    setDeactivateError("");
+  };
+
   const handleDeleteAccountClick = () => {
     setShowDeleteAccount(true);
     setDeletePassword("");
@@ -338,7 +408,8 @@ const Settings = () => {
           icon: "👤",
           label: "Edit Profile",
           description: "Update your profile information",
-          type: "link",
+          type: "button",
+          onClick: () => setShowEditProfile(true),
         },
         {
           icon: "🔒",
@@ -385,6 +456,7 @@ const Settings = () => {
           icon: "🚫",
           label: "Blocked Users",
           description: "Manage blocked accounts",
+          onClick: () => setShowBlockedUsers(true),
           type: "link",
         },
         {
@@ -392,6 +464,7 @@ const Settings = () => {
           label: "Who can see your profile",
           description: "Control profile visibility",
           type: "link",
+          onClick: () => setShowProfileVisibility(true),
         },
       ],
     },
@@ -417,6 +490,7 @@ const Settings = () => {
           label: "Notification Preferences",
           description: "Customize what you get notified about",
           type: "link",
+          onClick: () => setShowNotificationPreferences(true),
         },
       ],
     },
@@ -424,16 +498,10 @@ const Settings = () => {
       title: "Appearance",
       items: [
         {
-          icon: "🌙",
-          label: "Dark Mode",
-          description: "Switch to dark theme",
-          type: "toggle",
-          key: "darkMode",
-        },
-        {
-          icon: "🎨",
+          icon: "�",
           label: "Theme",
-          description: "Customize your theme",
+          description: "Switch between light, dark, and system themes",
+          onClick: () => setShowThemeModal(true),
           type: "link",
         },
         {
@@ -441,6 +509,7 @@ const Settings = () => {
           label: "Font Size",
           description: "Adjust text size",
           type: "link",
+          onClick: () => setShowFontSizeModal(true),
         },
       ],
     },
@@ -471,8 +540,8 @@ const Settings = () => {
             {section.items.map((item, itemIndex) => (
               <div
                 key={itemIndex}
-                onClick={item.type === "button" ? item.onClick : undefined}
-                className={`flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 ${item.type === "button" ? "cursor-pointer" : ""}`}
+                onClick={item.type === "button" ? item.onClick : (item.type === "link" && item.onClick) ? item.onClick : undefined}
+                className={`flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 ${(item.type === "button" || (item.type === "link" && item.onClick)) ? "cursor-pointer" : ""}`}
               >
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="text-2xl">{item.icon}</div>
@@ -541,7 +610,10 @@ const Settings = () => {
           Danger Zone
         </h2>
         <div className="space-y-3">
-          <button className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left">
+          <button 
+            onClick={handleDeactivateAccountClick}
+            className="w-full p-4 rounded-xl border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 text-left"
+          >
             <p className="font-bold text-red-600 dark:text-red-400">
               Deactivate Account
             </p>
@@ -823,6 +895,37 @@ const Settings = () => {
           </div>
         </div>
       )}
+
+      {/* Font Size Modal */}
+      <FontSizeModal 
+        isOpen={showFontSizeModal} 
+        onClose={() => setShowFontSizeModal(false)} 
+      />
+
+      <ThemeModal
+        isOpen={showThemeModal}
+        onClose={() => setShowThemeModal(false)}
+      />
+
+      <NotificationPreferencesModal
+        isOpen={showNotificationPreferences}
+        onClose={() => setShowNotificationPreferences(false)}
+      />
+
+      <BlockedUsersModal
+        isOpen={showBlockedUsers}
+        onClose={() => setShowBlockedUsers(false)}
+      />
+
+      <ProfileVisibilityModal
+        isOpen={showProfileVisibility}
+        onClose={() => setShowProfileVisibility(false)}
+      />
+
+      <EditProfileModal
+        isOpen={showEditProfile}
+        onClose={() => setShowEditProfile(false)}
+      />
     </div>
   );
 };

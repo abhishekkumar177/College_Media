@@ -45,9 +45,9 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => 
-            name !== CACHE_NAME && 
-            name !== API_CACHE_NAME && 
+          .filter((name) =>
+            name !== CACHE_NAME &&
+            name !== API_CACHE_NAME &&
             name !== IMAGE_CACHE_NAME
           )
           .map((name) => {
@@ -136,47 +136,87 @@ self.addEventListener('sync', (event) => {
     event.waitUntil(syncPosts());
   } else if (event.tag === 'sync-comments') {
     event.waitUntil(syncComments());
+  } else if (event.tag === 'sync-offline-queue') {
+    event.waitUntil(syncOfflineQueue());
   }
 });
 
-// Push notification handler
-self.addEventListener('push', (event) => {
-  console.log('Push notification received:', event);
+// ... (existing push/notification handlers) ...
 
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'College Media';
-  const options = {
-    body: data.body || 'New notification',
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
-    data: data.url || '/',
-  };
+// Sync offline queue (generic)
+async function syncOfflineQueue() {
+  try {
+    const db = await openQueueDB();
+    const requests = await getAllQueueRequests(db);
 
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-});
+    for (const request of requests) {
+      try {
+        // Re-execute the request
+        const response = await fetch(request.url, {
+          method: request.method,
+          headers: request.headers,
+          body: JSON.stringify(request.data), // Axios stores data as 'data', fetch needs body string
+        });
 
-// Notification click handler
-self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
-
-  event.notification.close();
-
-  event.waitUntil(
-    clients.openWindow(event.notification.data)
-  );
-});
-
-// Helper function to limit cache size
-async function limitCacheSize(cacheName, maxItems) {
-  const cache = await caches.open(cacheName);
-  const keys = await cache.keys();
-  if (keys.length > maxItems) {
-    // Delete oldest entries
-    await cache.delete(keys[0]);
-    await limitCacheSize(cacheName, maxItems);
+        if (response.ok) {
+          await deleteQueueRequest(db, request.id);
+          console.log('Offline request synced:', request.id);
+        } else {
+          // If failed, we might want to update retry count or just leave it for main thread to handle
+          // Since this is background sync, we'll leave it. Main thread logic handles complex retries.
+          // Or we could delete if 4xx error (except 408/429).
+          if (response.status >= 400 && response.status < 500 && response.status !== 408 && response.status !== 429) {
+            await deleteQueueRequest(db, request.id);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to sync offline request:', err);
+      }
+    }
+  } catch (err) {
+    console.error('Sync offline queue error:', err);
   }
+}
+
+// Queue DB Helpers (separate DB for generic queue)
+function openQueueDB() {
+  return new Promise((resolve, reject) => {
+    // Check frontend/src/utils/indexedDB.js for DB_NAME
+    const request = indexedDB.open('offline-queue-db', 1);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    // Upgrade should be handled by frontend, but good to have fallback if SW runs first? 
+    // Usually frontend opens it first.
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('requests')) {
+        db.createObjectStore('requests', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+function getAllQueueRequests(db) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('requests', 'readonly');
+    const store = transaction.objectStore('requests');
+    const request = store.getAll();
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+  });
+}
+
+function deleteQueueRequest(db, id) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('requests', 'readwrite');
+    const store = transaction.objectStore('requests');
+    const request = store.delete(id);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve();
+  });
 }
 
 // Sync posts when back online
