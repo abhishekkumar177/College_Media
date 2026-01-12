@@ -13,7 +13,9 @@ const { cacheMiddleware, invalidateCache } = require('../middleware/cacheMiddlew
 
 const cache = require('../utils/cache');
 const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
+
 const { hasPermission } = require('../config/roles');
+const { getIO, isUserOnline } = require('../socket');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
@@ -140,6 +142,17 @@ router.post('/', verifyToken, validateMessage, checkValidation, invalidateCache(
       ]);
     } catch (cacheErr) {
       logger.warn('Failed to invalidate receiver cache:', cacheErr);
+    }
+
+    // Emit real-time event
+    try {
+      const io = getIO();
+      // Emit to receiver
+      io.to(receiver).emit('new_message', message);
+      // Emit to sender (for multi-device sync)
+      io.to(req.userId).emit('new_message', message);
+    } catch (socketErr) {
+      logger.warn('Socket emit error:', socketErr.message);
     }
 
     res.status(201).json({

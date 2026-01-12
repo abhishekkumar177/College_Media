@@ -4,7 +4,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const http = require('http');
 const { initDB } = require('./config/db');
+const { initSocket } = require('./socket');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const logger = require('./utils/logger');
 const { globalLimiter } = require('./middleware/rateLimitMiddleware');
@@ -13,7 +15,9 @@ require('./utils/redisClient'); // Initialize Redis client
 
 dotenv.config();
 
+
 const app = express();
+const server = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -96,7 +100,8 @@ const connectDB = async () => {
 // Start server only if run directly
 if (require.main === module) {
   connectDB().then(() => {
-    app.listen(PORT, () => {
+    initSocket(server);
+    server.listen(PORT, () => {
       logger.info(`Server is running on port ${PORT}`);
     });
   });
