@@ -27,6 +27,10 @@ const { slidingWindowLimiter } = require("./middleware/slidingWindowLimiter");
 const { warmUpCache } = require("./utils/cache");
 const logger = require("./utils/logger");
 
+// 🔍 Observability & Metrics
+const metricsMiddleware = require("./middleware/metrics.middleware");
+const { client: metricsClient } = require("./utils/metrics");
+
 /* ------------------
    🌱 ENV SETUP
 ------------------ */
@@ -50,7 +54,10 @@ const FEATURE_FLAGS = Object.freeze({
   ENABLE_STRICT_RATE_LIMITING: ENV === "production",
   ENABLE_VERBOSE_ERRORS: ENV !== "production",
 });
-
+/* ------------------
+   📊 OBSERVABILITY – REQUEST METRICS
+------------------ */
+app.use(metricsMiddleware);
 /* ---------- Feature Flag Validation ---------- */
 (() => {
   Object.entries(FEATURE_FLAGS).forEach(([k, v]) => {
@@ -71,7 +78,21 @@ const FEATURE_FLAGS = Object.freeze({
 
   logger.info("Feature flags loaded", { env: ENV, FEATURE_FLAGS });
 })();
-
+/* ------------------
+   📈 PROMETHEUS METRICS
+------------------ */
+app.get("/metrics", async (req, res) => {
+  try {
+    res.set("Content-Type", metricsClient.register.contentType);
+    res.end(await metricsClient.register.metrics());
+  } catch (err) {
+    logger.error("Metrics endpoint failed", { error: err.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to load metrics",
+    });
+  }
+});
 /* ------------------
    🌍 CORS
 ------------------ */
