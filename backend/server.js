@@ -1,19 +1,15 @@
-const express = require('express');
-const compression = require('compression');
-const helmet = require('helmet');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const path = require('path');
-const http = require('http');
-const { initDB } = require('./config/db');
-const { initSocket } = require('./socket');
-const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-const logger = require('./utils/logger');
-const { globalLimiter } = require('./middleware/rateLimitMiddleware');
-const { sanitizeAll, validateContentType, preventParameterPollution } = require('./middleware/sanitizationMiddleware');
-const { setupSwagger } = require('./config/swagger');
-const passport = require('./config/passport');
-require('./utils/redisClient'); // Initialize Redis client
+/**
+ * ============================================================
+ *  College Media – Backend Server (HARDENED)
+ * ------------------------------------------------------------
+ *  ✔ Refresh Token Ready
+ *  ✔ Cookie Security Enabled
+ *  ✔ Startup Self-Checks
+ *  ✔ Token Abuse Protection
+ *  ✔ Graceful Shutdown
+ *  ✔ Observability Enabled
+ * ============================================================
+ */
 
 /* ============================================================
    📦 CORE DEPENDENCIES
@@ -24,13 +20,12 @@ const dotenv = require("dotenv");
 const path = require("path");
 const http = require("http");
 const os = require("os");
+const cookieParser = require("cookie-parser");
 
 /* ============================================================
    🔧 INTERNAL IMPORTS
 const helmet = require("helmet");
 const securityHeaders = require("./config/securityHeaders");
-
-
 const { initDB } = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
@@ -63,6 +58,14 @@ const sampleJob = require("./jobs/sampleJob");
    🌱 ENVIRONMENT SETUP
 dotenv.config();
 
+const ENV = process.env.NODE_ENV || "development";
+const PORT = process.env.PORT || 5000;
+const TRUST_PROXY = process.env.TRUST_PROXY === "true";
+const METRICS_TOKEN = process.env.METRICS_TOKEN || "metrics-secret";
+
+/* 🔐 AUTH / TOKEN CONFIG */
+const COOKIE_SECURE = ENV === "production";
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
 const app = express();
 const server = http.createServer(app);
@@ -96,11 +99,11 @@ if (process.env.NODE_ENV !== 'test') {
 app.disable("x-powered-by");
 
 /* ============================================================
-   🔐 SECURITY HEADERS (HELMET)
+   🔐 SECURITY HEADERS
 app.use(helmet(securityHeaders(ENV)));
 
 /* ============================================================
-   🌍 CORS CONFIG
+   🌍 CORS CONFIG (REFRESH TOKEN SAFE)
 ============================================================ */
 app.use(
   cors({
@@ -115,6 +118,11 @@ app.use(
     ],
   })
 );
+
+/* ============================================================
+   🍪 COOKIE PARSER (REFRESH TOKEN SUPPORT)
+============================================================ */
+app.use(cookieParser());
 
 /* ============================================================
    📦 BODY PARSERS
@@ -166,17 +174,10 @@ app.use((req, res, next) => {
 });
 
 /* ============================================================
-   ⏱️ RATE LIMITING (ISSUE #500 FIX)
+   ⏱️ RATE LIMITING
 ============================================================ */
-
-/**
- * Sliding window limiter – light protection
- */
 app.use("/api", slidingWindowLimiter);
 
-/**
- * Global limiter – protects all APIs
- */
 if (ENV === "production") {
   app.use("/api", globalLimiter);
 }
@@ -189,12 +190,11 @@ app.use(
   express.static(path.join(__dirname, "uploads"), {
     maxAge: "1h",
     etag: true,
-    immutable: false,
   })
 );
 
 /* ============================================================
-   ❤️ HEALTH CHECK
+   ❤️ HEALTH CHECK + AUTH SANITY
 ============================================================ */
 app.get("/", (req, res) => {
   res.json({
@@ -204,67 +204,36 @@ app.get("/", (req, res) => {
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     cpu: os.loadavg(),
+    refreshTokenCookie: {
+      httpOnly: true,
+      secure: COOKIE_SECURE,
+      domain: COOKIE_DOMAIN || "auto",
+    },
     timestamp: new Date().toISOString(),
   });
 });
 
-// Setup Swagger API documentation
-setupSwagger(app);
-
-// Import and register routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/posts', require('./routes/posts'));
-app.use('/api/messages', require('./routes/messages'));
-app.use('/api/account', require('./routes/account'));
-app.use('/api/search', require('./routes/search'));
-app.use('/api/moderation', require('./routes/moderation'));
-
-// Admin routes (not versioned)
-app.use('/api/admin', require('./routes/admin'));
-
-// 404 Not Found Handler (must be after all routes)
-app.use(notFound);
+/* ============================================================
+   📈 METRICS (SECURED)
 
   if (ENV === "production" && token !== METRICS_TOKEN) {
-    logger.warn("Unauthorized metrics access", {
-      ip: req.ip,
-    });
-    return res.status(403).json({
-      success: false,
-      message: "Forbidden",
-    });
+    logger.warn("Unauthorized metrics access", { ip: req.ip });
+    return res.status(403).json({ success: false });
   }
 
-  try {
-    res.set("Content-Type", metricsClient.register.contentType);
-    res.end(await metricsClient.register.metrics());
-  } catch (err) {
-    logger.error("Metrics endpoint failed", {
-      error: err.message,
-    });
-    res.status(500).json({
-      success: false,
-      message: "Failed to load metrics",
-    });
-  }
+  res.set("Content-Type", metricsClient.register.contentType);
+  res.end(await metricsClient.register.metrics());
 });
 
 /* ============================================================
    🔁 BACKGROUND JOB BOOTSTRAP
 const startBackgroundJobs = () => {
-  logger.info("Bootstrapping background jobs");
-
   setImmediate(async () => {
     try {
       await sampleJob.run({ shouldFail: false });
-      logger.info("Background job completed successfully");
+      logger.info("Background job executed");
     } catch (err) {
-      logger.error("Background job failed", {
-        job: "sample_background_job",
-        error: err.message,
-        stack: err.stack,
-      });
+      logger.error("Background job failed", err);
     }
   });
 };
@@ -275,40 +244,46 @@ const startBackgroundJobs = () => {
 let dbConnection = null;
 
 const startServer = async () => {
-  logger.info("Starting server bootstrap");
-
-  /* ---------- DB CONNECTION ---------- */
-  try {
-    dbConnection = await initDB();
-    logger.info("Database connected successfully");
-  } catch (err) {
-    logger.critical("Database connection failed", {
-      error: err.message,
-    });
+  /* 🔍 STARTUP SELF CHECK */
+  if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
+    logger.critical("Auth secrets missing");
     process.exit(1);
   }
 
-  // ------------------
-  // 🔐 ROUTES
-  // ------------------
+  try {
+    dbConnection = await initDB();
+  } catch (err) {
+    logger.critical("DB connection failed", err);
+    process.exit(1);
+  }
+
+  setImmediate(() => {
+    warmUpCache({
+      User: require("./models/User"),
+      Resume: require("./models/Resume"),
+    });
+  });
+
+  startBackgroundJobs();
+
+  /* 🔐 ROUTES */
   app.use("/api/auth", authLimiter, require("./routes/auth"));
   app.use("/api/users", require("./routes/users"));
+  app.use("/api/search", searchLimiter, require("./routes/search"));
+  app.use("/api/admin", adminLimiter, require("./routes/admin"));
   app.use("/api/resume", resumeRoutes);
   app.use("/api/upload", uploadRoutes);
   app.use("/api/messages", require("./routes/messages"));
   app.use("/api/account", require("./routes/account"));
-  app.use("/api/notifications", require("./routes/notifications"));
-  app.use("/api/alumni", require("./routes/alumni"));
-  app.use("/api/posts", require("./routes/posts"));
 
-  // ------------------
-  // ❌ ERROR HANDLERS (VERY IMPORTANT ORDER)
-  // ------------------
-  app.use(notFound);      // 404 handler
-  app.use(errorHandler); // global error handler
+  app.use(notFound);
+  app.use(errorHandler);
 
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+  server.keepAliveTimeout = 120000;
+  server.headersTimeout = 130000;
+
+  server.listen(PORT, () => {
+    logger.info(`Server running`, { port: PORT, env: ENV });
   });
 };
 
@@ -317,17 +292,21 @@ if (require.main === module) {
   connectDB().then(() => {
     initSocket(server);
 
-    // Start scheduler (only in production, not during tests)
-    if (process.env.NODE_ENV !== 'test') {
-      const scheduler = require('./jobs/scheduler');
-      scheduler.start();
+  server.close(async () => {
+    if (dbConnection?.mongoose) {
+      await dbConnection.mongoose.connection.close(false);
     }
-
-    server.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
-    });
+    process.exit(0);
   });
-}
+
+  setTimeout(() => process.exit(1), 10000);
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
+/* ============================================================
+   🧨 PROCESS SAFETY
 
 /* ============================================================
    ▶️ BOOTSTRAP
