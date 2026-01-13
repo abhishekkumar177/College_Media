@@ -21,6 +21,8 @@ const PERMISSIONS = {
     DELETE_ANY_POST: 'delete_any_post',
     DELETE_ANY_MESSAGE: 'delete_any_message',
     VIEW_ANY_PROFILE: 'view_any_profile', // Including private ones
+    VIEW_REPORTS: 'view_reports',
+    RESOLVE_REPORTS: 'resolve_reports',
 
     // System
     VIEW_LOGS: 'view_logs',
@@ -38,7 +40,9 @@ const ROLE_PERMISSIONS = {
         PERMISSIONS.VIEW_USERS,
         PERMISSIONS.BAN_USER,
         PERMISSIONS.DELETE_ANY_POST,
-        PERMISSIONS.VIEW_ANY_PROFILE
+        PERMISSIONS.VIEW_ANY_PROFILE,
+        PERMISSIONS.VIEW_REPORTS,
+        PERMISSIONS.RESOLVE_REPORTS
     ],
 
     [ROLES.ADMIN]: [
@@ -50,6 +54,8 @@ const ROLE_PERMISSIONS = {
         PERMISSIONS.DELETE_ANY_POST,
         PERMISSIONS.DELETE_ANY_MESSAGE,
         PERMISSIONS.VIEW_ANY_PROFILE,
+        PERMISSIONS.VIEW_REPORTS,
+        PERMISSIONS.RESOLVE_REPORTS,
         PERMISSIONS.VIEW_LOGS,
         PERMISSIONS.MANAGE_SETTINGS
     ]

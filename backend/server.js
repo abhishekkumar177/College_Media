@@ -214,9 +214,11 @@ setupSwagger(app);
 // Import and register routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/posts', require('./routes/posts'));
 app.use('/api/messages', require('./routes/messages'));
 app.use('/api/account', require('./routes/account'));
 app.use('/api/search', require('./routes/search'));
+app.use('/api/moderation', require('./routes/moderation'));
 
 // 404 Not Found Handler (must be after all routes)
 app.use(notFound);
