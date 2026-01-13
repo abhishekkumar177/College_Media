@@ -220,6 +220,9 @@ app.use('/api/account', require('./routes/account'));
 app.use('/api/search', require('./routes/search'));
 app.use('/api/moderation', require('./routes/moderation'));
 
+// Admin routes (not versioned)
+app.use('/api/admin', require('./routes/admin'));
+
 // 404 Not Found Handler (must be after all routes)
 app.use(notFound);
 
@@ -309,21 +312,20 @@ const startServer = async () => {
   });
 };
 
-/* ============================================================
-   🧹 GRACEFUL SHUTDOWN
+// Start server only if run directly
+if (require.main === module) {
+  connectDB().then(() => {
+    initSocket(server);
+
+    // Start scheduler (only in production, not during tests)
+    if (process.env.NODE_ENV !== 'test') {
+      const scheduler = require('./jobs/scheduler');
+      scheduler.start();
     }
 
-  setTimeout(() => {
-    logger.critical("Force shutdown");
-    process.exit(1);
-  }, 10000);
-};
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
-
-/* ============================================================
-   🧨 PROCESS SAFETY
+    server.listen(PORT, () => {
+      logger.info(`Server is running on port ${PORT}`);
+    });
   });
 }
 
