@@ -6,17 +6,21 @@
  * ✔ Refresh Token Rotation
  * ✔ Secure Cookies
  * ✔ Audit Logging
- * ✔ Abuse Safe
- * ✔ Error Resilient
+ * ✔ Password Change Audit & Invalidation
+ * ✔ Session / Token Revocation
  * ============================================================
  */
 
+const bcrypt = require("bcryptjs");
+const User = require("../models/User");
 const RefreshToken = require("../models/RefreshToken");
+
 const {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
 } = require("../utils/token.util");
+
 const { logAudit } = require("../utils/auditLogger");
 
 /* ============================================================
@@ -24,9 +28,7 @@ const { logAudit } = require("../utils/auditLogger");
 ============================================================ */
 exports.login = async (req, res) => {
   try {
-    /**
-     * ⚠️ Replace this with actual DB auth
-     */
+    // ⚠️ Replace with real DB auth
     const user = {
       _id: "64ff123abc123",
       role: "USER",
@@ -47,7 +49,6 @@ exports.login = async (req, res) => {
       path: "/api/auth/refresh-token",
     });
 
-    /* 🧾 AUDIT LOG */
     await logAudit({
       actorId: user._id,
       actorRole: user.role,
@@ -56,10 +57,7 @@ exports.login = async (req, res) => {
       req,
     });
 
-    return res.json({
-      success: true,
-      accessToken,
-    });
+    return res.json({ success: true, accessToken });
   } catch (err) {
     await logAudit({
       action: "LOGIN",
@@ -68,10 +66,7 @@ exports.login = async (req, res) => {
       metadata: { error: err.message },
     });
 
-    return res.status(401).json({
-      success: false,
-      message: "Login failed",
-    });
+    return res.status(401).json({ success: false });
   }
 };
 
@@ -91,13 +86,8 @@ exports.refreshToken = async (req, res) => {
   try {
     const decoded = await verifyRefreshToken(token);
 
-    /**
-     * 🔁 Rotate refresh token (replay attack safe)
-     */
-    await RefreshToken.updateOne(
-      { token },
-      { revoked: true }
-    );
+    // 🔁 Rotate refresh token
+    await RefreshToken.updateOne({ token }, { revoked: true });
 
     const newRefreshToken = await generateRefreshToken(decoded.userId);
     const newAccessToken = generateAccessToken({
@@ -118,10 +108,7 @@ exports.refreshToken = async (req, res) => {
       req,
     });
 
-    return res.json({
-      success: true,
-      accessToken: newAccessToken,
-    });
+    return res.json({ success: true, accessToken: newAccessToken });
   } catch (err) {
     await logAudit({
       action: "REFRESH_TOKEN",
@@ -132,7 +119,90 @@ exports.refreshToken = async (req, res) => {
 
     return res.status(401).json({
       success: false,
-      message: "Invalid or expired refresh token",
+      message: "Invalid refresh token",
+    });
+  }
+};
+
+/* ============================================================
+   🔑 CHANGE PASSWORD (🔥 ISSUE #532 FIX)
+============================================================ */
+exports.changePassword = async (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(userId).select("+password");
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isMatch) {
+      await logAudit({
+        actorId: userId,
+        action: "PASSWORD_CHANGE",
+        status: "FAILED",
+        req,
+        metadata: { reason: "Invalid current password" },
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: "Current password incorrect",
+      });
+    }
+
+    /* 🔐 UPDATE PASSWORD */
+    user.password = await bcrypt.hash(newPassword, 12);
+    user.passwordChangedAt = new Date();
+    await user.save();
+
+    /* 🔥 INVALIDATE ALL REFRESH TOKENS */
+    await RefreshToken.updateMany(
+      { userId },
+      { revoked: true }
+    );
+
+    /* 🍪 CLEAR CURRENT SESSION */
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/api/auth/refresh-token",
+    });
+
+    /* 🧾 AUDIT LOG */
+    await logAudit({
+      actorId: userId,
+      action: "PASSWORD_CHANGED",
+      targetId: userId,
+      status: "SUCCESS",
+      req,
+    });
+
+    return res.json({
+      success: true,
+      message:
+        "Password changed successfully. All sessions invalidated.",
+    });
+  } catch (err) {
+    await logAudit({
+      actorId: userId,
+      action: "PASSWORD_CHANGED",
+      status: "FAILED",
+      req,
+      metadata: { error: err.message },
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: "Password change failed",
     });
   }
 };
@@ -145,10 +215,7 @@ exports.logout = async (req, res) => {
 
   try {
     if (token) {
-      await RefreshToken.updateOne(
-        { token },
-        { revoked: true }
-      );
+      await RefreshToken.updateOne({ token }, { revoked: true });
     }
 
     res.clearCookie("refreshToken", {

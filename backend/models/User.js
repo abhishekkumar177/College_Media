@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -21,14 +22,25 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 6,
+      select: false, // 🔐 NEVER expose password
     },
+
+    /* 🔐 ROLE & ACCESS */
     role: {
       type: String,
       enum: ["student", "alumni", "admin"],
       default: "student",
     },
+
+    /* 🔥 PASSWORD SECURITY */
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
+
     firstName: { type: String, trim: true },
     lastName: { type: String, trim: true },
+
     bio: {
       type: String,
       default: "",
@@ -100,14 +112,52 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
 
     // 🔥 OPTIMISTIC LOCKING
-    optimisticConcurrency: true, // enables version check
-    versionKey: "__v", // explicit (clarity for reviewer)
+    optimisticConcurrency: true,
+    versionKey: "__v",
   }
 );
 
-/* ------------------
+/* ============================================================
+   🔐 PASSWORD HASHING
+============================================================ */
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // 🔥 Mark password change time (invalidate old JWTs)
+  this.passwordChangedAt = new Date(Date.now() - 1000);
+
+  next();
+});
+
+/* ============================================================
+   🔑 PASSWORD CHECK
+============================================================ */
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return bcrypt.compare(candidatePassword, userPassword);
+};
+
+/* ============================================================
+   🚫 JWT INVALIDATION CHECK
+============================================================ */
+userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return jwtTimestamp < changedTimestamp;
+  }
+  return false;
+};
+
+/* ============================================================
    🔐 SAFE SAVE HELPER
------------------- */
+============================================================ */
 userSchema.methods.safeSave = async function () {
   try {
     return await this.save();
@@ -124,9 +174,9 @@ userSchema.methods.safeSave = async function () {
   }
 };
 
-/* ------------------
+/* ============================================================
    🧠 BUSINESS METHODS
------------------- */
+============================================================ */
 userSchema.methods.deactivate = async function (reason = null) {
   this.isActive = false;
   this.deletionReason = reason;
