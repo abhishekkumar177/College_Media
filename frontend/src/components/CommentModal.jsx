@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { commentsApi } from "../api/endpoints";
 import { useTheme } from "../context/ThemeContext";
 import useTypingIndicator from "../hooks/useTypingIndicator";
+import useFocusTrap from "../hooks/useFocusTrap";
+import useOptimisticUpdate from "../hooks/useOptimisticUpdate";
 import TypingIndicator from "./TypingIndicator";
 import useContentModeration from "../hooks/useContentModeration";
 import ModerationWarning from "./ModerationWarning";

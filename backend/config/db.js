@@ -1,40 +1,128 @@
 const mongoose = require('mongoose');
 const fs = require('fs');
+const logger = require('../utils/logger');
+const { initializePool, healthCheck } = require('./dbPool');
+const { initializeQueryMonitoring } = require('../middleware/queryMonitor');
 
-// Check if MongoDB is available by attempting to connect with a timeout
 let useMongoDB = true;
+let isConnected = false;
 
-// Function to initialize database connection
+// Function to initialize database connection with pooling
 const initDB = async () => {
   const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/college_media';
-  
-  // Try to connect to MongoDB
+
+  // Try to connect to MongoDB with connection pooling
   try {
-    // Attempt connection with a timeout
-    const connectPromise = new Promise((resolve, reject) => {
-      const conn = mongoose.connect(MONGODB_URI, {
-        // Remove deprecated options for newer versions
-      });
-      
-      conn.then(resolve).catch(reject);
-    });
-    
-    // Set a timeout for the connection attempt
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('MongoDB connection timeout')), 3000)
-    );
-    
-    await Promise.race([connectPromise, timeoutPromise]);
-    
-    console.log('MongoDB connected successfully');
+    // Initialize connection pool
+    await initializePool(MONGODB_URI);
+
+    // Initialize query monitoring
+    initializeQueryMonitoring(mongoose);
+
+    logger.info('MongoDB connected successfully with connection pooling');
     useMongoDB = true;
-    return { useMongoDB: true, mongoose };
+
+    return {
+      useMongoDB: true,
+      mongoose,
+      healthCheck
+    };
   } catch (error) {
-    console.warn('MongoDB connection failed:', error.message);
-    console.log('Falling back to file-based database for development');
+    logger.warn(`MongoDB connection failed: ${error.message}`);
+    logger.info('Falling back to file-based database for development');
     useMongoDB = false;
-    return { useMongoDB: false, mongoose: null };
+    return {
+      useMongoDB: false,
+      mongoose: null,
+      healthCheck: null
+    };
   }
 };
 
-module.exports = { initDB, useMongoDB };
+/* ------------------
+   🔐 CRON JOB LOCK (ANTI-OVERLAP)
+------------------ */
+const acquireJobLock = async (jobName, ttlMs = 60000) => {
+  if (!useMongoDB || !mongoose) return true;
+
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlMs);
+
+  const LockSchema = new mongoose.Schema(
+    {
+      jobName: { type: String, unique: true },
+      lockedAt: Date,
+      expiresAt: Date,
+    },
+    { collection: LOCK_COLLECTION }
+  );
+
+  const Lock =
+    mongoose.models.JobLock || mongoose.model("JobLock", LockSchema);
+
+  try {
+    await Lock.findOneAndUpdate(
+      {
+        jobName,
+        $or: [
+          { expiresAt: { $lt: now } },
+          { expiresAt: { $exists: false } },
+        ],
+      },
+      {
+        jobName,
+        lockedAt: now,
+        expiresAt,
+      },
+      { upsert: true, new: true }
+    );
+
+    return true;
+  } catch (err) {
+    console.warn(`🔒 Job "${jobName}" already running`);
+    return false;
+  }
+};
+
+const releaseJobLock = async (jobName) => {
+  if (!useMongoDB || !mongoose) return;
+
+  const Lock =
+    mongoose.models.JobLock || mongoose.model("JobLock");
+
+  try {
+    await Lock.deleteOne({ jobName });
+    console.log(`🔓 Job lock released: ${jobName}`);
+  } catch (err) {
+    console.error("❌ Failed to release job lock:", err.message);
+  }
+};
+
+/* ------------------
+   🧹 CLEANUP
+------------------ */
+const closeDB = async () => {
+  if (useMongoDB && mongoose?.connection?.readyState === 1) {
+    await mongoose.connection.close(false);
+    console.log("🧹 MongoDB connection closed");
+  }
+};
+
+/* ------------------
+   📊 STATUS
+------------------ */
+const getDBStatus = () => ({
+  useMongoDB,
+  connected: isConnected,
+});
+
+/* ------------------
+   📦 EXPORTS
+------------------ */
+module.exports = {
+  initDB,
+  closeDB,
+  acquireJobLock,
+  releaseJobLock,
+  getDBStatus,
+};

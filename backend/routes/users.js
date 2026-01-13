@@ -1,69 +1,93 @@
-const express = require('express');
-const UserMongo = require('../models/User');
-const UserMock = require('../mockdb/userDB');
-const { validateProfileUpdate, checkValidation } = require('../middleware/validationMiddleware');
+const express = require("express");
+const UserMongo = require("../models/User");
+const UserMock = require("../mockdb/userDB");
+const {
+  validateProfileUpdate,
+  checkValidation,
+} = require("../middleware/validationMiddleware");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path');
+const logger = require('../utils/logger');
+const { apiLimiter } = require('../middleware/rateLimitMiddleware');
+
+const { isValidName, isValidBio, isValidEmail } = require('../utils/validators');
+const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
+const { parsePaginationParams, paginateQuery } = require('../utils/pagination');
+const { cacheMiddleware, invalidateCache } = require('../middleware/cacheMiddleware');
+
+const { uploadProfilePicture, handleUploadError, getUploadedFileUrl } = require('../middleware/upload');
+const { deleteImage, getPublicIdFromUrl, isCloudinaryConfigured } = require('../config/cloudinary');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
 
-// Middleware to verify JWT token
+/* ------------------
+   🔐 AUTH MIDDLEWARE
+------------------ */
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Bearer TOKEN
+  const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({
       success: false,
-      data: null,
-      message: 'Access denied. No token provided.'
+      message: "Access denied. No token provided.",
     });
   }
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
+const authorizeSelfOrAdmin = (paramKey = "userId") => {
+  return (req, res, next) => {
+    const targetId = req.params[paramKey];
+
+    // Admin override
+    if (req.currentUser.role === "admin") return next();
+
+    // Owner-only access
+    if (targetId !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You are not authorized to access this resource",
     next();
   } catch (error) {
-    res.status(400).json({
+    return res.status(401).json({
       success: false,
-      data: null,
-      message: 'Invalid token.'
+      message: "Invalid token.",
     });
   }
 };
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); //Appending extension
-  }
-});
 
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'));
-    }
-  }
-});
 
-// Get current user profile
-router.get('/profile', verifyToken, async (req, res, next) => {
+/**
+ * @swagger
+ * /api/users/profile:
+ *   get:
+ *     summary: Get current user profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean }
+ *                 data: { $ref: '#/components/schemas/User' }
+ *                 message: { type: string }
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
+router.get('/profile', verifyToken, cacheMiddleware({ prefix: 'user-profile', ttl: 300 }), async (req, res, next) => {
   try {
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const user = await UserMongo.findById(req.userId).select('-password');
@@ -98,19 +122,44 @@ router.get('/profile', verifyToken, async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error:', error);
     next(error);
   }
 });
 
 // Update user profile
-router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, async (req, res, next) => {
+router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, invalidateCache(['user-profile::userId']), async (req, res, next) => {
   try {
     const { firstName, lastName, bio } = req.body;
-    
+
+    // Validate inputs
+    if (firstName && !isValidName(firstName)) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: 'Invalid first name format (1-50 characters, letters only)'
+      });
+    }
+
+    if (lastName && !isValidName(lastName)) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: 'Invalid last name format (1-50 characters, letters only)'
+      });
+    }
+
+    if (bio && !isValidBio(bio)) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: 'Bio must be 500 characters or less'
+      });
+    }
+
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const updatedUser = await UserMongo.findByIdAndUpdate(
@@ -154,13 +203,13 @@ router.put('/profile', verifyToken, validateProfileUpdate, checkValidation, asyn
       });
     }
   } catch (error) {
-    console.error('Update profile error:', error);
+    logger.error('Update profile error:', error);
     next(error);
   }
 });
 
 // Upload profile picture
-router.post('/profile-picture', verifyToken, upload.single('profilePicture'), async (req, res, next) => {
+router.post('/profile-picture', verifyToken, uploadProfilePicture.single('profilePicture'), handleUploadError, invalidateCache(['user-profile::userId']), async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -169,24 +218,34 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
         message: 'No file uploaded'
       });
     }
-    
+
+    // Get the uploaded file URL (works for both Cloudinary and local)
+    const profilePictureUrl = getUploadedFileUrl(req, req.file);
+
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
-      // Use MongoDB
+      // Get old profile picture URL to delete from Cloudinary
+      const user = await UserMongo.findById(req.userId);
+      const oldPictureUrl = user?.profilePicture;
+
+      // Update user with new profile picture
       const updatedUser = await UserMongo.findByIdAndUpdate(
         req.userId,
-        { profilePicture: `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` },
+        { profilePicture: profilePictureUrl },
         { new: true, runValidators: true }
       ).select('-password');
 
-      if (!updatedUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
+/* =====================================================
+   👤 GET CURRENT USER PROFILE
+
+      // Delete old image from Cloudinary (if it was a Cloudinary URL)
+      if (oldPictureUrl && isCloudinaryConfigured()) {
+        const oldPublicId = getPublicIdFromUrl(oldPictureUrl);
+        if (oldPublicId) {
+          deleteImage(oldPublicId).catch(err => logger.error('Failed to delete old image:', err));
+        }
       }
 
       res.json({
@@ -200,8 +259,12 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
       // Use mock database
       const updatedUser = await UserMock.updateProfilePicture(
         req.userId,
-        `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`
+        profilePictureUrl
       );
+      if (!user)
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
 
       if (!updatedUser) {
         return res.status(404).json({
@@ -220,19 +283,23 @@ router.post('/profile-picture', verifyToken, upload.single('profilePicture'), as
       });
     }
   } catch (error) {
-    console.error('Upload profile picture error:', error);
+    logger.error('Upload profile picture error:', error);
     next(error);
   }
 });
 
 // Get user by username (for viewing other profiles)
-router.get('/profile/:username', verifyToken, async (req, res, next) => {
+router.get('/profile/:username', verifyToken, cacheMiddleware({
+  prefix: 'user-profile-public',
+  ttl: 300,
+  keyGenerator: (req) => `cache:user-profile-public:${req.params.username}`
+}), async (req, res, next) => {
   try {
     const { username } = req.params;
-    
+
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const user = await UserMongo.findOne({ username }).select('-password -email');
@@ -247,42 +314,21 @@ router.get('/profile/:username', verifyToken, async (req, res, next) => {
       res.json({
         success: true,
         data: user,
-        message: 'Profile retrieved successfully'
-      });
-    } else {
-      // Use mock database
-      const user = await UserMock.findByUsername(username);
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
-
-      // Remove sensitive fields
-      const { password, email, ...publicProfile } = user;
-
-      res.json({
-        success: true,
-        data: publicProfile,
-        message: 'Profile retrieved successfully'
       });
     }
-  } catch (error) {
-    console.error('Get user profile error:', error);
-    next(error);
-  }
-});
 
 // Get user's posts
-router.get('/profile/:username/posts', verifyToken, async (req, res, next) => {
+router.get('/profile/:username/posts', verifyToken, cacheMiddleware({
+  prefix: 'user-posts-public',
+  ttl: 60,
+  keyGenerator: (req) => `cache:user-posts-public:${req.params.username}`
+}), async (req, res, next) => {
   try {
     const { username } = req.params;
-    
+
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB - You'll need to create a Post model
       const user = await UserMongo.findOne({ username });
@@ -326,24 +372,24 @@ router.get('/profile/:username/posts', verifyToken, async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error('Get user posts error:', error);
+    logger.error('Get user posts error:', error);
     next(error);
   }
 });
 
 // Update profile settings (email, privacy, etc.)
-router.put('/profile/settings', verifyToken, async (req, res, next) => {
+router.put('/profile/settings', verifyToken, invalidateCache(['user-profile::userId']), async (req, res, next) => {
   try {
     const { email, isPrivate, notificationSettings } = req.body;
-    
+
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
+
     const updateData = {};
     if (email) updateData.email = email;
     if (typeof isPrivate !== 'undefined') updateData.isPrivate = isPrivate;
     if (notificationSettings) updateData.notificationSettings = notificationSettings;
-    
+
     if (dbConnection && dbConnection.useMongoDB) {
       // Use MongoDB
       const updatedUser = await UserMongo.findByIdAndUpdate(
@@ -360,210 +406,175 @@ router.put('/profile/settings', verifyToken, async (req, res, next) => {
         });
       }
 
-      res.json({
-        success: true,
-        data: updatedUser,
-        message: 'Settings updated successfully'
+      const updatedUser = await UserMock.update(req.userId, {
+        firstName,
+        lastName,
+        bio,
       });
-    } else {
-      // Use mock database
-      const updatedUser = await UserMock.update(req.userId, updateData);
-
-      if (!updatedUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
 
       res.json({
         success: true,
         data: updatedUser,
-        message: 'Settings updated successfully'
+        message: "Profile updated successfully",
       });
+    } catch (err) {
+      next(err); // 409 conflict handled globally
     }
-  } catch (error) {
-    console.error('Update settings error:', error);
-    next(error);
   }
-});
+);
 
 // Get profile stats (followers, following, posts count)
-router.get('/profile/stats', verifyToken, async (req, res, next) => {
+router.get('/profile/stats', verifyToken, cacheMiddleware({ prefix: 'user-stats', ttl: 300 }), async (req, res, next) => {
   try {
-    // Get database connection from app
-    const dbConnection = req.app.get('dbConnection');
-    
-    if (dbConnection && dbConnection.useMongoDB) {
-      // Use MongoDB
+    const { email, isPrivate, notificationSettings } = req.body;
+    const db = req.app.get("dbConnection");
+
+    if (db?.useMongoDB) {
       const user = await UserMongo.findById(req.userId);
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
+      if (!user)
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
 
-      // TODO: Implement actual counts from relationships and posts
-      const stats = {
-        posts: 0,
-        followers: user.followers?.length || 0,
-        following: user.following?.length || 0
-      };
+      if (email) user.email = email;
+      if (typeof isPrivate !== "undefined")
+        user.isPrivate = isPrivate;
+      if (notificationSettings)
+        user.notificationSettings = notificationSettings;
 
-      res.json({
+      const updatedUser = await user.safeSave();
+
+      return res.json({
         success: true,
-        data: stats,
-        message: 'Stats retrieved successfully'
+        data: updatedUser,
+        message: "Settings updated successfully",
       });
-    } else {
-      // Use mock database
-      const mockStats = {
-        posts: 6,
-        followers: 1247,
-        following: 543
-      };
-
-      res.json({
-        success: true,
-        data: mockStats,
-        message: 'Stats retrieved successfully'
-      });
+    } catch (err) {
+      next(err);
     }
-  } catch (error) {
-    console.error('Get stats error:', error);
-    next(error);
-  }
-});
-
-// Follow/Unfollow user
-router.post('/profile/:username/follow', verifyToken, async (req, res, next) => {
+router.put("/profile/settings", verifyToken, async (req, res, next) => {
   try {
-    const { username } = req.params;
-    
-    // Get database connection from app
-    const dbConnection = req.app.get('dbConnection');
-    
-    if (dbConnection && dbConnection.useMongoDB) {
-      // Use MongoDB
-      const targetUser = await UserMongo.findOne({ username });
-      if (!targetUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
+    const { email, isPrivate, notificationSettings } = req.body;
 
-      // Check if already following
-      const currentUser = await UserMongo.findById(req.userId);
-      const isFollowing = currentUser.following?.includes(targetUser._id);
+    if (email) req.currentUser.email = email;
+    if (typeof isPrivate !== "undefined")
+      req.currentUser.isPrivate = isPrivate;
+    if (notificationSettings)
+      req.currentUser.notificationSettings = notificationSettings;
 
-      if (isFollowing) {
-        // Unfollow
-        await UserMongo.findByIdAndUpdate(req.userId, {
-          $pull: { following: targetUser._id }
-        });
-        await UserMongo.findByIdAndUpdate(targetUser._id, {
-          $pull: { followers: req.userId }
-        });
+    const updatedUser =
+      typeof req.currentUser.safeSave === "function"
+        ? await req.currentUser.safeSave()
+        : await UserMock.update(req.userId, req.body);
 
-        res.json({
-          success: true,
-          data: { isFollowing: false },
-          message: 'Unfollowed successfully'
-        });
-      } else {
-        // Follow
-        await UserMongo.findByIdAndUpdate(req.userId, {
-          $addToSet: { following: targetUser._id }
-        });
-        await UserMongo.findByIdAndUpdate(targetUser._id, {
-          $addToSet: { followers: req.userId }
-        });
-
-        res.json({
-          success: true,
-          data: { isFollowing: true },
-          message: 'Followed successfully'
-        });
-      }
-    } else {
-      // Use mock database
-      res.json({
-        success: true,
-        data: { isFollowing: true },
-        message: 'Follow action completed'
-      });
-    }
-  } catch (error) {
-    console.error('Follow/Unfollow error:', error);
-    next(error);
+    const updatedUser = await UserMock.update(req.userId, req.body);
+    res.json({
+      success: true,
+      data: updatedUser,
+      message: "Settings updated successfully",
+    });
+  } catch (err) {
+    next(err);
   }
 });
 
 // Delete profile picture
-router.delete('/profile-picture', verifyToken, async (req, res, next) => {
+router.delete('/profile-picture', verifyToken, invalidateCache(['user-profile::userId']), async (req, res, next) => {
   try {
     // Get database connection from app
     const dbConnection = req.app.get('dbConnection');
-    
-    if (dbConnection && dbConnection.useMongoDB) {
-      // Use MongoDB
-      const updatedUser = await UserMongo.findByIdAndUpdate(
-        req.userId,
-        { $unset: { profilePicture: "" } },
-        { new: true }
-      ).select('-password');
 
-      if (!updatedUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
+        // 🔥 BOTH VERSION CHECKED
+        await currentUser.safeSave();
+        await targetUser.safeSave();
+
+        return res.json({
+          success: true,
+          data: { isFollowing: !isFollowing },
+          message: isFollowing ? "Unfollowed" : "Followed",
         });
       }
 
       res.json({
         success: true,
-        data: null,
-        message: 'Profile picture removed successfully'
+        data: { isFollowing: true },
+        message: "Follow action completed",
       });
-    } else {
-      // Use mock database
-      const updatedUser = await UserMock.updateProfilePicture(req.userId, null);
+    } catch (err) {
+      next(err);
+    }
+  }
+});
+
+// ADMIN/MODERATOR ROUTES
+
+/**
+ * @route   GET /api/users
+ * @desc    Get all users (paginated)
+ * @access  Private (Admin/Moderator)
+ */
+router.get('/', verifyToken, checkPermission(PERMISSIONS.VIEW_USERS), async (req, res, next) => {
+  try {
+    const dbConnection = req.app.get('dbConnection');
+    const useMongoDB = dbConnection?.useMongoDB;
+
+    if (useMongoDB) {
+      const { page, limit, skip, sort } = parsePaginationParams(req.query);
+
+      const query = { isDeleted: false };
+      // Optional: Filter by role if provided
+      if (req.query.role) query.role = req.query.role;
+      // Optional: Search by username/name
+      if (req.query.search) {
+        query.$text = { $search: req.query.search };
+      }
+
+      const result = await paginateQuery(UserMongo, query, {
+        page,
+        limit,
+        sort,
+        select: '-password'
+      });
 
       res.json({
         success: true,
-        data: null,
-        message: 'Profile picture removed successfully'
+        data: result.data,
+        pagination: result.pagination,
+        message: 'Users retrieved successfully'
+      });
+    } else {
+      // Mock DB implementation (simple list)
+      const users = await UserMock.findAll(); // Assuming this exists or returns mocked list
+      const publicUsers = users.map(u => {
+        const { password, ...rest } = u;
+        return rest;
+      });
+
+      res.json({
+        success: true,
+        data: publicUsers,
+        message: 'Users retrieved successfully (Mock)'
       });
     }
   } catch (error) {
-    console.error('Delete profile picture error:', error);
+    logger.error('Get users error:', error);
     next(error);
   }
 });
 
 /**
- * @route   GET /api/users/blocked
- * @desc    Get list of blocked users
- * @access  Private
+ * @route   DELETE /api/users/:userId
+ * @desc    Delete a user (Admin only)
+ * @access  Private (Admin)
  */
-router.get('/blocked', verifyToken, async (req, res, next) => {
+router.delete('/:userId', verifyToken, checkPermission(PERMISSIONS.DELETE_USER), async (req, res, next) => {
   try {
+    const { userId } = req.params;
     const dbConnection = req.app.get('dbConnection');
     const useMongoDB = dbConnection?.useMongoDB;
 
-    let blockedUsers = [];
-
     if (useMongoDB) {
-      const user = await UserMongo.findById(req.userId)
-        .populate('blockedUsers', 'username email profilePicture firstName lastName')
-        .select('blockedUsers');
-      
+      const user = await UserMongo.findById(userId);
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -572,237 +583,44 @@ router.get('/blocked', verifyToken, async (req, res, next) => {
         });
       }
 
-      blockedUsers = user.blockedUsers || [];
-    } else {
-      const user = UserMock.findById(req.userId);
-      
-      if (!user) {
-        return res.status(404).json({
+      // Prevent deleting yourself or other admins (optional safeguard)
+      if (user._id.toString() === req.userId) {
+        return res.status(400).json({
           success: false,
           data: null,
-          message: 'User not found'
+          message: 'Cannot delete your own admin account through this endpoint'
         });
       }
 
-      // Get blocked users details
-      if (user.blockedUsers && user.blockedUsers.length > 0) {
-        blockedUsers = user.blockedUsers.map(userId => {
-          const blockedUser = UserMock.findById(userId);
-          if (blockedUser) {
-            return {
-              _id: blockedUser._id,
-              username: blockedUser.username,
-              email: blockedUser.email,
-              profilePicture: blockedUser.profilePicture,
-              firstName: blockedUser.firstName,
-              lastName: blockedUser.lastName
-            };
-          }
-          return null;
-        }).filter(user => user !== null);
-      }
-    }
+      await user.softDelete('Deleted by Admin');
 
-    res.json({
-      success: true,
-      data: blockedUsers,
-      message: 'Blocked users retrieved successfully'
-    });
-  } catch (error) {
-    console.error('Get blocked users error:', error);
-    next(error);
-  }
-});
-
-/**
- * @route   POST /api/users/:userId/block
- * @desc    Block a user
- * @access  Private
- */
-router.post('/:userId/block', verifyToken, async (req, res, next) => {
-  try {
-    const { userId } = req.params;
-
-    // Validate: Cannot block yourself
-    if (userId === req.userId) {
-      return res.status(400).json({
-        success: false,
-        data: null,
-        message: 'You cannot block yourself'
-      });
-    }
-
-    const dbConnection = req.app.get('dbConnection');
-    const useMongoDB = dbConnection?.useMongoDB;
-
-    if (useMongoDB) {
-      // Check if target user exists
-      const targetUser = await UserMongo.findById(userId);
-      if (!targetUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
-
-      // Get current user and block the target user
-      const currentUser = await UserMongo.findById(req.userId);
-      if (!currentUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'Current user not found'
-        });
-      }
-
-      await currentUser.blockUser(userId);
-
-      // Also remove current user from target user's followers/following
-      await UserMongo.findByIdAndUpdate(userId, {
-        $pull: {
-          followers: req.userId,
-          following: req.userId
-        }
-      });
+      // Invalidate cache
+      await invalidateCache([`user-profile:${userId}`, `user-profile-public:${user.username}`])(req, res, () => { });
 
       res.json({
         success: true,
         data: null,
-        message: 'User blocked successfully'
+        message: 'User deleted successfully'
       });
     } else {
-      // Check if target user exists
-      const targetUser = UserMock.findById(userId);
-      if (!targetUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'User not found'
-        });
-      }
-
-      // Block the user
-      const result = UserMock.blockUser(req.userId, userId);
+      // Mock DB
+      const result = await UserMock.delete(userId);
       if (!result) {
         return res.status(404).json({
           success: false,
           data: null,
-          message: 'Failed to block user'
-        });
-      }
-
-      // Also remove current user from target user's followers/following
-      const targetUserData = UserMock.findById(userId);
-      if (targetUserData.followers) {
-        targetUserData.followers = targetUserData.followers.filter(id => id !== req.userId);
-      }
-      if (targetUserData.following) {
-        targetUserData.following = targetUserData.following.filter(id => id !== req.userId);
-      }
-      UserMock.updateOne({ _id: userId }, targetUserData);
-
-      res.json({
-        success: true,
-        data: null,
-        message: 'User blocked successfully'
-      });
-    }
-  } catch (error) {
-    console.error('Block user error:', error);
-    next(error);
-  }
-});
-
-/**
- * @route   DELETE /api/users/:userId/block
- * @desc    Unblock a user
- * @access  Private
- */
-router.delete('/:userId/block', verifyToken, async (req, res, next) => {
-  try {
-    const { userId } = req.params;
-
-    const dbConnection = req.app.get('dbConnection');
-    const useMongoDB = dbConnection?.useMongoDB;
-
-    if (useMongoDB) {
-      // Get current user and unblock the target user
-      const currentUser = await UserMongo.findById(req.userId);
-      if (!currentUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'Current user not found'
-        });
-      }
-
-      await currentUser.unblockUser(userId);
-
-      res.json({
-        success: true,
-        data: null,
-        message: 'User unblocked successfully'
-      });
-    } else {
-      // Unblock the user
-      const result = UserMock.unblockUser(req.userId, userId);
-      if (!result) {
-        return res.status(404).json({
-          success: false,
-          data: null,
-          message: 'Failed to unblock user'
-        });
-      }
-
-      res.json({
-        success: true,
-        data: null,
-        message: 'User unblocked successfully'
-      });
-    }
-  } catch (error) {
-    console.error('Unblock user error:', error);
-    next(error);
-  }
-});
-
-/**
- * @route   GET /api/users/:userId/is-blocked
- * @desc    Check if a user is blocked
- * @access  Private
- */
-router.get('/:userId/is-blocked', verifyToken, async (req, res, next) => {
-  try {
-    const { userId } = req.params;
-
-    const dbConnection = req.app.get('dbConnection');
-    const useMongoDB = dbConnection?.useMongoDB;
-
-    let isBlocked = false;
-
-    if (useMongoDB) {
-      const currentUser = await UserMongo.findById(req.userId).select('blockedUsers');
-      if (!currentUser) {
-        return res.status(404).json({
-          success: false,
-          data: null,
           message: 'User not found'
         });
       }
 
-      isBlocked = currentUser.isUserBlocked(userId);
-    } else {
-      isBlocked = UserMock.isUserBlocked(req.userId, userId);
+      res.json({
+        success: true,
+        data: null,
+        message: 'User deleted successfully'
+      });
     }
-
-    res.json({
-      success: true,
-      data: { isBlocked },
-      message: isBlocked ? 'User is blocked' : 'User is not blocked'
-    });
   } catch (error) {
-    console.error('Check if user is blocked error:', error);
+    logger.error('Delete user error:', error);
     next(error);
   }
 });
