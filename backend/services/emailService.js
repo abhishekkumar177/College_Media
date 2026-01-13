@@ -1,4 +1,5 @@
 const { Resend } = require('resend');
+const logger = require('../utils/logger');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -87,14 +88,14 @@ const sendPasswordResetOTP = async (email, otp) => {
     });
 
     if (error) {
-      console.error('Resend email error:', error);
+      logger.error('Resend email error:', error);
       throw new Error('Failed to send email');
     }
 
-    console.log('Password reset OTP email sent successfully:', data);
+    logger.info('Password reset OTP email sent successfully:', { data });
     return data;
   } catch (error) {
-    console.error('Email service error:', error);
+    logger.error('Email service error:', error);
     throw error;
   }
 };

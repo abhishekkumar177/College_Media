@@ -3,6 +3,7 @@ import { FaHeart, FaRegHeart, FaLink, FaEllipsisV } from "react-icons/fa";
 import ReportButton from "./ReportButton";
 import PollDisplay from "./PollDisplay";
 import { usePollByPost } from "../hooks/usePolls";
+import ProgressiveImage from "./ProgressiveImage";
 
 const Post = ({
   post,
@@ -12,6 +13,26 @@ const Post = ({
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const { poll, hasPoll } = usePollByPost(post.id);
+
+  // Optimistic update for likes
+  const { data: likes, isUpdating: isLiking, optimisticUpdate: updateLike } = useOptimisticUpdate({
+    initialState: post.likes,
+    updateFn: async (newLikes) => {
+      // Call the parent's onLike handler which should return a promise
+      if (onLike) {
+        await onLike(post.id);
+      }
+      return newLikes;
+    },
+    optimisticUpdateFn: (currentLikes) => post.liked ? currentLikes - 1 : currentLikes + 1,
+    errorMessage: 'Failed to update like. Please try again.'
+  });
+
+  const handleLikeClick = () => {
+    // Toggle liked state optimistically
+    post.liked = !post.liked;
+    updateLike();
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -28,7 +49,7 @@ const Post = ({
             <p className="text-xs text-gray-500">{post.timestamp}</p>
           </div>
         </div>
-        
+
         {/* More Menu */}
         <div className="relative">
           <button
@@ -38,7 +59,7 @@ const Post = ({
           >
             <FaEllipsisV className="text-gray-600" />
           </button>
-          
+
           {showMenu && (
             <>
               <div
@@ -60,9 +81,10 @@ const Post = ({
 
       {/* Image */}
       {post.imageUrl && (
-        <img
+        <ProgressiveImage
           src={post.imageUrl}
-          alt="Post"
+          placeholder={post.thumbnailUrl} // Optional: use if available
+          alt={`Post by ${post.user.username}`}
           className="w-full object-cover"
         />
       )}
@@ -79,16 +101,17 @@ const Post = ({
         <div className="flex items-center gap-4">
           {/* Like */}
           <button
-            onClick={() => onLike(post.id)}
+            onClick={handleLikeClick}
             className="flex items-center gap-2"
             aria-label={post.liked ? "Unlike post" : "Like post"}
+            disabled={isLiking}
           >
             {post.liked ? (
               <FaHeart className="text-red-500" />
             ) : (
               <FaRegHeart className="text-gray-700" />
             )}
-            <span>{post.likes}</span>
+            <span className={isLiking ? 'opacity-70' : ''}>{likes}</span>
           </button>
 
           {/* Copy Link */}

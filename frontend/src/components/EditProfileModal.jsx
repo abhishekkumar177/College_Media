@@ -22,6 +22,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      // Fetch profile data (fetchProfile handles contextUser fallback)
       fetchProfile();
       setError("");
       setSuccessMessage("");
@@ -48,8 +49,23 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         setOriginalData(profileData);
       }
     } catch (err) {
-      console.error("Failed to fetch profile:", err);
-      setError("Failed to load profile data");
+      // Fallback to context user data
+      if (contextUser) {
+        const profileData = {
+          firstName: contextUser.firstName || "",
+          lastName: contextUser.lastName || "",
+          username: contextUser.username || "",
+          email: contextUser.email || "",
+          bio: contextUser.bio || "",
+          profilePicture: contextUser.profilePicture || "",
+          profileBanner: contextUser.profileBanner || "",
+        };
+        setFormData(profileData);
+        setOriginalData(profileData);
+        setError(""); // Clear error since we have fallback data
+      } else {
+        setError("Failed to load profile data");
+      }
     } finally {
       setLoading(false);
     }
@@ -105,7 +121,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     try {
       const response = await accountApi.updateProfile(formData);
 
-      if (response.success) {
+      // apiClient unwraps response.data, backend returns { success, message, data }
+      if (response && response.success) {
         // Update user state in AuthContext so changes reflect everywhere
         setUser(response.data);
         
@@ -115,13 +132,13 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         setTimeout(() => {
           setSuccessMessage("");
           onClose();
-        }, 2000);
+        }, 1500);
       } else {
         setError(response?.message || "Failed to update profile.");
       }
     } catch (err) {
       console.error("Failed to update profile:", err);
-      setError(err.message || "Failed to update profile. Please try again.");
+      setError(err?.response?.data?.message || err.message || "Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }

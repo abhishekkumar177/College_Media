@@ -1,245 +1,123 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
+const jwt = require('jsonwebtoken');
+const Post = require('../models/Post');
+const User = require('../models/User');
+const ModerationService = require('../services/moderationService');
+const logger = require('../utils/logger');
+const { apiLimiter } = require('../middleware/rateLimitMiddleware');
+const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
 
-const Post = require("../models/Post");
-const User = require("../models/User");
-const Comment = require("../models/Comment");
+const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
 
-const JWT_SECRET = process.env.JWT_SECRET || "college_media_secret_key";
-
-/* ---------------- AUTH MIDDLEWARE ---------------- */
+// Middleware to verify token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      data: null,
-      message: "Access denied. No token provided",
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    return res.status(401).json({
-      success: false,
-      data: null,
-      message: "Invalid token",
-    });
-  }
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, message: 'No token' });
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.userId = decoded.userId;
+        next();
+    } catch (error) {
+        res.status(401).json({ success: false, message: 'Invalid token' });
+    }
 };
 
-/* =========================================================
-   ❌ BEFORE (N+1 PROBLEM – DON'T DO THIS)
-   =========================================================
-   const posts = await Post.find();
-   for (let post of posts) {
-     post.user = await User.findById(post.userId);
-     post.comments = await Comment.find({ postId: post._id });
-   }
-*/
-
-/* =========================================================
-   ✅ AFTER (SINGLE QUERY USING AGGREGATION)
-   ========================================================= */
-
 /**
- * @route   GET /api/posts
- * @desc    Get all posts with user + comments (NO N+1)
- * @access  Public
+ * @swagger
+ * /api/posts:
+ *   post:
+ *     summary: Create a new post
+ *     tags: [Posts]
+ *     security:
+ *       - bearerAuth: []
  */
-router.get("/", async (req, res) => {
-  try {
-    const posts = await Post.aggregate([
-      // Join USERS
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "author",
-        },
-      },
-      { $unwind: "$author" },
+router.post('/', verifyToken, apiLimiter, async (req, res) => {
+    try {
+        const { content, tags, visibility, images } = req.body;
 
-      // Join COMMENTS
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "post",
-          as: "comments",
-        },
-      },
+        // Check content safety asynchronously
+        ModerationService.checkAndFlag(content, 'Post', null, req.userId).catch(err =>
+            logger.error('Content safety check failed:', err)
+        );
 
-      // Project only required fields
-      {
-        $project: {
-          title: 1,
-          content: 1,
-          createdAt: 1,
+        const post = await Post.create({
+            author: req.userId,
+            content,
+            tags,
+            visibility,
+            images
+        });
 
-          "author._id": 1,
-          "author.username": 1,
-          "author.firstName": 1,
-          "author.lastName": 1,
-          "author.profilePicture": 1,
+        // Update targetId for content safety check if we wanted to link it precisely in the catch above
+        // But checkAndFlag creates a report if needed. Ideally we pass the post ID.
+        // Let's rerun check with ID. Ideally we check BEFORE create, but for "flagging" we create then flag.
+        // If we want to block, we check before.
+        // Let's do async flag update.
+        ModerationService.checkAndFlag(content, 'Post', post._id, req.userId);
 
-          commentsCount: { $size: "$comments" },
-        },
-      },
-
-      { $sort: { createdAt: -1 } },
-    ]);
-
-    res.json({
-      success: true,
-      data: posts,
-      message: "Posts fetched successfully (N+1 fixed)",
-    });
-  } catch (error) {
-    console.error("Fetch posts error:", error);
-    res.status(500).json({
-      success: false,
-      data: null,
-      message: "Error fetching posts",
-    });
-  }
-});
-
-/**
- * @route   GET /api/posts/:id
- * @desc    Get single post with comments + users
- * @access  Public
- */
-router.get("/:id", async (req, res) => {
-  try {
-    const postId = new mongoose.Types.ObjectId(req.params.id);
-
-    const post = await Post.aggregate([
-      { $match: { _id: postId } },
-
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "author",
-        },
-      },
-      { $unwind: "$author" },
-
-      {
-        $lookup: {
-          from: "comments",
-          localField: "_id",
-          foreignField: "post",
-          as: "comments",
-        },
-      },
-
-      {
-        $lookup: {
-          from: "users",
-          localField: "comments.user",
-          foreignField: "_id",
-          as: "commentUsers",
-        },
-      },
-
-      {
-        $project: {
-          title: 1,
-          content: 1,
-          createdAt: 1,
-          author: {
-            _id: "$author._id",
-            username: "$author.username",
-            profilePicture: "$author.profilePicture",
-          },
-          comments: {
-            $map: {
-              input: "$comments",
-              as: "comment",
-              in: {
-                _id: "$$comment._id",
-                content: "$$comment.content",
-                createdAt: "$$comment.createdAt",
-                user: {
-                  $arrayElemAt: [
-                    {
-                      $filter: {
-                        input: "$commentUsers",
-                        as: "u",
-                        cond: { $eq: ["$$u._id", "$$comment.user"] },
-                      },
-                    },
-                    0,
-                  ],
-                },
-              },
-            },
-          },
-        },
-      },
-    ]);
-
-    if (!post.length) {
-      return res.status(404).json({
-        success: false,
-        data: null,
-        message: "Post not found",
-      });
+        res.status(201).json({
+            success: true,
+            data: post,
+            message: 'Post created successfully'
+        });
+    } catch (error) {
+        logger.error('Create post error:', error);
+        res.status(400).json({ success: false, message: error.message });
     }
-
-    res.json({
-      success: true,
-      data: post[0],
-      message: "Post fetched successfully",
-    });
-  } catch (error) {
-    console.error("Fetch post error:", error);
-    res.status(500).json({
-      success: false,
-      data: null,
-      message: "Error fetching post",
-    });
-  }
 });
 
 /**
- * @route   POST /api/posts
- * @desc    Create post
- * @access  Private
+ * @swagger
+ * /api/posts/{postId}/report:
+ *   post:
+ *     summary: Report a post
+ *     tags: [Posts]
  */
-router.post("/", verifyToken, async (req, res) => {
-  try {
-    const { title, content } = req.body;
+router.post('/:postId/report', verifyToken, apiLimiter, async (req, res) => {
+    try {
+        const { reason, description } = req.body;
+        const { postId } = req.params;
 
-    const post = await Post.create({
-      title,
-      content,
-      user: req.userId,
-    });
+        const report = await ModerationService.createReport({
+            reporterId: req.userId,
+            targetType: 'Post',
+            targetId: postId,
+            reason,
+            description
+        });
 
-    res.status(201).json({
-      success: true,
-      data: post,
-      message: "Post created successfully",
-    });
-  } catch (error) {
-    console.error("Create post error:", error);
-    res.status(500).json({
-      success: false,
-      data: null,
-      message: "Error creating post",
-    });
-  }
+        res.status(201).json({
+            success: true,
+            data: report,
+            message: 'Post reported successfully'
+        });
+    } catch (error) {
+        logger.error('Report post error:', error);
+        res.status(400).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/posts:
+ *   get:
+ *     summary: Get feed posts
+ *     tags: [Posts]
+ */
+router.get('/', async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const posts = await Post.find({ isDeleted: false, visibility: 'public' })
+            .populate('author', 'username firstName lastName profilePicture')
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
+
+        res.json({ success: true, data: posts });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 module.exports = router;

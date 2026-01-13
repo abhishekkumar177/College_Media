@@ -1,58 +1,44 @@
-/**
- * useInfiniteScroll Hook
- * Issue #374: Implement Infinite Scroll Custom Hook for Post Feed
- * 
- * A custom hook that uses IntersectionObserver to trigger a callback
- * when the user scrolls to the bottom of a list.
- */
-
-import { useCallback, useRef, useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useThrottle } from './useThrottle';
 
 /**
- * useInfiniteScroll
+ * useInfiniteScroll hook
+ * Triggers a callback when the user scrolls near the bottom of the page.
+ * Uses throttling to prevent excessive event firing.
  * 
- * @param {Function} callback - Function to call when threshold is reached (loading more items)
- * @param {Object} options - IntersectionObserver options
- * @param {boolean} options.hasMore - Whether there are more items to load
- * @param {number} options.threshold - Observer threshold (default 1.0)
- * @param {string} options.rootMargin - Observer rootMargin (default '20px')
- * @returns {Object} { lastElementRef, isFetching, setIsFetching }
+ * @param {Function} callback - Function to call when threshold is reached
+ * @param {Object} options - Options object
+ * @param {number} options.threshold - Distance from bottom in pixels (default: 300)
+ * @param {boolean} options.hasMore - Whether there is more content to load
+ * @param {boolean} options.loading - Whether content is currently loading
+ * @param {number} options.throttleLimit - Time in ms to throttle the scroll event
  */
-const useInfiniteScroll = (callback, { hasMore = true, threshold = 1.0, rootMargin = '20px' } = {}) => {
-    const [isFetching, setIsFetching] = useState(false);
-    const observer = useRef(null);
+export const useInfiniteScroll = (callback, {
+    threshold = 300,
+    hasMore = true,
+    loading = false,
+    throttleLimit = 200
+} = {}) => {
 
-    const lastElementRef = useCallback(
-        (node) => {
-            // If currently fetching or no more items, don't observe
-            if (isFetching || !hasMore) return;
+    const handleScroll = () => {
+        if (loading || !hasMore) return;
 
-            // Disconnect previous observer
-            if (observer.current) observer.current.disconnect();
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
 
-            observer.current = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting && hasMore) {
-                    setIsFetching(true);
-                    callback().finally(() => {
-                        // We use finally to ensure fetching state is reset if the callback returns a promise
-                        setIsFetching(false);
-                    });
-                }
-            }, { threshold, rootMargin });
-
-            if (node) observer.current.observe(node);
-        },
-        [isFetching, hasMore, callback, threshold, rootMargin]
-    );
-
-    // Clean up on unmount
-    useEffect(() => {
-        return () => {
-            if (observer.current) observer.current.disconnect();
+        if (scrollTop + windowHeight >= documentHeight - threshold) {
+            callback();
         }
-    }, []);
+    };
 
-    return { lastElementRef, isFetching, setIsFetching };
+    // Create a throttled version of the scroll handler
+    const throttledScroll = useThrottle(handleScroll, throttleLimit);
+
+    useEffect(() => {
+        window.addEventListener('scroll', throttledScroll);
+        return () => window.removeEventListener('scroll', throttledScroll);
+    }, [throttledScroll]);
 };
 
 export default useInfiniteScroll;

@@ -34,6 +34,11 @@ export const SettingsProvider = ({ children }) => {
           }
         }
       } catch (error) {
+        // Silently handle 404 errors - settings endpoint not implemented yet
+        if (error.response?.status === 404) {
+          console.log("Settings endpoint not available, using local storage");
+          return;
+        }
         console.error("Failed to fetch settings:", error);
       }
     };
@@ -103,6 +108,8 @@ export const SettingsProvider = ({ children }) => {
     try {
       await accountApi.updateSettings({ fontSize: newSize });
     } catch (error) {
+      // Silently handle 404 - settings endpoint not implemented yet
+      if (error.response?.status === 404) return;
       console.error("Failed to update font size:", error);
     } finally {
       setLoading(false);
@@ -120,6 +127,8 @@ export const SettingsProvider = ({ children }) => {
     try {
       await accountApi.updateSettings({ theme: newTheme });
     } catch (error) {
+      // Silently handle 404 - settings endpoint not implemented yet
+      if (error.response?.status === 404) return;
       console.error("Failed to update theme:", error);
     } finally {
       setLoading(false);

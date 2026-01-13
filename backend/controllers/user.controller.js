@@ -106,27 +106,6 @@ exports.createUser = async (req, res) => {
     },
   });
 };
-const User = require("../models/User");
-const paginate = require("../utils/paginate");
-
-/* -------------------------------------------
-   GET ALL USERS (PAGINATED)
-------------------------------------------- */
-exports.getAllUsers = async (req, res) => {
-  const { page, limit } = req.query;
-
-  const result = await paginate(
-    User,
-    { isDeleted: { $ne: true } }, // safe filter
-    { page, limit }
-  );
-
-  res.status(200).json({
-    success: true,
-    data: result.data,
-    pagination: result.pagination,
-  });
-};
 
 /* -------------------------------------------
    UPDATE USER

@@ -14,6 +14,7 @@ import { BookmarkProvider } from "./context/BookmarkContext.jsx";
 import { SocketProvider } from "./context/SocketContext.jsx";
 import { AccessibilityProvider } from "./context/AccessibilityContext.jsx";
 import { NotificationProvider } from "./context/NotificationContext.jsx";
+import { PollProvider } from "./context/PollContext.jsx";
 import { register as registerServiceWorker } from "./utils/serviceWorkerRegistration";
 import "./index.css";
 import "./styles/accessibility.css";
@@ -33,9 +34,11 @@ createRoot(document.getElementById("root")).render(
             <NotificationProvider> 
               <ThemeProvider>
                 <BookmarkProvider>
-                  <BrowserRouter>
-                    <App />
-                  </BrowserRouter>
+                  <PollProvider>
+                    <BrowserRouter>
+                      <App />
+                    </BrowserRouter>
+                  </PollProvider>
                 </BookmarkProvider>
               </ThemeProvider>
             </NotificationProvider>

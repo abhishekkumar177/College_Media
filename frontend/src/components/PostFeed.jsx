@@ -7,14 +7,12 @@ import SearchFilterBar from "./SearchFilterBar";
 import { mockPosts } from "../data/post";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 
-const PAGE_SIZE = 5;
-
 const PostFeed = () => {
   const [posts, setPosts] = useState([]);
   const [newPosts, setNewPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [copiedLink, setCopiedLink] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
 
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,10 +33,9 @@ const PostFeed = () => {
 
   // Initial Load
   useEffect(() => {
-    const init = async () => {
-      setLoading(true);
-      const initialPosts = await fetchPosts(0);
-      setPosts(initialPosts);
+    setTimeout(() => {
+
+      setPosts(mockPosts);
       setLoading(false);
       if (initialPosts.length < PAGE_SIZE) setHasMore(false);
     };
@@ -60,6 +57,26 @@ const PostFeed = () => {
   const { lastElementRef, isFetching } = useInfiniteScroll(loadMorePosts, {
     hasMore,
     rootMargin: '100px' // Start loading 100px before end
+  });
+
+  // Infinite Scroll Handler with Throttle
+  const handleLoadMore = () => {
+    if (loadingMore) return;
+    setLoadingMore(true);
+    console.log("Loading more posts... (Throttled)");
+
+    // Simulate loading more posts
+    setTimeout(() => {
+      // Just duplicate posts for demo to show scrolling works
+      setPosts(prev => [...prev, ...mockPosts.map(p => ({ ...p, id: p.id + Date.now() }))]);
+      setLoadingMore(false);
+    }, 1500);
+  };
+
+  useInfiniteScroll(handleLoadMore, {
+    loading: loading || loadingMore,
+    hasMore: true,
+    throttleLimit: 500 // Configurable limit
   });
 
   const handleLike = (postId) => {

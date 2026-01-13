@@ -1,0 +1,4 @@
+- [ ] Run tests to verify they pass
+- [ ] Create .github/workflows/test.yml for CI integration
+- [ ] Update TESTING.md if needed (currently comprehensive)
+- [ ] Ensure all dependencies are installed (MSW, etc.)

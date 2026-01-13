@@ -47,14 +47,13 @@ const create = async (userData) => {
     throw new Error('User with this email or username already exists');
   }
   
-  // Hash the password
-  const hashedPassword = await bcrypt.hash(userData.password, 10);
-  
-  // Create new user object
+  // Create new user object (password should already be hashed from auth route)
   const newUser = {
     _id: Date.now().toString(), // Simple ID generation for mock
     ...userData,
-    password: hashedPassword,
+    isActive: true,
+    isVerified: false,
+    role: 'user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -119,6 +118,42 @@ const updatePassword = (id, hashedPassword) => {
   }
   
   users[userIndex].password = hashedPassword;
+  users[userIndex].updatedAt = new Date().toISOString();
+  
+  writeUsers(users);
+  
+  return true;
+};
+
+// Deactivate user account
+const deactivate = (id) => {
+  const users = readUsers();
+  const userIndex = users.findIndex(user => user._id === id);
+  
+  if (userIndex === -1) {
+    return null;
+  }
+  
+  users[userIndex].isActive = false;
+  users[userIndex].deactivatedAt = new Date().toISOString();
+  users[userIndex].updatedAt = new Date().toISOString();
+  
+  writeUsers(users);
+  
+  return true;
+};
+
+// Reactivate user account
+const reactivate = (id) => {
+  const users = readUsers();
+  const userIndex = users.findIndex(user => user._id === id);
+  
+  if (userIndex === -1) {
+    return null;
+  }
+  
+  users[userIndex].isActive = true;
+  users[userIndex].deactivatedAt = null;
   users[userIndex].updatedAt = new Date().toISOString();
   
   writeUsers(users);

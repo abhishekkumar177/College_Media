@@ -3,6 +3,8 @@ import { Icon } from '@iconify/react';
 import { useAuth } from '../context/AuthContext';
 import { useCreatePoll } from '../hooks/usePolls';
 import PollCreator from './PollCreator';
+import useContentModeration from '../hooks/useContentModeration';
+import ModerationWarning from './ModerationWarning';
 
 const CreatePost = ({ onPostCreated }) => {
   const { user } = useAuth();
@@ -13,7 +15,10 @@ const CreatePost = ({ onPostCreated }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [showPollCreator, setShowPollCreator] = useState(false);
   const [pollData, setPollData] = useState(null);
-  
+
+  const { analyze, bypass, resetModeration, warnings } = useContentModeration();
+  const [showModerationModal, setShowModerationModal] = useState(false);
+
   // Character counter configuration
   const maxLength = 500;
 
@@ -36,12 +41,9 @@ const CreatePost = ({ onPostCreated }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!caption.trim() && !image && !pollData) return;
-
+  const executePostCreation = async () => {
     setIsCreating(true);
-    
+
     // Create poll if poll data exists
     let createdPoll = null;
     if (pollData) {
@@ -50,7 +52,7 @@ const CreatePost = ({ onPostCreated }) => {
         postId: Date.now(), // Temporary ID, should be actual post ID from backend
       });
     }
-    
+
     // In a real app, this would be an API call to create a post
     // For now, we'll simulate the creation
     setTimeout(() => {
@@ -69,7 +71,7 @@ const CreatePost = ({ onPostCreated }) => {
         liked: false,
         poll: createdPoll || null
       };
-      
+
       onPostCreated && onPostCreated(newPost);
       setCaption('');
       setImage(null);
@@ -77,7 +79,36 @@ const CreatePost = ({ onPostCreated }) => {
       setPollData(null);
       setShowPollCreator(false);
       setIsCreating(false);
+      resetModeration();
     }, 1000);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!caption.trim() && !image && !pollData) return;
+
+    // Content Moderation check
+    // We check caption and poll question if it exists
+    const textToCheck = [caption, pollData?.question].filter(Boolean).join(' ');
+    const { isClean } = analyze(textToCheck);
+
+    if (!isClean) {
+      setShowModerationModal(true);
+      return;
+    }
+
+    await executePostCreation();
+  };
+
+  const handleModerationBypass = () => {
+    bypass();
+    setShowModerationModal(false);
+    executePostCreation();
+  };
+
+  const handleModerationEdit = () => {
+    setShowModerationModal(false);
+    resetModeration(); // Reset so they can try again
   };
 
   const handlePollCreate = (poll) => {
@@ -93,8 +124,8 @@ const CreatePost = ({ onPostCreated }) => {
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
       <div className="p-4">
         <div className="flex items-center mb-4">
-          <img 
-            src={user?.profilePicture || 'https://placehold.co/40x40/FF6B6B/FFFFFF?text=U'} 
+          <img
+            src={user?.profilePicture || 'https://placehold.co/40x40/FF6B6B/FFFFFF?text=U'}
             alt={user?.username}
             className="w-10 h-10 rounded-full object-cover mr-3"
           />
@@ -112,27 +143,26 @@ const CreatePost = ({ onPostCreated }) => {
             rows="3"
             maxLength={maxLength}
           />
-          
+
           {/* Character Counter */}
           <div className="flex justify-end mt-1">
-            <span 
-              className={`text-xs ${
-                caption.length >= maxLength 
-                  ? 'text-red-600 font-bold' 
-                  : caption.length > maxLength * 0.8 
-                  ? 'text-yellow-600 font-medium'
-                  : 'text-gray-500'
-              }`}
+            <span
+              className={`text-xs ${caption.length >= maxLength
+                  ? 'text-red-600 font-bold'
+                  : caption.length > maxLength * 0.8
+                    ? 'text-yellow-600 font-medium'
+                    : 'text-gray-500'
+                }`}
             >
               {caption.length} / {maxLength}
             </span>
           </div>
-          
+
           {imagePreview && (
             <div className="mt-3 relative">
-              <img 
-                src={imagePreview} 
-                alt="Preview" 
+              <img
+                src={imagePreview}
+                alt="Preview"
                 className="w-full h-64 object-cover rounded-lg"
               />
               <button
@@ -193,7 +223,7 @@ const CreatePost = ({ onPostCreated }) => {
                   className="hidden"
                 />
               </label>
-              
+
               <button
                 type="button"
                 onClick={() => setShowPollCreator(!showPollCreator)}
@@ -204,7 +234,7 @@ const CreatePost = ({ onPostCreated }) => {
                 <Icon icon="mdi:poll" className="w-6 h-6" />
               </button>
             </div>
-            
+
             <button
               type="submit"
               disabled={isCreating || (!caption.trim() && !image && !pollData)}
@@ -215,6 +245,13 @@ const CreatePost = ({ onPostCreated }) => {
           </div>
         </form>
       </div>
+
+      <ModerationWarning
+        isOpen={showModerationModal}
+        onClose={handleModerationEdit}
+        onBypass={handleModerationBypass}
+        warnings={warnings}
+      />
     </div>
   );
 };

@@ -16,18 +16,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    console.log("🔍 AuthContext: Checking token...", storedToken ? "Token found" : "No token");
     if (storedToken) {
       fetchUserData(storedToken);
     } else {
       setLoading(false);
+      setIsInitialized(true);
     }
   }, []);
 
   const fetchUserData = async (token) => {
+    console.log("🔐 AuthContext: Fetching user data...");
     try {
+      setLoading(true);
       setError(null);
       const response = await fetch(
         `${
@@ -38,15 +43,18 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
+      console.log("📡 AuthContext: Profile response status:", response.status);
+
       if (!response.ok) {
         throw new Error("Session expired. Please login again.");
       }
 
       const data = await response.json();
+      console.log("✅ AuthContext: User data loaded successfully");
       setUser(data.data);
       setToken(token);
     } catch (err) {
-      console.error(err);
+      console.error("❌ AuthContext: Error fetching user data:", err);
       localStorage.removeItem("token");
       setToken(null);
       setUser(null);
@@ -58,6 +66,8 @@ export const AuthProvider = ({ children }) => {
       }
     } finally {
       setLoading(false);
+      setIsInitialized(true);
+      console.log("🏁 AuthContext: Loading complete");
     }
   };
 
@@ -115,15 +125,20 @@ export const AuthProvider = ({ children }) => {
       const API_BASE_URL =
         import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
+      console.log("📤 Registering user with data:", { ...formData, password: '***' });
+
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
+      console.log("📥 Response status:", response.status);
+
       let data;
       try {
         data = await response.json();
+        console.log("📥 Response data:", data);
       } catch {
         throw new Error(
           "Server returned an invalid response. Please try again later."
@@ -131,25 +146,21 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (data.success) {
-        // Backend sends token inside data object
-        const token = data.data.token || data.token;
-        const userData = { ...data.data };
-        delete userData.token; // Remove token from user object
-
-        localStorage.setItem("token", token);
-        setToken(token);
-        setUser(userData);
+        // Registration successful - user needs to login
+        // Registration doesn't return token, only success message
         setError(null);
 
-        return { success: true, user: userData };
+        return { success: true, message: data.message };
       } else {
+        console.error("❌ Registration failed:", data.message, data.errors);
         return {
           success: false,
           message: data.message || "Registration failed.",
+          errors: data.errors
         };
       }
     } catch (err) {
-      console.error("Registration Error:", err);
+      console.error("❌ Registration Error:", err);
 
       return {
         success: false,

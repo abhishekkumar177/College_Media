@@ -1,85 +1,40 @@
-/**
- * ======================================
- *  Database Initialization & Management
- *  MongoDB with Fallback + Lock Support
- * ======================================
- */
-
-const mongoose = require("mongoose");
-const fs = require("fs");
-const path = require("path");
-
-/* ------------------
-   🌱 CONFIG
------------------- */
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/college_media";
-
-const CONNECTION_TIMEOUT = 5000;
-const LOCK_COLLECTION = "job_locks";
+const mongoose = require('mongoose');
+const fs = require('fs');
+const logger = require('../utils/logger');
+const { initializePool, healthCheck } = require('./dbPool');
+const { initializeQueryMonitoring } = require('../middleware/queryMonitor');
 
 let useMongoDB = true;
 let isConnected = false;
 
-/* ------------------
-   📁 FILE DB FALLBACK
------------------- */
-const fileDBPath = path.join(__dirname, "../data");
-if (!fs.existsSync(fileDBPath)) {
-  fs.mkdirSync(fileDBPath, { recursive: true });
-}
-
-/* ------------------
-   🔌 INIT DB
------------------- */
+// Function to initialize database connection with pooling
 const initDB = async () => {
+  const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/college_media';
+
+  // Try to connect to MongoDB with connection pooling
   try {
-    const connectPromise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: CONNECTION_TIMEOUT,
-      maxPoolSize: 10,
-      minPoolSize: 2,
-    });
+    // Initialize connection pool
+    await initializePool(MONGODB_URI);
 
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("MongoDB connection timeout")),
-        CONNECTION_TIMEOUT
-      )
-    );
+    // Initialize query monitoring
+    initializeQueryMonitoring(mongoose);
 
-    await Promise.race([connectPromise, timeoutPromise]);
-
-    isConnected = true;
+    logger.info('MongoDB connected successfully with connection pooling');
     useMongoDB = true;
-
-    console.log("✅ MongoDB connected");
-
-    mongoose.connection.on("disconnected", () => {
-      console.warn("⚠️ MongoDB disconnected");
-      isConnected = false;
-    });
-
-    mongoose.connection.on("reconnected", () => {
-      console.log("🔁 MongoDB reconnected");
-      isConnected = true;
-    });
 
     return {
       useMongoDB: true,
       mongoose,
-      isConnected: () => isConnected,
+      healthCheck
     };
-  } catch (err) {
-    console.warn("❌ MongoDB unavailable:", err.message);
-    console.log("📁 Falling back to file-based storage");
-
+  } catch (error) {
+    logger.warn(`MongoDB connection failed: ${error.message}`);
+    logger.info('Falling back to file-based database for development');
     useMongoDB = false;
-    isConnected = false;
-
     return {
       useMongoDB: false,
       mongoose: null,
-      isConnected: () => false,
+      healthCheck: null
     };
   }
 };

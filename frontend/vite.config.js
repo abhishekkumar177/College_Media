@@ -40,9 +40,12 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: true,
       port: 5173,
+      strictPort: false,
       hmr: {
         protocol: "ws",
         host: "localhost",
+        port: 5173,
+        clientPort: 5173,
       },
     },
 

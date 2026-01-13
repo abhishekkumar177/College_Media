@@ -22,13 +22,39 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validation checks
+    if (formData.username.length < 3 || formData.username.length > 30) {
+      toast.error("Username must be between 3 and 30 characters");
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      toast.error("Username can only contain letters, numbers, and underscores");
+      return;
+    }
+
+    if (formData.firstName.length < 2 || formData.firstName.length > 50) {
+      toast.error("First name must be between 2 and 50 characters");
+      return;
+    }
+
+    if (formData.lastName.length < 2 || formData.lastName.length > 50) {
+      toast.error("Last name must be between 2 and 50 characters");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match!");
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      toast.error("Password must contain at least one uppercase letter, one lowercase letter, and one number");
       return;
     }
     
@@ -36,13 +62,21 @@ const Signup = () => {
     
     try {
       const { confirmPassword, ...registerData } = formData;
+      console.log("Submitting registration:", { ...registerData, password: '***' });
+      
       const response = await register(registerData);
       
+      console.log("Registration response:", response);
+      
       if (response.success) {
-        toast.success("Registration successful!");
-        navigate("/feed");
+        toast.success("Registration successful! Please login.");
+        // Navigate to login page instead of feed
+        navigate("/login");
       } else {
-        toast.error(response.message || "Registration failed");
+        // Show detailed error message
+        const errorMsg = response.message || "Registration failed";
+        toast.error(errorMsg);
+        console.error("Registration failed:", response);
       }
     } catch (error) {
       console.error("Signup error:", error);

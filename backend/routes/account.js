@@ -9,6 +9,12 @@ const UserMock = require('../mockdb/userDB');
 const MessageMongo = require('../models/Message');
 const MessageMock = require('../mockdb/messageDB');
 const { validateAccountDeletion, checkValidation } = require('../middleware/validationMiddleware');
+const logger = require('../utils/logger');
+const { sensitiveLimiter, apiLimiter } = require('../middleware/rateLimitMiddleware');
+const { isValidPassword } = require('../utils/validators');
+const ActivityLog = require('../models/ActivityLog');
+const ExportService = require('../services/exportService');
+const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
 
@@ -27,18 +33,211 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-/* =====================================================
-   DELETE ACCOUNT (SOFT DELETE)
-   ✔ Transaction
-   ✔ Optimistic Locking
-   ✔ Data Consistency
-===================================================== */
-router.delete('/', verifyToken, validateAccountDeletion, checkValidation, async (req, res) => {
-  const session = await mongoose.startSession();
-
+/**
+ * @swagger
+ * /api/account/activity:
+ *   get:
+ *     summary: Get user's activity log
+ *     tags: [Account]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: action
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Activity log retrieved
+ */
+router.get('/activity', verifyToken, apiLimiter, async (req, res) => {
   try {
-    const { password, reason, version } = req.body;
-    const { useMongoDB } = req.app.get('dbConnection');
+    const { page = 1, limit = 20, action } = req.query;
+    const dbConnection = req.app.get('dbConnection');
+
+    if (dbConnection && dbConnection.useMongoDB) {
+      const result = await ActivityLog.getUserActivity(req.userId, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        action
+      });
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Activity log retrieved successfully'
+      });
+    } else {
+      // Mock DB - return empty
+      res.json({
+        success: true,
+        data: { logs: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } },
+        message: 'Activity log not available in mock mode'
+      });
+    }
+  } catch (error) {
+    logger.error('Get activity log error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Failed to retrieve activity log'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/account/audit-log:
+ *   get:
+ *     summary: Get global audit log (Admin only)
+ *     tags: [Account]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: action
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: riskLevel
+ *         schema:
+ *           type: string
+ *           enum: [low, medium, high]
+ *     responses:
+ *       200:
+ *         description: Audit log retrieved
+ *       403:
+ *         description: Access denied
+ */
+router.get('/audit-log', verifyToken, checkPermission(PERMISSIONS.VIEW_LOGS), async (req, res) => {
+  try {
+    const { page = 1, limit = 50, action, userId, riskLevel, dateFrom, dateTo } = req.query;
+    const dbConnection = req.app.get('dbConnection');
+
+    if (dbConnection && dbConnection.useMongoDB) {
+      const result = await ActivityLog.getAuditLog({
+        page: parseInt(page),
+        limit: parseInt(limit),
+        action,
+        userId,
+        riskLevel,
+        dateFrom,
+        dateTo
+      });
+
+      res.json({
+        success: true,
+        data: result,
+        message: 'Audit log retrieved successfully'
+      });
+    } else {
+      res.json({
+        success: true,
+        data: { logs: [], pagination: { page: 1, limit: 50, total: 0, totalPages: 0 } },
+        message: 'Audit log not available in mock mode'
+      });
+    }
+  } catch (error) {
+    logger.error('Get audit log error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Failed to retrieve audit log'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/account/export:
+ *   post:
+ *     summary: Request data export
+ *     tags: [Account]
+ *     parameters:
+ *       - in: body
+ *         name: format
+ *         schema: { type: string, enum: [pdf, csv] }
+ */
+router.post('/export', verifyToken, sensitiveLimiter, async (req, res) => {
+  try {
+    const { format = 'pdf' } = req.body;
+    const result = await ExportService.requestExport(req.userId, format);
+
+    res.status(202).json({
+      success: true,
+      data: result,
+      message: 'Export started. Check status/download later.'
+    });
+  } catch (error) {
+    logger.error('Export request error:', error);
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/account/export/{jobId}:
+ *   get:
+ *     summary: Get export job status
+ *     tags: [Account]
+ */
+router.get('/export/:jobId', verifyToken, async (req, res) => {
+  try {
+    const status = await ExportService.getExportStatus(req.params.jobId);
+    if (!status) return res.status(404).json({ success: false, message: 'Job not found' });
+
+    res.json({ success: true, data: status });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Status check failed' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/account/export/{jobId}/download:
+ *   get:
+ *     summary: Download exported file
+ *     tags: [Account]
+ */
+router.get('/export/:jobId/download', verifyToken, async (req, res) => {
+  try {
+    const filePath = await ExportService.getExportFilePath(req.params.jobId);
+    if (!filePath) return res.status(404).json({ success: false, message: 'File not ready or expired' });
+
+    res.download(filePath);
+  } catch (error) {
+    logger.error('Download error:', error);
+    res.status(500).json({ success: false, message: 'Download failed' });
+  }
+});
+
+/**
+ * @route   DELETE /api/account
+ * @desc    Delete user account (soft delete)
+ * @access  Private
+ */
+router.delete('/', verifyToken, sensitiveLimiter, validateAccountDeletion, checkValidation, async (req, res) => {
+  try {
+    const { password, reason } = req.body;
+    logger.info('Delete account request received:', {
+      userId: req.userId,
+      hasPassword: !!password,
+      passwordLength: password?.length
+    });
+    const dbConnection = req.app.get('dbConnection');
+    const useMongoDB = dbConnection?.useMongoDB;
 
     /* -------- MOCK DB -------- */
     if (!useMongoDB) {
@@ -51,7 +250,16 @@ router.delete('/', verifyToken, validateAccountDeletion, checkValidation, async 
       await UserMock.softDelete(req.userId, reason);
       await MessageMock.softDeleteByUser(req.userId);
 
-      return res.json({ success: true, message: 'Account deletion initiated successfully' });
+    // Verify password
+    logger.info('Verifying password for user:', { email: user.email });
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    logger.info('Password verification result:', { isPasswordValid });
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        data: null,
+        message: 'Incorrect password'
+      });
     }
 
     /* -------- MONGODB TRANSACTION -------- */
@@ -83,12 +291,63 @@ router.delete('/', verifyToken, validateAccountDeletion, checkValidation, async 
         { $addToSet: { deletedBy: req.userId } },
         { session }
       );
-    });
+    } else {
+      // Handle mock database message cleanup
+      const messages = await MessageMock.find({});
+      for (const msg of messages) {
+        if (msg.sender === req.userId || msg.receiver === req.userId) {
+          if (!msg.deletedBy.includes(req.userId)) {
+            await MessageMock.updateOne(
+              { _id: msg._id },
+              { $push: { deletedBy: req.userId } }
+            );
+          }
+        }
+      }
+    }
+
+    // Log deletion for audit
+    logger.info(`User account deleted: ${req.userId} at ${new Date().toISOString()}`);
 
     res.json({
       success: true,
       message: 'Account deletion initiated successfully'
     });
+  } catch (error) {
+    logger.error('Delete account error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Error deleting account'
+    });
+  }
+});
+
+/**
+ * @route   POST /api/account/restore
+ * @desc    Restore a deleted account
+ * @access  Private
+ */
+router.post('/restore', verifyToken, apiLimiter, async (req, res) => {
+  try {
+    const dbConnection = req.app.get('dbConnection');
+    const useMongoDB = dbConnection?.useMongoDB;
+
+    // Get user
+    let user;
+    if (useMongoDB) {
+      user = await UserMongo.findById(req.userId);
+    } else {
+      user = await UserMock.findById(req.userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: 'User not found'
+      });
+    }
 
   } catch (error) {
     if (error.message === 'INVALID_PASSWORD') {
@@ -102,17 +361,37 @@ router.delete('/', verifyToken, validateAccountDeletion, checkValidation, async 
       });
     }
 
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error deleting account' });
-  } finally {
-    session.endSession();
+    // Restore account
+    if (useMongoDB) {
+      await user.restore();
+    } else {
+      await UserMock.restore(req.userId);
+    }
+
+    // Log restoration for audit
+    logger.info(`User account restored: ${req.userId} at ${new Date().toISOString()}`);
+
+    res.json({
+      success: true,
+      data: null,
+      message: 'Account restored successfully'
+    });
+  } catch (error) {
+    logger.error('Restore account error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Error restoring account'
+    });
   }
 });
 
-/* =====================================================
-   RESTORE ACCOUNT (OPTIMISTIC LOCK SAFE)
-===================================================== */
-router.post('/restore', verifyToken, async (req, res) => {
+/**
+ * @route   DELETE /api/account/permanent
+ * @desc    Permanently delete user account (admin only or after grace period)
+ * @access  Private/Admin
+ */
+router.delete('/permanent', verifyToken, sensitiveLimiter, async (req, res) => {
   try {
     const { version } = req.body;
     const { useMongoDB } = req.app.get('dbConnection');
@@ -125,23 +404,62 @@ router.post('/restore', verifyToken, async (req, res) => {
       return res.json({ success: true, message: 'Account restored successfully' });
     }
 
-    const user = await UserMongo.findOneAndUpdate(
-      {
-        _id: req.userId,
-        __v: version,      // 🔐 optimistic lock
-        isDeleted: true,
-        scheduledDeletionDate: { $gt: new Date() }
-      },
-      {
-        $set: {
-          isDeleted: false,
-          deletedAt: null,
-          deletionReason: null,
-          scheduledDeletionDate: null
-        }
-      },
-      { new: true }
-    );
+    // TODO: Delete user's posts, comments, likes, etc.
+
+    // Remove user from followers/following lists
+    if (useMongoDB) {
+      await UserMongo.updateMany(
+        { followers: req.userId },
+        { $pull: { followers: req.userId } }
+      );
+      await UserMongo.updateMany(
+        { following: req.userId },
+        { $pull: { following: req.userId } }
+      );
+    }
+
+    // Permanently delete user account
+    if (useMongoDB) {
+      await UserMongo.findByIdAndDelete(req.userId);
+    } else {
+      await UserMock.permanentDelete(req.userId);
+    }
+
+    // Log permanent deletion for audit
+    logger.info(`User account permanently deleted: ${req.userId} at ${new Date().toISOString()}`);
+
+    res.json({
+      success: true,
+      data: null,
+      message: 'Account permanently deleted'
+    });
+  } catch (error) {
+    logger.error('Permanent delete error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Error permanently deleting account'
+    });
+  }
+});
+
+/**
+ * @route   GET /api/account/deletion-status
+ * @desc    Get account deletion status
+ * @access  Private
+ */
+router.get('/deletion-status', verifyToken, apiLimiter, async (req, res) => {
+  try {
+    const dbConnection = req.app.get('dbConnection');
+    const useMongoDB = dbConnection?.useMongoDB;
+
+    // Get user
+    let user;
+    if (useMongoDB) {
+      user = await UserMongo.findById(req.userId).select('isDeleted deletedAt scheduledDeletionDate deletionReason');
+    } else {
+      user = await UserMock.findById(req.userId);
+    }
 
     if (!user) {
       return res.status(409).json({
@@ -150,17 +468,38 @@ router.post('/restore', verifyToken, async (req, res) => {
       });
     }
 
-    res.json({ success: true, message: 'Account restored successfully' });
+    const status = {
+      isDeleted: user.isDeleted || false,
+      deletedAt: user.deletedAt || null,
+      scheduledDeletionDate: user.scheduledDeletionDate || null,
+      deletionReason: user.deletionReason || null,
+      canRestore: user.isDeleted && user.scheduledDeletionDate && new Date() < new Date(user.scheduledDeletionDate),
+      daysUntilPermanentDeletion: user.scheduledDeletionDate
+        ? Math.ceil((new Date(user.scheduledDeletionDate) - new Date()) / (1000 * 60 * 60 * 24))
+        : null
+    };
+
+    res.json({
+      success: true,
+      data: status,
+      message: 'Deletion status retrieved successfully'
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error restoring account' });
+    logger.error('Get deletion status error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Error retrieving deletion status'
+    });
   }
 });
 
-/* =====================================================
-   PERMANENT DELETE (SAFE)
-===================================================== */
-router.delete('/permanent', verifyToken, async (req, res) => {
+/**
+ * @route   POST /api/account/export-data
+ * @desc    Export user's data (GDPR compliance)
+ * @access  Private
+ */
+router.post('/export-data', verifyToken, sensitiveLimiter, async (req, res) => {
   try {
     const { useMongoDB } = req.app.get('dbConnection');
 
@@ -169,9 +508,17 @@ router.delete('/permanent', verifyToken, async (req, res) => {
       return res.json({ success: true, message: 'Account permanently deleted' });
     }
 
-    const user = await UserMongo.findById(req.userId);
-    if (!user || !user.isDeleted) {
-      return res.status(400).json({ success: false, message: 'Account not eligible' });
+    // Get user's messages
+    let messages;
+    if (useMongoDB) {
+      messages = await MessageMongo.find({
+        $or: [{ sender: req.userId }, { receiver: req.userId }]
+      }).select('-deletedBy');
+    } else {
+      messages = await MessageMock.find({});
+      messages = messages.filter(m =>
+        m.sender === req.userId || m.receiver === req.userId
+      );
     }
 
     await MessageMongo.deleteMany({
@@ -182,8 +529,104 @@ router.delete('/permanent', verifyToken, async (req, res) => {
 
     res.json({ success: true, message: 'Account permanently deleted' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: 'Error deleting account permanently' });
+    logger.error('Export data error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      message: 'Error exporting data'
+    });
+  }
+});
+
+/* =====================================================
+   GET USER SETTINGS
+===================================================== */
+router.get('/settings', verifyToken, async (req, res) => {
+  try {
+    const { useMongoDB } = req.app.get('dbConnection');
+
+    const user = useMongoDB
+      ? await UserMongo.findById(req.userId).select('settings')
+      : await UserMock.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Return default settings if none exist
+    const settings = user.settings || {
+      fontSize: 'medium',
+      theme: 'auto',
+      notifications: {
+        email: true,
+        push: true,
+        inApp: true
+      },
+      privacy: {
+        profileVisibility: 'public',
+        showEmail: false,
+        showPhone: false
+      }
+    };
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    res.status(500).json({ success: false, message: 'Error fetching settings' });
+  }
+});
+
+/* =====================================================
+   UPDATE USER SETTINGS
+===================================================== */
+router.put('/settings', verifyToken, async (req, res) => {
+  try {
+    const { useMongoDB } = req.app.get('dbConnection');
+    const { fontSize, theme, notifications, privacy } = req.body;
+
+    const updateData = {};
+    if (fontSize) updateData['settings.fontSize'] = fontSize;
+    if (theme) updateData['settings.theme'] = theme;
+    if (notifications) updateData['settings.notifications'] = notifications;
+    if (privacy) updateData['settings.privacy'] = privacy;
+
+    if (useMongoDB) {
+      const user = await UserMongo.findByIdAndUpdate(
+        req.userId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      ).select('settings');
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      res.json({
+        success: true,
+        data: user.settings,
+        message: 'Settings updated successfully'
+      });
+    } else {
+      const user = await UserMock.findById(req.userId);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      user.settings = { ...user.settings, ...req.body };
+      await UserMock.update(req.userId, user);
+
+      res.json({
+        success: true,
+        data: user.settings,
+        message: 'Settings updated successfully'
+      });
+    }
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    res.status(500).json({ success: false, message: 'Error updating settings' });
   }
 });
 

@@ -1,9 +1,19 @@
-import redisClient from "../config/redisClient.js";
+let redisClient;
+try {
+  redisClient = require("../config/redisClient");
+} catch (err) {
+  redisClient = null;
+}
 
 const WINDOW_SIZE = 60; // seconds
-const MAX_REQUESTS = 100;
+const MAX_REQUESTS = 10000; // Very high for development
 
-export const slidingWindowLimiter = async (req, res, next) => {
+const slidingWindowLimiter = async (req, res, next) => {
+  // Skip rate limiting in development or if Redis is not available
+  if (process.env.NODE_ENV === 'development' || !redisClient) {
+    return next();
+  }
+
   try {
     const userId = req.user?.id || req.ip;
     const key = `sliding:${userId}`;
@@ -32,6 +42,10 @@ export const slidingWindowLimiter = async (req, res, next) => {
 
     next();
   } catch (error) {
-    next(error);
+    console.error('Sliding window limiter error:', error);
+    // Don't block request on error
+    next();
   }
 };
+
+module.exports = { slidingWindowLimiter };

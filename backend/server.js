@@ -24,7 +24,6 @@ const cookieParser = require("cookie-parser");
 
 /* ============================================================
    🔧 INTERNAL IMPORTS
-============================================================ */
 const helmet = require("helmet");
 const securityHeaders = require("./config/securityHeaders");
 const { initDB } = require("./config/db");
@@ -53,12 +52,10 @@ const { client: metricsClient } = require("./utils/metrics");
 
 /* ============================================================
    🔁 BACKGROUND JOBS
-============================================================ */
 const sampleJob = require("./jobs/sampleJob");
 
 /* ============================================================
    🌱 ENVIRONMENT SETUP
-============================================================ */
 dotenv.config();
 
 const ENV = process.env.NODE_ENV || "development";
@@ -70,21 +67,39 @@ const METRICS_TOKEN = process.env.METRICS_TOKEN || "metrics-secret";
 const COOKIE_SECURE = ENV === "production";
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
-/* ============================================================
-   🚀 APP & SERVER INIT
-============================================================ */
 const app = express();
 const server = http.createServer(app);
+const PORT = process.env.PORT || 5000;
+const METRICS_TOKEN = process.env.METRICS_TOKEN || "metrics-secret";
+const TRUST_PROXY = process.env.TRUST_PROXY === "true";
 
-if (TRUST_PROXY) {
-  app.set("trust proxy", 1);
+// Middleware
+app.use(helmet()); // Set security headers
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for now (if needed for development)
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "data:", "https:"], // Allow images from https sources
+    connectSrc: ["'self'"],
+  },
+}));
+app.use(compression()); // Compress all responses
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+
+// Apply global rate limiter
+// conditional check for test environment to avoid rate limits during testing
+if (process.env.NODE_ENV !== 'test') {
+  app.use(globalLimiter);
 }
 
 app.disable("x-powered-by");
 
 /* ============================================================
    🔐 SECURITY HEADERS
-============================================================ */
 app.use(helmet(securityHeaders(ENV)));
 
 /* ============================================================
@@ -117,7 +132,6 @@ app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
 /* ============================================================
    📊 REQUEST METRICS
-============================================================ */
 app.use(metricsMiddleware);
 
 /* ============================================================
@@ -201,9 +215,6 @@ app.get("/", (req, res) => {
 
 /* ============================================================
    📈 METRICS (SECURED)
-============================================================ */
-app.get("/metrics", async (req, res) => {
-  const token = req.headers["x-metrics-token"];
 
   if (ENV === "production" && token !== METRICS_TOKEN) {
     logger.warn("Unauthorized metrics access", { ip: req.ip });
@@ -216,7 +227,6 @@ app.get("/metrics", async (req, res) => {
 
 /* ============================================================
    🔁 BACKGROUND JOB BOOTSTRAP
-============================================================ */
 const startBackgroundJobs = () => {
   setImmediate(async () => {
     try {
@@ -258,8 +268,6 @@ const startServer = async () => {
 
   /* 🔐 ROUTES */
   app.use("/api/auth", authLimiter, require("./routes/auth"));
-  app.use("/api/auth/otp", otpLimiter);
-
   app.use("/api/users", require("./routes/users"));
   app.use("/api/search", searchLimiter, require("./routes/search"));
   app.use("/api/admin", adminLimiter, require("./routes/admin"));
@@ -279,11 +287,10 @@ const startServer = async () => {
   });
 };
 
-/* ============================================================
-   🧹 GRACEFUL SHUTDOWN
-============================================================ */
-const shutdown = async (signal) => {
-  logger.warn("Shutdown initiated", { signal });
+// Start server only if run directly
+if (require.main === module) {
+  connectDB().then(() => {
+    initSocket(server);
 
   server.close(async () => {
     if (dbConnection?.mongoose) {
@@ -300,17 +307,6 @@ process.on("SIGTERM", shutdown);
 
 /* ============================================================
    🧨 PROCESS SAFETY
-============================================================ */
-process.on("unhandledRejection", (reason) =>
-  logger.critical("Unhandled Rejection", reason)
-);
-
-process.on("uncaughtException", (err) => {
-  logger.critical("Uncaught Exception", err);
-  process.exit(1);
-});
 
 /* ============================================================
    ▶️ BOOTSTRAP
-============================================================ */
-startServer();

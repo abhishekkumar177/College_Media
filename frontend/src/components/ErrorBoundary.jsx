@@ -40,6 +40,10 @@ class ErrorBoundary extends React.Component {
     // Log the error
     logError(error, errorInfo);
 
+    // Check if it's an API error
+    const isApiError = error.name === 'ApiError' || error.constructor?.name === 'ApiError';
+    const isRetryable = isApiError && error.status >= 500;
+
     this.setState(prevState => ({
       error,
       errorInfo,

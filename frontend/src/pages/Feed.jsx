@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import CreatePost from "../components/CreatePost.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Feed = () => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState("all");
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const filters = [
     { id: "all", label: "All Posts", icon: "📰" },
@@ -10,7 +14,7 @@ const Feed = () => {
     { id: "recent", label: "Recent", icon: "⚡" },
   ];
 
-  const posts = [
+  const defaultPosts = [
     {
       id: 1,
       user: {
@@ -91,6 +95,60 @@ const Feed = () => {
     },
   ];
 
+  // Load posts from localStorage or use default posts
+  const [posts, setPosts] = useState(() => {
+    const savedPosts = localStorage.getItem('feedPosts');
+    if (savedPosts) {
+      try {
+        return JSON.parse(savedPosts);
+      } catch (error) {
+        console.error('Error parsing saved posts:', error);
+        return defaultPosts;
+      }
+    }
+    return defaultPosts;
+  });
+
+  // Save posts to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('feedPosts', JSON.stringify(posts));
+  }, [posts]);
+
+  const handlePostCreated = (newPost) => {
+    console.log('New post created:', newPost);
+    console.log('Current user:', user);
+    
+    // Add the new post to the top of the feed
+    const formattedPost = {
+      id: newPost.id,
+      user: {
+        name: user?.name || user?.username || "You",
+        username: user?.username || "@you",
+        avatar: user?.profilePicture || "https://i.pravatar.cc/150?img=1",
+        verified: user?.verified || false,
+      },
+      content: newPost.caption || "",
+      image: newPost.imageUrl || null,
+      timestamp: newPost.timestamp || "Just now",
+      likes: newPost.likes || 0,
+      comments: newPost.comments || 0,
+      shares: 0,
+      tags: [],
+    };
+    
+    console.log('Formatted post:', formattedPost);
+    
+    // Use functional update to get the latest posts state
+    setPosts((prevPosts) => {
+      console.log('Previous posts count:', prevPosts.length);
+      const newPosts = [formattedPost, ...prevPosts];
+      console.log('New posts count:', newPosts.length);
+      return newPosts;
+    });
+    
+    setShowCreateModal(false);
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Feed Header */}
@@ -131,24 +189,36 @@ const Feed = () => {
             alt="Your avatar"
             className="w-12 h-12 rounded-full"
           />
-          <button className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full text-left hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-full text-left hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+          >
             What's on your mind?
           </button>
         </div>
         <div className="flex items-center justify-around mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          >
             <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <span className="text-sm font-medium">Photo</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          >
             <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
             <span className="text-sm font-medium">Video</span>
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+          <button 
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+          >
             <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
             </svg>
@@ -156,6 +226,30 @@ const Feed = () => {
           </button>
         </div>
       </div>
+
+      {/* Create Post Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">Create Post</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+              >
+                <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              <CreatePost 
+                onPostCreated={handlePostCreated}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Posts Feed */}
       {posts.map((post) => (

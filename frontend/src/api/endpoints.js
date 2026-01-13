@@ -154,6 +154,16 @@ export const accountApi = {
   updateProfile: (data) => apiClient.put('/account/profile', data),
 };
 
+// Polls endpoints
+export const pollsApi = {
+  getAll: (params) => apiClient.get('/polls', { params }),
+  getById: (id) => apiClient.get(`/polls/${id}`),
+  create: (data) => apiClient.post('/polls', data),
+  vote: (id, data) => apiClient.post(`/polls/${id}/vote`, data),
+  getResults: (id) => apiClient.get(`/polls/${id}/results`),
+  delete: (id) => apiClient.delete(`/polls/${id}`),
+};
+
 // Export all APIs
 export default {
   auth: authApi,

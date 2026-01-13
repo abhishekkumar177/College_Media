@@ -1,5 +1,35 @@
 # Two-Factor Authentication (2FA) Documentation
 
+## 🎯 Implementation Status: ✅ BACKEND COMPLETE
+
+**Last Updated:** January 13, 2026
+
+**Backend Implementation:** ✅ Complete and Ready  
+**Frontend Implementation:** 📝 Pending (See documentation below)
+
+### What's Implemented:
+- ✅ All 2FA backend routes (`/2fa/enable`, `/2fa/verify`, `/2fa/disable`, `/2fa/status`, `/2fa/verify-login`)
+- ✅ TOTP secret generation using `speakeasy`
+- ✅ QR code generation using `qrcode`
+- ✅ Database schema with `twoFactorEnabled` and `twoFactorSecret` fields
+- ✅ JWT token verification middleware
+- ✅ Login flow integration (checks for 2FA)
+- ✅ Session management after 2FA verification
+- ✅ Mock DB and MongoDB support
+
+### Quick Start:
+```bash
+# Backend is ready to use
+cd backend
+npm install speakeasy qrcode  # Already done
+node server.js
+
+# Test endpoints with curl or Postman
+# See API Endpoints section below for details
+```
+
+---
+
 ## Table of Contents
 1. [Overview](#overview)
 2. [Architecture](#architecture)
@@ -238,16 +268,479 @@ const verifyToken = (req, res, next) => {
 #### Import Dependencies
 
 ```javascript
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
-const UserMongo = require('../models/User');
-const UserMock = require('../mockdb/userDB');
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const speakeasy = require("speakeasy");
+const QRCode = require("qrcode");
+
+const UserMongo = require("../models/User");
+const UserMock = require("../mockdb/userDB");
+const Session = require("../models/Session");
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
+const JWT_SECRET = process.env.JWT_SECRET || "college_media_secret_key";
+```
+
+#### Middleware for Token Verification
+
+```javascript
+// Middleware to verify JWT token
+const verifyToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Access denied. No token provided.'
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.userId = decoded.userId || decoded.id;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.'
+    });
+  }
+};
+```
+
+#### Enable 2FA Endpoint
+
+```javascript
+/**
+ * POST /api/auth/2fa/enable
+ * Generate TOTP secret and QR code for 2FA setup
+ * 
+ * @access Protected (requires JWT token)
+ * @returns {Object} { success, data: { secret, qrCode }, message }
+ */
+router.post('/2fa/enable', verifyToken, async (req, res, next) => {
+  try {
+    const dbConnection = req.app.get('dbConnection');
+    
+    // Find user
+    let user;
+    if (dbConnection && dbConnection.useMongoDB) {
+      user = await UserMongo.findById(req.userId);
+    } else {
+      user = UserMock.findById(req.userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if 2FA is already enabled
+    if (user.twoFactorEnabled) {
+      return res.status(400).json({
+        success: false,
+        message: 'Two-factor authentication is already enabled'
+      });
+    }
+
+    // Generate TOTP secret
+    const secret = speakeasy.generateSecret({
+      name: `College Media (${user.email})`,
+      issuer: 'College Media',
+      length: 32
+    });
+
+    // Generate QR code as base64 data URL
+    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
+
+    // Return secret and QR code to frontend (don't save yet, wait for verification)
+    res.json({
+      success: true,
+      data: {
+        secret: secret.base32,
+        qrCode: qrCodeUrl
+      },
+      message: '2FA setup initialized. Scan QR code with your authenticator app.'
+    });
+  } catch (error) {
+    console.error('Enable 2FA error:', error);
+    next(error);
+  }
+});
+```
+
+**Secret Generation Details:**
+- **Algorithm**: SHA-1 (TOTP standard)
+- **Period**: 30 seconds (default)
+- **Digits**: 6 (standard for most authenticator apps)
+- **Encoding**: Base32 (standard for TOTP)
+
+#### Verify and Save 2FA Endpoint
+
+```javascript
+/**
+ * POST /api/auth/2fa/verify
+ * Verify TOTP code and enable 2FA for user
+ * 
+ * @access Protected (requires JWT token)
+ * @param {string} secret - Base32 encoded secret from enable endpoint
+ * @param {string} token - 6-digit TOTP code from authenticator app
+ * @returns {Object} { success, data, message }
+ */
+router.post('/2fa/verify', verifyToken, async (req, res, next) => {
+  try {
+    const { secret, token } = req.body;
+
+    // Validate input
+    if (!secret || !token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Secret and token are required'
+      });
+    }
+
+    // Verify TOTP code
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: token,
+      window: 2 // Allow ±2 time steps (60 seconds tolerance)
+    });
+
+    if (!verified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please try again.'
+      });
+    }
+
+    // Save secret and enable 2FA
+    const dbConnection = req.app.get('dbConnection');
+    
+    if (dbConnection && dbConnection.useMongoDB) {
+      await UserMongo.findByIdAndUpdate(req.userId, {
+        twoFactorEnabled: true,
+        twoFactorSecret: secret
+      });
+    } else {
+      const user = UserMock.findById(req.userId);
+      if (user) {
+        UserMock.update(req.userId, {
+          twoFactorEnabled: true,
+          twoFactorSecret: secret
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      message: 'Two-factor authentication enabled successfully'
+    });
+  } catch (error) {
+    console.error('Verify 2FA error:', error);
+    next(error);
+  }
+});
+```
+
+**Verification Window:**
+- `window: 2` allows codes from 2 time steps before and after current time
+- Provides 60 seconds of tolerance for clock drift
+- Balances security and usability
+
+#### Disable 2FA Endpoint
+
+```javascript
+/**
+ * POST /api/auth/2fa/disable
+ * Disable 2FA for user account
+ * 
+ * @access Protected (requires JWT token)
+ * @param {string} password - User's password for verification
+ * @returns {Object} { success, data, message }
+ */
+router.post('/2fa/disable', verifyToken, async (req, res, next) => {
+  try {
+    const { password } = req.body;
+
+    // Validate input
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password is required to disable 2FA'
+      });
+    }
+
+    const dbConnection = req.app.get('dbConnection');
+    
+    // Find user with password field
+    let user;
+    if (dbConnection && dbConnection.useMongoDB) {
+      user = await UserMongo.findById(req.userId).select('+password');
+    } else {
+      user = UserMock.findById(req.userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid password'
+      });
+    }
+
+    // Check if 2FA is enabled
+    if (!user.twoFactorEnabled) {
+      return res.status(400).json({
+        success: false,
+        message: 'Two-factor authentication is not enabled'
+      });
+    }
+
+    // Disable 2FA and remove secret
+    if (dbConnection && dbConnection.useMongoDB) {
+      await UserMongo.findByIdAndUpdate(req.userId, {
+        twoFactorEnabled: false,
+        twoFactorSecret: null
+      });
+    } else {
+      UserMock.update(req.userId, {
+        twoFactorEnabled: false,
+        twoFactorSecret: null
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Two-factor authentication disabled successfully'
+    });
+  } catch (error) {
+    console.error('Disable 2FA error:', error);
+    next(error);
+  }
+});
+```
+
+**Security Measures:**
+- Requires password verification before disabling
+- Completely removes secret from database
+- Prevents unauthorized 2FA removal
+
+#### Get 2FA Status Endpoint
+
+```javascript
+/**
+ * GET /api/auth/2fa/status
+ * Get current 2FA status for the user
+ * 
+ * @access Protected (requires JWT token)
+ * @returns {Object} { success, data: { twoFactorEnabled }, message }
+ */
+router.get('/2fa/status', verifyToken, async (req, res, next) => {
+  try {
+    const dbConnection = req.app.get('dbConnection');
+    
+    // Find user
+    let user;
+    if (dbConnection && dbConnection.useMongoDB) {
+      user = await UserMongo.findById(req.userId).select('twoFactorEnabled');
+    } else {
+      user = UserMock.findById(req.userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        twoFactorEnabled: user.twoFactorEnabled || false
+      },
+      message: '2FA status retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Get 2FA status error:', error);
+    next(error);
+  }
+});
+```
+
+#### Verify 2FA During Login
+
+```javascript
+/**
+ * POST /api/auth/2fa/verify-login
+ * Verify 2FA code during login
+ * 
+ * @access Public (but requires userId from initial login)
+ * @param {string} userId - User ID from initial login response
+ * @param {string} token - 6-digit TOTP code from authenticator app
+ * @returns {Object} { success, data: { token, user }, message }
+ */
+router.post('/2fa/verify-login', async (req, res, next) => {
+  try {
+    const { userId, token } = req.body;
+
+    // Validate input
+    if (!userId || !token) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID and token are required'
+      });
+    }
+
+    const dbConnection = req.app.get('dbConnection');
+    
+    // Find user
+    let user;
+    if (dbConnection && dbConnection.useMongoDB) {
+      user = await UserMongo.findById(userId);
+    } else {
+      user = UserMock.findById(userId);
+    }
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (!user.twoFactorEnabled || !user.twoFactorSecret) {
+      return res.status(400).json({
+        success: false,
+        message: '2FA is not enabled for this account'
+      });
+    }
+
+    // Verify TOTP code
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: 'base32',
+      token: token,
+      window: 2
+    });
+
+    if (!verified) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid verification code'
+      });
+    }
+
+    // 🔐 CREATE NEW SESSION
+    const sessionId = crypto.randomUUID();
+
+    await Session.create({
+      userId: user._id,
+      sessionId,
+      ipAddress: req.ip,
+      userAgent: req.headers["user-agent"],
+      isActive: true,
+    });
+
+    // 🔑 JWT BOUND TO SESSION
+    const jwtToken = jwt.sign(
+      { userId: user._id, sessionId },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      data: {
+        token: jwtToken,
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        }
+      },
+      message: '2FA verification successful'
+    });
+  } catch (error) {
+    console.error('Verify login 2FA error:', error);
+    next(error);
+  }
+});
+```
+
+#### Updated Login Flow
+
+The login endpoint has been updated to check for 2FA:
+
+```javascript
+router.post("/login", validateLogin, checkValidation, loginLimiter, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const dbConnection = req.app.get("dbConnection");
+
+    const user = dbConnection?.useMongoDB
+      ? await UserMongo.findOne({ email })
+      : await UserMock.findByEmail(email);
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled) {
+      // Return a special response indicating 2FA is required
+      return res.json({
+        success: true,
+        requiresTwoFactor: true,
+        userId: user._id,
+        message: "Two-factor authentication required",
+      });
+    }
+
+    // Continue with normal login flow if 2FA not enabled
+    const sessionId = crypto.randomUUID();
+
+    await Session.create({
+      userId: user._id,
+      sessionId,
+      ipAddress: req.ip,
+      userAgent: req.headers["user-agent"],
+      isActive: true,
+    });
+
+    const token = jwt.sign(
+      { userId: user._id, sessionId },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      data: { token },
+      message: "Login successful",
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 ```
 
 #### Enable 2FA Endpoint
@@ -824,11 +1317,13 @@ const handle2FADisable = async (password) => {
 
 ### Complete API Reference
 
-#### 1. Enable 2FA
+#### 1. Enable 2FA - Initialize Setup
 
 **Endpoint:** `POST /api/auth/2fa/enable`
 
 **Authentication:** Required (JWT Bearer token)
+
+**Description:** Generates a new TOTP secret and QR code for the user. Does not save to database until verification.
 
 **Request Headers:**
 ```http
@@ -852,11 +1347,18 @@ Content-Type: application/json
 
 **Error Responses:**
 
+*400 Bad Request - Already Enabled:*
+```json
+{
+  "success": false,
+  "message": "Two-factor authentication is already enabled"
+}
+```
+
 *401 Unauthorized:*
 ```json
 {
   "success": false,
-  "data": null,
   "message": "Access denied. No token provided."
 }
 ```
@@ -865,16 +1367,19 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "data": null,
   "message": "User not found"
 }
 ```
 
-#### 2. Verify 2FA Code
+---
+
+#### 2. Verify 2FA Code - Complete Setup
 
 **Endpoint:** `POST /api/auth/2fa/verify`
 
 **Authentication:** Required (JWT Bearer token)
+
+**Description:** Verifies the TOTP code from authenticator app and saves the secret to enable 2FA.
 
 **Request Headers:**
 ```http
@@ -894,7 +1399,6 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "data": null,
   "message": "Two-factor authentication enabled successfully"
 }
 ```
@@ -905,7 +1409,6 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "data": null,
   "message": "Secret and token are required"
 }
 ```
@@ -914,16 +1417,19 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "data": null,
   "message": "Invalid verification code. Please try again."
 }
 ```
+
+---
 
 #### 3. Disable 2FA
 
 **Endpoint:** `POST /api/auth/2fa/disable`
 
 **Authentication:** Required (JWT Bearer token)
+
+**Description:** Disables 2FA for the user account. Requires password verification for security.
 
 **Request Headers:**
 ```http
@@ -942,7 +1448,6 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "data": null,
   "message": "Two-factor authentication disabled successfully"
 }
 ```
@@ -953,25 +1458,35 @@ Content-Type: application/json
 ```json
 {
   "success": false,
-  "data": null,
   "message": "Password is required to disable 2FA"
 }
 ```
 
-*400 Bad Request - Wrong Password:*
+*400 Bad Request - Not Enabled:*
 ```json
 {
   "success": false,
-  "data": null,
-  "message": "Incorrect password"
+  "message": "Two-factor authentication is not enabled"
 }
 ```
+
+*401 Unauthorized - Wrong Password:*
+```json
+{
+  "success": false,
+  "message": "Invalid password"
+}
+```
+
+---
 
 #### 4. Get 2FA Status
 
 **Endpoint:** `GET /api/auth/2fa/status`
 
 **Authentication:** Required (JWT Bearer token)
+
+**Description:** Returns whether 2FA is currently enabled for the user.
 
 **Request Headers:**
 ```http
@@ -983,17 +1498,155 @@ Authorization: Bearer <jwt_token>
 {
   "success": true,
   "data": {
-    "enabled": true
+    "twoFactorEnabled": true
   },
   "message": "2FA status retrieved successfully"
 }
 ```
 
+**Error Responses:**
+
+*401 Unauthorized:*
+```json
+{
+  "success": false,
+  "message": "Invalid or expired token."
+}
+```
+
+*404 Not Found:*
+```json
+{
+  "success": false,
+  "message": "User not found"
+}
+```
+
+---
+
+#### 5. Verify 2FA During Login
+
+**Endpoint:** `POST /api/auth/2fa/verify-login`
+
+**Authentication:** None (public endpoint, called after initial login)
+
+**Description:** Verifies TOTP code during login for users with 2FA enabled. Creates session and returns JWT token.
+
+**Request Headers:**
+```http
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "userId": "507f1f77bcf86cd799439011",
+  "token": "123456"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "507f1f77bcf86cd799439011",
+      "username": "johndoe",
+      "email": "john@example.com",
+      "role": "student"
+    }
+  },
+  "message": "2FA verification successful"
+}
+```
+
+**Error Responses:**
+
+*400 Bad Request - Missing Fields:*
+```json
+{
+  "success": false,
+  "message": "User ID and token are required"
+}
+```
+
+*400 Bad Request - 2FA Not Enabled:*
+```json
+{
+  "success": false,
+  "message": "2FA is not enabled for this account"
+}
+```
+
+*401 Unauthorized - Invalid Code:*
+```json
+{
+  "success": false,
+  "message": "Invalid verification code"
+}
+```
+
+*404 Not Found:*
+```json
+{
+  "success": false,
+  "message": "User not found"
+}
+```
+
+---
+
+#### 6. Login Flow (Modified)
+
+**Endpoint:** `POST /api/auth/login`
+
+**Authentication:** None
+
+**Description:** Standard login endpoint, now checks for 2FA. If 2FA is enabled, returns special response requiring verification.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Success Response - No 2FA (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  },
+  "message": "Login successful"
+}
+```
+
+**Success Response - 2FA Required (200):**
+```json
+{
+  "success": true,
+  "requiresTwoFactor": true,
+  "userId": "507f1f77bcf86cd799439011",
+  "message": "Two-factor authentication required"
+}
+```
+
+**Frontend Flow:**
+1. User enters email/password
+2. If response has `requiresTwoFactor: true`, show 2FA input
+3. User enters 6-digit code from authenticator
+4. Call `/api/auth/2fa/verify-login` with userId and code
+5. Receive JWT token and complete login
+
 ---
 
 ## Database Schema
 
-### MongoDB Schema
+### MongoDB Schema (✅ Already Implemented)
 
 ```javascript
 const userSchema = new mongoose.Schema({

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 // Exported for use with useContext(AccessibilityContext)
 export const AccessibilityContext = createContext();

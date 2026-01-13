@@ -46,12 +46,14 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // Calculate request duration
-    const duration = Date.now() - response.config.metadata.startTime;
+    const duration = response.config?.metadata?.startTime
+      ? Date.now() - response.config.metadata.startTime
+      : 0;
 
     // Log response in development
     if (import.meta.env.DEV) {
       console.log(
-        `✅ [API Response] ${response.config.method?.toUpperCase()} ${response.config.url} - ${duration}ms`
+        `✅ [API Response] ${response.config?.method?.toUpperCase()} ${response.config?.url} - ${duration}ms`
       );
     }
 
@@ -70,6 +72,14 @@ apiClient.interceptors.response.use(
         `❌ [API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${duration}ms`,
         error.response?.status
       );
+    }
+
+    // Check for network errors or offline status
+    // Status 0/undefined usually means network error/cors/offline
+    if (!error.response && error.code !== 'ERR_CANCELED' && error.config) {
+      // Import dynamically to avoid circular dependency issues at module level
+      const { default: offlineQueue } = await import('../utils/offlineQueue');
+      await offlineQueue.add(error.config);
     }
 
     // Handle specific error cases
@@ -140,7 +150,7 @@ apiClient.interceptors.response.use(
     } else if (error.request) {
       // Request made but no response received
       throw new NetworkError(
-        'Network error. Please check your internet connection.'
+        'Network error. Request added to offline queue.'
       );
     } else {
       // Something else happened
@@ -184,16 +194,16 @@ axiosRetry(apiClient, {
 });
 
 // Add response interceptor to show success after retry
-const originalResponseInterceptor = apiClient.interceptors.response.handlers[0].fulfilled;
+const originalResponseInterceptor = apiClient.interceptors.response.handlers[0]?.fulfilled;
 apiClient.interceptors.response.use(
   (response) => {
     // Show success notification if request succeeded after retry
-    if (response.config.onRetrySuccess) {
+    if (response?.config?.onRetrySuccess) {
       showRetrySuccessNotification();
     }
-    return originalResponseInterceptor(response);
+    return originalResponseInterceptor ? originalResponseInterceptor(response) : response;
   },
-  apiClient.interceptors.response.handlers[0].rejected
+  apiClient.interceptors.response.handlers[0]?.rejected
 );
 
 export default apiClient;

@@ -3,7 +3,7 @@
  * Handles JWT token storage, retrieval, and validation
  */
 
-const TOKEN_KEY = 'auth_token';
+const TOKEN_KEY = 'token'; // Changed from 'auth_token' to match AuthContext
 const REFRESH_TOKEN_KEY = 'refresh_token';
 
 /**

@@ -14,7 +14,10 @@ const protect = async (req, res, next) => {
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.id).select('-password');
+      // Support both 'id' and 'userId' for backwards compatibility
+      const userId = decoded.userId || decoded.id;
+
+      req.user = await User.findById(userId).select('-password');
 
       if (!req.user) {
         res.status(401);
