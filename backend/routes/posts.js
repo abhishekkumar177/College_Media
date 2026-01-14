@@ -5,6 +5,7 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const ModerationService = require('../services/moderationService');
 const RecommenderService = require('../services/recommender');
+const EventPublisher = require('../events/publisher');
 const logger = require('../utils/logger');
 const { apiLimiter } = require('../middleware/rateLimitMiddleware');
 const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
@@ -140,8 +141,16 @@ router.post('/:postId/like', verifyToken, async (req, res) => {
         // Track interaction for recommendations
         await RecommenderService.trackInteraction(req.userId, postId, 'post', 'like');
 
-        // Update like count
-        await Post.findByIdAndUpdate(postId, { $inc: { likeCount: 1 } });
+        // Update like count and get post
+        const post = await Post.findByIdAndUpdate(postId, { $inc: { likeCount: 1 } }, { new: true });
+
+        if (post && post.author.toString() !== req.userId) {
+            EventPublisher.publish('POST_LIKED', {
+                targetUserId: post.author,
+                actorId: req.userId,
+                postId: post._id
+            });
+        }
 
         res.json({ success: true, message: 'Post liked' });
     } catch (error) {

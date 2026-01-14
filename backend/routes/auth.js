@@ -10,6 +10,8 @@ const crypto = require("crypto");
 const UserMongo = require("../models/User");
 const UserMock = require("../mockdb/userDB");
 const Session = require("../models/Session");
+const EventPublisher = require("../events/publisher");
+const MFAService = require("../services/mfaService");
 
 const {
   validateRegister,
@@ -142,6 +144,13 @@ router.post(
         lastName,
       });
 
+      // Publish Event
+      EventPublisher.publish('USER_REGISTERED', {
+        userId: user._id,
+        email: user.email,
+        name: `${firstName} ${lastName}`
+      });
+
       res.status(201).json({
         success: true,
         message: "User registered successfully",
@@ -213,8 +222,6 @@ router.post(
 /* ============================================================
    🔐 2FA VERIFY LOGIN
 ============================================================ */
-const MFAService = require("../services/mfaService");
-
 /* ============================================================
    🔐 2FA SETUP (GENERATE QR)
    ============================================================ */
