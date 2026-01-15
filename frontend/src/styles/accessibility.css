@@ -146,6 +146,52 @@ select:focus-visible {
   background: #000;
 }
 
+/* High contrast text combinations */
+.contrast-text-primary {
+  color: #000000;
+}
+
+.dark .contrast-text-primary {
+  color: #ffffff;
+}
+
+.contrast-text-secondary {
+  color: #333333;
+}
+
+.dark .contrast-text-secondary {
+  color: #cccccc;
+}
+
+.contrast-bg-primary {
+  background-color: #ffffff;
+}
+
+.dark .contrast-bg-primary {
+  background-color: #000000;
+}
+
+.contrast-bg-secondary {
+  background-color: #f8f9fa;
+}
+
+.dark .contrast-bg-secondary {
+  background-color: #1a1a1a;
+}
+
+/* Focus indicators with high contrast */
+.high-contrast button:focus-visible,
+.high-contrast a:focus-visible,
+.high-contrast input:focus-visible,
+.high-contrast textarea:focus-visible,
+.high-contrast select:focus-visible {
+  outline: 3px solid #ffff00 !important;
+  outline-offset: 2px;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
 /* Interactive Elements - Minimum 44x44px */
 button,
 a,

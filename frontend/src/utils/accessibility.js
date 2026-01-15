@@ -129,3 +129,136 @@ export const createErrorMessage = (fieldName, error) => {
     message: error,
   };
 };
+
+/**
+ * Enhanced form validation with accessibility feedback
+ */
+export const validateFieldAccessibility = (fieldElement, value, rules = {}) => {
+  const errors = [];
+  const fieldName = fieldElement.name || fieldElement.id || 'field';
+
+  // Required field validation
+  if (rules.required && (!value || value.trim() === '')) {
+    errors.push(`${fieldName} is required`);
+  }
+
+  // Length validation
+  if (rules.minLength && value && value.length < rules.minLength) {
+    errors.push(`${fieldName} must be at least ${rules.minLength} characters`);
+  }
+
+  if (rules.maxLength && value && value.length > rules.maxLength) {
+    errors.push(`${fieldName} must be no more than ${rules.maxLength} characters`);
+  }
+
+  // Pattern validation
+  if (rules.pattern && value && !rules.pattern.test(value)) {
+    errors.push(rules.patternMessage || `${fieldName} format is invalid`);
+  }
+
+  // Update field accessibility attributes
+  const errorId = `${fieldElement.id || fieldElement.name}-error`;
+  fieldElement.setAttribute('aria-invalid', errors.length > 0 ? 'true' : 'false');
+
+  if (errors.length > 0) {
+    fieldElement.setAttribute('aria-describedby', errorId);
+  } else {
+    fieldElement.removeAttribute('aria-describedby');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+    errorId,
+    errorMessage: errors.join('. ')
+  };
+};
+
+/**
+ * Create progress indicator with accessibility
+ */
+export const createProgressIndicator = (container, options = {}) => {
+  const {
+    label = 'Loading...',
+    value = 0,
+    max = 100,
+    showPercentage = true
+  } = options;
+
+  const progressContainer = document.createElement('div');
+  progressContainer.setAttribute('role', 'progressbar');
+  progressContainer.setAttribute('aria-valuenow', value);
+  progressContainer.setAttribute('aria-valuemin', '0');
+  progressContainer.setAttribute('aria-valuemax', max);
+  progressContainer.setAttribute('aria-label', label);
+
+  const progressBar = document.createElement('div');
+  progressBar.className = 'progress-bar';
+  progressBar.style.width = `${(value / max) * 100}%`;
+
+  const labelElement = document.createElement('span');
+  labelElement.className = 'sr-only';
+  labelElement.textContent = showPercentage ? `${label} ${value}%` : label;
+
+  progressContainer.appendChild(progressBar);
+  progressContainer.appendChild(labelElement);
+
+  if (container) {
+    container.appendChild(progressContainer);
+  }
+
+  return {
+    container: progressContainer,
+    update: (newValue) => {
+      progressContainer.setAttribute('aria-valuenow', newValue);
+      progressBar.style.width = `${(newValue / max) * 100}%`;
+      if (showPercentage) {
+        labelElement.textContent = `${label} ${newValue}%`;
+      }
+    },
+    remove: () => {
+      if (progressContainer.parentNode) {
+        progressContainer.parentNode.removeChild(progressContainer);
+      }
+    }
+  };
+};
+
+/**
+ * Announce form validation results
+ */
+export const announceFormValidation = (formElement, validationResults) => {
+  const totalErrors = validationResults.reduce((sum, result) => sum + result.errors.length, 0);
+
+  if (totalErrors === 0) {
+    announceToScreenReader('Form validation successful', 'polite');
+  } else {
+    announceToScreenReader(`Form has ${totalErrors} error${totalErrors > 1 ? 's' : ''}. Please review and correct the highlighted fields.`, 'assertive');
+  }
+};
+
+/**
+ * Check touch target accessibility (minimum 44x44px)
+ */
+export const validateTouchTargets = (container = document) => {
+  const issues = [];
+  const interactiveElements = container.querySelectorAll('button, a, [role="button"], input[type="submit"], input[type="button"]');
+
+  interactiveElements.forEach((element) => {
+    const rect = element.getBoundingClientRect();
+    const computedStyle = window.getComputedStyle(element);
+
+    const width = rect.width + parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
+    const height = rect.height + parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom);
+
+    if (width < 44 || height < 44) {
+      issues.push({
+        element,
+        issue: `Touch target too small: ${Math.round(width)}x${Math.round(height)}px (minimum 44x44px required)`,
+        dimensions: { width: Math.round(width), height: Math.round(height) }
+      });
+    }
+  });
+
+  return { valid: issues.length === 0, issues };
+};

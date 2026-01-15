@@ -23,6 +23,8 @@ export const AccessibilityProvider = ({ children }) => {
 
   const [politeMessage, setPoliteMessage] = useState('');
   const [assertiveMessage, setAssertiveMessage] = useState('');
+  const [formErrors, setFormErrors] = useState({});
+  const [progressIndicators, setProgressIndicators] = useState({});
 
   // 2. Load preferences on Mount only (Client-side)
   useEffect(() => {
@@ -83,12 +85,109 @@ export const AccessibilityProvider = ({ children }) => {
     }, 5000);
   }, []);
 
+  // 6. Form Validation Feedback
+  const setFieldError = useCallback((fieldId, error) => {
+    setFormErrors(prev => ({
+      ...prev,
+      [fieldId]: error
+    }));
+
+    if (error) {
+      announce(error, 'assertive');
+    }
+  }, [announce]);
+
+  const clearFieldError = useCallback((fieldId) => {
+    setFormErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[fieldId];
+      return newErrors;
+    });
+  }, []);
+
+  const getFieldError = useCallback((fieldId) => {
+    return formErrors[fieldId] || null;
+  }, [formErrors]);
+
+  // 7. Progress Indicator Management
+  const createProgressIndicator = useCallback((id, options = {}) => {
+    const indicator = {
+      id,
+      value: options.initialValue || 0,
+      max: options.max || 100,
+      label: options.label || 'Loading...',
+      showPercentage: options.showPercentage !== false,
+      created: Date.now()
+    };
+
+    setProgressIndicators(prev => ({
+      ...prev,
+      [id]: indicator
+    }));
+
+    announce(`${indicator.label} started`, 'polite');
+
+    return id;
+  }, [announce]);
+
+  const updateProgressIndicator = useCallback((id, value) => {
+    setProgressIndicators(prev => {
+      if (!prev[id]) return prev;
+
+      const updated = { ...prev[id], value };
+      announce(`${updated.label} ${updated.showPercentage ? value + '%' : 'updated'}`, 'polite');
+
+      return {
+        ...prev,
+        [id]: updated
+      };
+    });
+  }, [announce]);
+
+  const removeProgressIndicator = useCallback((id) => {
+    setProgressIndicators(prev => {
+      if (!prev[id]) return prev;
+
+      announce(`${prev[id].label} completed`, 'polite');
+
+      const newIndicators = { ...prev };
+      delete newIndicators[id];
+      return newIndicators;
+    });
+  }, [announce]);
+
+  const getProgressIndicator = useCallback((id) => {
+    return progressIndicators[id] || null;
+  }, [progressIndicators]);
+
   // Memoize value to prevent unnecessary re-renders of all consumers
   const contextValue = useMemo(() => ({
     preferences,
     updatePreference,
-    announce
-  }), [preferences, updatePreference, announce]);
+    announce,
+    formErrors,
+    setFieldError,
+    clearFieldError,
+    getFieldError,
+    progressIndicators,
+    createProgressIndicator,
+    updateProgressIndicator,
+    removeProgressIndicator,
+    getProgressIndicator
+  }), [
+    preferences,
+    updatePreference,
+    announce,
+    formErrors,
+    setFieldError,
+    clearFieldError,
+    getFieldError,
+    progressIndicators,
+    createProgressIndicator,
+    updateProgressIndicator,
+    removeProgressIndicator,
+    getProgressIndicator
+  ]);
 
   return (
     <AccessibilityContext.Provider value={contextValue}>
