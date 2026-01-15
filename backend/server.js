@@ -258,6 +258,7 @@ app.use("/api/payment", require("./routes/payment"));
 app.use("/api/live", require("./routes/live"));
 app.use("/api/feed", require("./routes/recommendations"));
 app.use("/api/proctoring", require("./routes/proctoring"));
+app.use("/api/interview", require("./routes/interview"));
 app.use("/api/account", require("./routes/account"));
 
 /* ============================================================
