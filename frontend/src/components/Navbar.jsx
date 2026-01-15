@@ -7,6 +7,11 @@ import NotificationBell from "./NotificationBell";
 import SearchBar from "./SearchBar";
 import OfflineQueueIndicator from "./OfflineQueueIndicator";
 
+/**
+ * Navigation Bar Component
+ * Main navigation bar at the top of the application, containing the app logo, search functionality, and user profile button.
+ * @returns {JSX.Element} The navigation bar JSX element
+ */
 function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user } = useAuth();

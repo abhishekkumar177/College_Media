@@ -123,6 +123,7 @@ const CreatePost = ({ onPostCreated }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
       <div className="p-4">
+        <h2 id="create-post-heading" className="sr-only">Create New Post</h2>
         <div className="flex items-center mb-4">
           <img
             src={user?.profilePicture || 'https://placehold.co/40x40/FF6B6B/FFFFFF?text=U'}
@@ -134,25 +135,34 @@ const CreatePost = ({ onPostCreated }) => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <textarea
-            value={caption}
-            onChange={handleCaptionChange}
-            placeholder="What's happening?"
-            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-            rows="3"
-            maxLength={maxLength}
-          />
+        <form onSubmit={handleSubmit} role="form" aria-labelledby="create-post-heading">
+          <div className="mb-3">
+            <label htmlFor="post-caption" className="sr-only">Post content</label>
+            <textarea
+              id="post-caption"
+              value={caption}
+              onChange={handleCaptionChange}
+              placeholder="What's happening?"
+              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              rows="3"
+              maxLength={maxLength}
+              aria-describedby="char-counter"
+              aria-invalid={caption.length > maxLength}
+            />
+          </div>
 
           {/* Character Counter */}
           <div className="flex justify-end mt-1">
             <span
+              id="char-counter"
               className={`text-xs ${caption.length >= maxLength
                   ? 'text-red-600 font-bold'
                   : caption.length > maxLength * 0.8
                     ? 'text-yellow-600 font-medium'
                     : 'text-gray-500'
                 }`}
+              aria-live="polite"
+              aria-atomic="true"
             >
               {caption.length} / {maxLength}
             </span>
@@ -214,22 +224,33 @@ const CreatePost = ({ onPostCreated }) => {
 
           <div className="flex items-center justify-between mt-3">
             <div className="flex space-x-2">
-              <label className="cursor-pointer text-gray-600 hover:text-purple-600 transition-colors p-1 rounded hover:bg-purple-50" title="Add image">
+              <label 
+                htmlFor="image-upload"
+                className="cursor-pointer text-gray-600 hover:text-purple-600 transition-colors p-2 rounded hover:bg-purple-50 focus-within:ring-2 focus-within:ring-purple-500"
+                title="Add image"
+                aria-label="Upload image"
+              >
                 <Icon icon="mdi:image" className="w-6 h-6" />
                 <input
+                  id="image-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
+                  aria-describedby="image-upload-desc"
                 />
               </label>
+              <span id="image-upload-desc" className="sr-only">Select an image file to upload with your post</span>
 
               <button
                 type="button"
                 onClick={() => setShowPollCreator(!showPollCreator)}
                 disabled={!!pollData}
-                className="text-gray-600 hover:text-indigo-600 transition-colors p-1 rounded hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-gray-600 hover:text-indigo-600 transition-colors p-2 rounded hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-indigo-500"
                 title="Add poll"
+                aria-label={pollData ? "Poll already added" : "Add poll to post"}
+                aria-expanded={showPollCreator}
+                aria-controls="poll-creator"
               >
                 <Icon icon="mdi:poll" className="w-6 h-6" />
               </button>
@@ -238,10 +259,12 @@ const CreatePost = ({ onPostCreated }) => {
             <button
               type="submit"
               disabled={isCreating || (!caption.trim() && !image && !pollData)}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-indigo-700 transition-all"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-700 hover:to-indigo-700 transition-all focus:ring-2 focus:ring-purple-500"
+              aria-describedby={isCreating ? "posting-status" : undefined}
             >
               {isCreating ? 'Posting...' : 'Post'}
             </button>
+            {isCreating && <span id="posting-status" className="sr-only" aria-live="assertive">Creating your post, please wait</span>}
           </div>
         </form>
       </div>

@@ -1,5 +1,12 @@
 import React from "react";
+import SuggestedAccountItem from "./SuggestedAccountItem";
+import TrendingHashtag from "./TrendingHashtag";
 
+/**
+ * Right Sidebar Component
+ * Sidebar containing friend suggestions, trending hashtags, and online friends.
+ * @returns {JSX.Element} The right sidebar JSX element
+ */
 function RightSidebar() {
   const friendSuggestions = [
     {
@@ -74,38 +81,11 @@ function RightSidebar() {
         </div>
         <div className="space-y-4">
           {friendSuggestions.map((friend, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={friend.avatar}
-                  alt={friend.name}
-                  className="w-10 h-10 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
-                />
-                <div>
-                  <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
-                    {friend.name}
-                  </p>
-                  <p className="text-slate-600 dark:text-slate-300 text-xs">
-                    {friend.followers} followers
-                  </p>
-                </div>
-              </div>
-              <button className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-300">
-                <svg
-                  className="w-5 h-5 text-slate-600 dark:text-slate-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </button>
-            </div>
+            <SuggestedAccountItem
+              key={index}
+              account={friend}
+              onFollow={() => {}}
+            />
           ))}
         </div>
       </div>
@@ -132,12 +112,11 @@ function RightSidebar() {
         </div>
         <div className="flex flex-wrap gap-2">
           {trendingHashtags.map((hashtag, index) => (
-            <span
+            <TrendingHashtag
               key={index}
-              className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-300 cursor-pointer"
-            >
-              {hashtag}
-            </span>
+              hashtag={hashtag}
+              onClick={() => {}}
+            />
           ))}
         </div>
       </div>

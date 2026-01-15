@@ -3,6 +3,8 @@ import { PostSkeleton } from "../components/SkeletonLoader";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MainLayout from "../layout/MainLayout.jsx";
+import ExploreHub from "../pages/ExplorerHub.jsx";
+import PricingPage from "../pages/PricingPage.jsx";
 
 const LazyWrapper = ({ children }) => (
   <Suspense fallback={<PostSkeleton />}>
@@ -137,6 +139,9 @@ const AppRoutes = ({
           </LazyWrapper>
         }
       />
+
+      <Route path="/explore-hub" element={<ExploreHub />} />
+      <Route path="/pricing" element={<PricingPage />} />
 
       {/* Protected Routes */}
       <Route

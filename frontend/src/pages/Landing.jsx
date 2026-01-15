@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   GraduationCap,
@@ -337,7 +337,7 @@ const Landing = () => {
           Join Your Campus Today
         </h2>
         <Link
-          to="/signup"
+          to="/explore-hub"
           className="inline-flex items-center gap-2 px-8 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-100 transition"
         >
           Get Started Free <ArrowRight />

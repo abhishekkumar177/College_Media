@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
 
+/**
+ * Post Card Component
+ * Individual post display with user info, media, interactions, and caption.
+ * @param {Object} props - The component props
+ * @param {Object} props.post - Post object containing user, media, caption, likes
+ * @param {Function} props.onLike - Handler for like toggle
+ * @param {boolean} [props.isLiked=false] - Whether the post is liked
+ * @returns {JSX.Element} The post card JSX element
+ */
 const PostCard = ({ post, onLike, isLiked = false }) => {
   const [liked, setLiked] = useState(isLiked);
   const [likeCount, setLikeCount] = useState(post.likes);

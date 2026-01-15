@@ -5,6 +5,16 @@ import PollDisplay from "./PollDisplay";
 import { usePollByPost } from "../hooks/usePolls";
 import ProgressiveImage from "./ProgressiveImage";
 
+/**
+ * Post Component
+ * Individual post display with user info, media, interactions, and caption.
+ * @param {Object} props - The component props
+ * @param {Object} props.post - Post object containing user, media, caption, likes, etc.
+ * @param {Function} props.onLike - Handler for like toggle
+ * @param {Function} props.onCopyLink - Handler for copying post link
+ * @param {boolean} props.copiedLink - Whether the link has been copied
+ * @returns {JSX.Element} The post JSX element
+ */
 const Post = ({
   post,
   onLike,

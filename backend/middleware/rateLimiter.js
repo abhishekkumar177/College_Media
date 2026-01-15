@@ -1,208 +1,154 @@
-/**
- * =====================================================
- * Advanced Rate Limiting Middleware
- * -----------------------------------------------------
- * ✔ Per-IP / Per-User / Per-Token limiting
- * ✔ Redis-backed with in-memory fallback
- * ✔ Different limits for:
- *    - Global APIs
- *    - Auth APIs
- *    - Sensitive APIs (OTP, Search)
- * ✔ Proper 429 responses
- * ✔ Centralized logging
- * ✔ Production hardened
- * =====================================================
- */
-
-const rateLimit = require("express-rate-limit");
-const RedisStore = require("rate-limit-redis");
-const redisClient = require("../config/redisClient");
-const logger = require("../utils/logger");
-
-/* -----------------------------------------------------
-   🧠 REDIS STORE (WITH FALLBACK)
------------------------------------------------------ */
-const rateLimitStore = redisClient
-  ? new RedisStore({
-      sendCommand: (...args) => redisClient.sendCommand(args),
-    })
-  : undefined;
-
-/* -----------------------------------------------------
-   🧠 KEY GENERATOR
-   Priority:
-   1. Authenticated user ID
-   2. Authorization token
-   3. IP address
------------------------------------------------------ */
-const keyGenerator = (req) => {
-  if (req.user && req.user.id) {
-    return `user:${req.user.id}`;
-  }
-
-  if (req.headers.authorization) {
-    return `token:${req.headers.authorization}`;
-  }
-
-  return `ip:${req.ip}`;
-};
-
-/* -----------------------------------------------------
-   🚨 RATE LIMIT VIOLATION HANDLER
------------------------------------------------------ */
-const onLimitReached = (req, res, next, options) => {
-  logger.warn("Rate limit exceeded", {
-    path: req.originalUrl,
-    method: req.method,
-    key: keyGenerator(req),
-    ip: req.ip,
-    limit: options.max,
-    windowMs: options.windowMs,
-  });
-};
-
-/* -----------------------------------------------------
-   ❌ COMMON 429 RESPONSE
------------------------------------------------------ */
-const rateLimitResponse = (req, res) => {
-  return res.status(429).json({
-    success: false,
-    error: "TOO_MANY_REQUESTS",
-    message: "Too many requests. Please try again later.",
-  });
-};
-
-/* -----------------------------------------------------
-   🌍 GLOBAL API LIMITER
-   Applies to most APIs
------------------------------------------------------ */
-const globalLimiter = rateLimit({
-  store: rateLimitStore,
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // reasonable global limit
-  keyGenerator,
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: rateLimitResponse,
-  onLimitReached,
+/* =====================================================
+   📊 CENTRALIZED RATE LIMIT CONFIG
+   (Removes magic numbers & allows reuse)
+===================================================== */
+const RATE_LIMIT_CONFIG = Object.freeze({
+  GLOBAL: {
+    WINDOW_MS: 15 * 60 * 1000,
+    MAX: 200,
+  },
+  AUTH: {
+    WINDOW_MS: 10 * 60 * 1000,
+    MAX: 20,
+  },
+  OTP: {
+    WINDOW_MS: 5 * 60 * 1000,
+    MAX: 5,
+  },
+  SEARCH: {
+    WINDOW_MS: 60 * 1000,
+    MAX: 60,
+  },
+  ADMIN: {
+    WINDOW_MS: 15 * 60 * 1000,
+    MAX: 500,
+  },
+  BURST: {
+    WINDOW_MS: 30 * 1000,
+    MAX: 30,
+  },
 });
 
-/* -----------------------------------------------------
-   🔐 AUTH LIMITER
-   Login / Signup / Token APIs
------------------------------------------------------ */
-const authLimiter = rateLimit({
-  store: rateLimitStore,
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 20, // strict to prevent brute force
+/* =====================================================
+   🧠 ROLE BASED LIMIT RESOLVER
+===================================================== */
+const resolveLimitByRole = (req, defaultLimit) => {
+  if (!req.user) return defaultLimit;
+
+  switch (req.user.role) {
+    case "admin":
+      return defaultLimit * 2;
+    case "moderator":
+      return Math.floor(defaultLimit * 1.5);
+    default:
+      return defaultLimit;
+  }
+};
+
+/* =====================================================
+   🔁 REDIS HEALTH CHECK (SAFE FALLBACK)
+===================================================== */
+const isRedisHealthy = () => {
+  try {
+    return redisClient && redisClient.isOpen;
+  } catch (err) {
+    logger.error("Redis health check failed", { err });
+    return false;
+  }
+};
+
+/* =====================================================
+   🧯 BURST PROTECTION LIMITER
+   Prevents sudden spikes
+===================================================== */
+const burstLimiter = rateLimit({
+  store: isRedisHealthy() ? rateLimitStore : undefined,
+  windowMs: RATE_LIMIT_CONFIG.BURST.WINDOW_MS,
+  max: RATE_LIMIT_CONFIG.BURST.MAX,
   keyGenerator,
   handler: (req, res) => {
-    logger.warn("Auth rate limit hit", {
+    logger.warn("Burst traffic detected", {
       ip: req.ip,
-      user: req.user?.id || null,
       route: req.originalUrl,
     });
 
+    res.setHeader("Retry-After", "30");
+
     return res.status(429).json({
       success: false,
-      error: "AUTH_RATE_LIMIT",
-      message:
-        "Too many authentication attempts. Please wait and try again.",
+      error: "BURST_LIMIT",
+      message: "Too many requests in a short time. Please slow down.",
     });
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: () => process.env.NODE_ENV === 'development', // Skip in development
 });
 
-/* -----------------------------------------------------
-   🔥 OTP / SENSITIVE ACTION LIMITER
------------------------------------------------------ */
-const otpLimiter = rateLimit({
-  store: rateLimitStore,
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 5, // very strict
+/* =====================================================
+   🧪 ROUTE BASED LIMIT OVERRIDE
+===================================================== */
+const routeLimiter = (options) =>
+  rateLimit({
+    store: isRedisHealthy() ? rateLimitStore : undefined,
+    windowMs: options.windowMs,
+    max: (req) => resolveLimitByRole(req, options.max),
+    keyGenerator,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: rateLimitResponse,
+  });
+
+/* =====================================================
+   📈 RATE LIMIT METRICS HOOK
+===================================================== */
+const metricsHook = (req, res, next) => {
+  res.on("finish", () => {
+    if (res.statusCode === 429) {
+      logger.info("Rate limit metric", {
+        ip: req.ip,
+        route: req.originalUrl,
+        method: req.method,
+      });
+    }
+  });
+  next();
+};
+
+/* =====================================================
+   🛡️ COMPOSED PROTECTION LAYER
+   (Global + Burst + Metrics)
+===================================================== */
+const protectedLimiter = [
+  metricsHook,
+  burstLimiter,
+  safeGlobalLimiter,
+];
+
+/* =====================================================
+   🚑 EMERGENCY LOCKDOWN MODE
+   Enable during attacks
+===================================================== */
+const emergencyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 50,
   keyGenerator,
   handler: (req, res) => {
-    logger.warn("OTP abuse detected", {
+    logger.error("Emergency rate limit active", {
       ip: req.ip,
-      key: keyGenerator(req),
     });
 
     return res.status(429).json({
       success: false,
-      error: "OTP_RATE_LIMIT",
+      error: "EMERGENCY_LIMIT",
       message:
-        "Too many OTP requests. Please wait before requesting again.",
+        "Service temporarily restricted due to high traffic.",
     });
   },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
-/* -----------------------------------------------------
-   🔍 SEARCH / READ HEAVY API LIMITER
------------------------------------------------------ */
-const searchLimiter = rateLimit({
-  store: rateLimitStore,
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 60,
-  keyGenerator,
-  handler: (req, res) => {
-    logger.warn("Search rate limit exceeded", {
-      query: req.query,
-      ip: req.ip,
-    });
-
-    return res.status(429).json({
-      success: false,
-      error: "SEARCH_RATE_LIMIT",
-      message: "Too many search requests. Slow down.",
-    });
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-/* -----------------------------------------------------
-   👑 ADMIN LIMITER (RELAXED)
------------------------------------------------------ */
-const adminLimiter = rateLimit({
-  store: rateLimitStore,
-  windowMs: 15 * 60 * 1000,
-  max: 500, // admins allowed more
-  keyGenerator,
-  skip: (req) => req.user?.role !== "admin",
-  handler: rateLimitResponse,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-/* -----------------------------------------------------
-   🧪 DEV / HEALTH CHECK SKIPPER
------------------------------------------------------ */
-const skipLimiterForHealth = (req) => {
-  return req.originalUrl === "/" || req.originalUrl === "/health";
-};
-
-/* -----------------------------------------------------
-   🧩 WRAPPED GLOBAL LIMITER WITH SKIP
------------------------------------------------------ */
-const safeGlobalLimiter = (req, res, next) => {
-  if (skipLimiterForHealth(req)) {
-    return next();
-  }
-  return globalLimiter(req, res, next);
-};
-
-/* -----------------------------------------------------
-   📦 EXPORTS
------------------------------------------------------ */
-module.exports = {
-  globalLimiter: safeGlobalLimiter,
-  authLimiter,
-  otpLimiter,
-  searchLimiter,
-  adminLimiter,
-  keyGenerator,
-};
+/* =====================================================
+   📦 EXTENDED EXPORTS
+===================================================== */
+module.exports.burstLimiter = burstLimiter;
+module.exports.routeLimiter = routeLimiter;
+module.exports.protectedLimiter = protectedLimiter;
+module.exports.emergencyLimiter = emergencyLimiter;
+module.exports.RATE_LIMIT_CONFIG = RATE_LIMIT_CONFIG;

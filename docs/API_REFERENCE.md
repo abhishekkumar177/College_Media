@@ -1,889 +1,1513 @@
-# 🔌 College Media API Reference
+# College Media API Reference
 
-**Version:** 1.0.0  
-**Base URL:** `http://localhost:5000/api/v1`  
-**Status:** Living Document (Updated as backend is implemented)  
-**Last Updated:** January 2026  
+## Overview
 
-This comprehensive API reference documents all backend endpoints for College Media, a social media platform for college communities. It includes detailed specifications for authentication, user management, content sharing, social interactions, messaging, and real-time features.
+The College Media API is a RESTful API for the College Media social platform. It provides endpoints for user authentication, profile management, posts, messaging, live streaming, and more.
 
-## 📋 Table of Contents
+## Base URL
 
-- [Authentication](#authentication)
-- [Users](#users)
-- [Posts](#posts)
-- [Comments](#comments)
-- [Follow System](#follow-system)
-- [Messages](#messages)
-- [Notifications](#notifications)
-- [Search](#search)
-- [WebSocket Events](#websocket-events)
-- [Integration Guide](#integration-guide)
-- [Error Codes](#error-codes)
-- [Rate Limits](#rate-limits)
-- [Security Headers](#security-headers)
-- [Edge Cases](#edge-cases)
+- Development: `http://localhost:5000`
+- Production: `https://api.collegemedia.com`
 
-## 🔐 Authentication
+## Authentication
 
-All API endpoints (except registration and login) require JWT authentication via the `Authorization` header:
+All API requests require JWT authentication via Bearer token in the Authorization header.
 
 ```
-Authorization: Bearer <jwt_token>
+Authorization: Bearer <your_jwt_token>
 ```
 
-Tokens expire after 15 minutes. Use refresh tokens to obtain new access tokens.
+### Obtaining a Token
 
-### Register User
+Use the `/api/auth/login` endpoint to authenticate and receive a JWT token.
 
-**Endpoint:** `POST /auth/register`  
-**Description:** Create a new user account  
-**Auth Required:** No  
-**Rate Limit:** 10 requests per hour per IP  
+## Rate Limiting
+
+The API implements rate limiting to prevent abuse. Limits vary by endpoint:
+- Authentication endpoints: 5 requests per 15 minutes
+- General API endpoints: 100 requests per 15 minutes
+- Search endpoints: 30 requests per minute
+- Admin endpoints: 50 requests per minute
+
+Rate limit headers are included in responses:
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Remaining requests
+- `X-RateLimit-Reset`: Time when limit resets (Unix timestamp)
+
+## Response Format
+
+All responses follow a consistent format:
+
+```json
+{
+  "success": true|false,
+  "data": {},
+  "message": "Response message"
+}
+```
+
+## Error Codes
+
+- `400` - Bad Request: Invalid input data
+- `401` - Unauthorized: Missing or invalid authentication
+- `403` - Forbidden: Insufficient permissions
+- `404` - Not Found: Resource not found
+- `429` - Too Many Requests: Rate limit exceeded
+- `500` - Internal Server Error: Server error
+
+## Endpoints
+
+### Authentication
+
+#### POST /api/auth/register
+
+Register a new user account.
 
 **Request Body:**
 ```json
 {
-  "username": "john_doe",
+  "username": "johndoe",
   "email": "john@example.com",
-  "password": "securePassword123",
-  "first_name": "John",
-  "last_name": "Doe"
+  "password": "securepassword123",
+  "firstName": "John",
+  "lastName": "Doe"
 }
 ```
 
-**Response (201 Created):**
+**Response (201):**
 ```json
 {
   "success": true,
+  "message": "User registered successfully",
   "data": {
-    "id": "uuid-123",
-    "username": "john_doe",
-    "email": "john@example.com",
-    "token": "eyJhbGciOiJIUzI1NiIs...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
+    "id": "user_id"
   }
 }
 ```
 
-**cURL Example:**
-```bash
-curl -X POST http://localhost:5000/api/v1/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "john_doe",
-    "email": "john@example.com",
-    "password": "securePassword123",
-    "first_name": "John",
-    "last_name": "Doe"
-  }'
-```
+**Error Responses:**
+- `400`: User already exists or invalid data
 
-**Errors:**
-- `400 Bad Request`: Invalid input data
-- `409 Conflict`: Username or email already exists
-- `429 Too Many Requests`: Rate limit exceeded
+#### POST /api/auth/login
 
-### Login
-
-**Endpoint:** `POST /auth/login`  
-**Description:** Authenticate user and return tokens  
-**Auth Required:** No  
-**Rate Limit:** 5 requests per minute per IP  
+Authenticate user credentials.
 
 **Request Body:**
 ```json
 {
   "email": "john@example.com",
-  "password": "securePassword123"
+  "password": "securepassword123"
 }
 ```
 
-**Response (200 OK):**
+**Response (200):**
 ```json
 {
   "success": true,
+  "message": "Login successful",
   "data": {
-    "id": "uuid-123",
-    "username": "john_doe",
-    "token": "eyJhbGciOiJIUzI1NiIs...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
+    "token": "jwt_token_here"
   }
 }
 ```
 
-**cURL Example:**
-```bash
-curl -X POST http://localhost:5000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
+**Response (200) - 2FA Required:**
+```json
+{
+  "success": true,
+  "requiresTwoFactor": true,
+  "userId": "user_id"
+}
+```
+
+**Error Responses:**
+- `400`: Invalid credentials
+
+#### POST /api/auth/2fa/setup
+
+Generate 2FA setup QR code.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "secret": "base32_secret",
+  "qrCodeUrl": "otpauth://totp/..."
+}
+```
+
+#### POST /api/auth/2fa/enable
+
+Enable 2FA after verification.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "secret": "base32_secret",
+  "token": "123456"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "2FA enabled successfully",
+  "backupCodes": ["code1", "code2", ...]
+}
+```
+
+#### POST /api/auth/2fa/disable
+
+Disable 2FA.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "token": "123456"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "2FA disabled"
+}
+```
+
+#### POST /api/auth/2fa/verify-login
+
+Complete login with 2FA.
+
+**Request Body:**
+```json
+{
+  "userId": "user_id",
+  "token": "123456"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "2FA login successful",
+  "data": {
+    "token": "jwt_token_here"
+  }
+}
+```
+
+#### POST /api/auth/logout
+
+Logout current session.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+```
+
+### Users
+
+#### GET /api/users/profile
+
+Get current user profile.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "user_id",
+    "username": "johndoe",
     "email": "john@example.com",
-    "password": "securePassword123"
-  }'
+    "firstName": "John",
+    "lastName": "Doe",
+    "bio": "Computer Science student",
+    "profilePicture": "url",
+    "role": "student",
+    "isActive": true,
+    "createdAt": "2023-01-01T00:00:00.000Z"
+  }
+}
 ```
 
-**Errors:**
-- `400 Bad Request`: Invalid credentials
-- `401 Unauthorized`: Account disabled
-- `429 Too Many Requests`: Rate limit exceeded
+#### PUT /api/users/profile
 
-### Refresh Token
+Update user profile.
 
-**Endpoint:** `POST /auth/refresh`  
-**Description:** Obtain new access token using refresh token  
-**Auth Required:** No  
-**Rate Limit:** 10 requests per minute per user  
+**Headers:** Authorization required
 
 **Request Body:**
 ```json
 {
-  "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
+  "firstName": "John",
+  "lastName": "Doe",
+  "bio": "Updated bio"
 }
 ```
 
-**Response (200 OK):**
+**Response (200):**
 ```json
 {
   "success": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIs...",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIs..."
-  }
+  "message": "Profile updated successfully"
 }
 ```
 
-**Errors:**
-- `400 Bad Request`: Invalid refresh token
-- `401 Unauthorized`: Refresh token expired
+#### POST /api/users/profile-picture
 
-## 👥 Users
+Upload profile picture.
 
-### Get User Profile
+**Headers:** Authorization required
 
-**Endpoint:** `GET /users/{user_id}`  
-**Description:** Retrieve user profile information  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
-
-**Path Parameters:**
-- `user_id` (UUID): User ID  
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid-123",
-    "username": "john_doe",
-    "first_name": "John",
-    "last_name": "Doe",
-    "bio": "College student | Photography enthusiast",
-    "profile_picture_url": "https://s3.amazonaws.com/...",
-    "profile_banner_url": "https://s3.amazonaws.com/...",
-    "follower_count": 1250,
-    "following_count": 450,
-    "post_count": 87,
-    "is_verified": false,
-    "is_private": false,
-    "is_following": true,
-    "created_at": "2025-01-15T10:30:00Z"
-  }
-}
-```
-
-**cURL Example:**
-```bash
-curl -X GET http://localhost:5000/api/v1/users/uuid-123 \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
-```
-
-**Errors:**
-- `404 Not Found`: User not found
-- `403 Forbidden`: Private profile, not following
-
-### Update User Profile
-
-**Endpoint:** `PUT /users/{user_id}`  
-**Description:** Update user profile information  
-**Auth Required:** Yes (own profile only)  
-**Rate Limit:** 20 requests per minute per user  
-
-**Request Body:**
-```json
-{
-  "bio": "Updated bio",
-  "first_name": "John",
-  "last_name": "Doe"
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid-123",
-    "username": "john_doe",
-    "first_name": "John",
-    "last_name": "Doe",
-    "bio": "Updated bio",
-    "updated_at": "2025-01-15T11:00:00Z"
-  }
-}
-```
-
-**Errors:**
-- `400 Bad Request`: Invalid input data
-- `403 Forbidden`: Not authorized to update this profile
-
-### Upload Profile Picture
-
-**Endpoint:** `POST /users/{user_id}/profile-picture`  
-**Description:** Upload profile picture  
-**Auth Required:** Yes (own profile only)  
-**Rate Limit:** 5 requests per minute per user  
-**Content-Type:** multipart/form-data  
-
-**Form Data:**
-- `file`: Image file (max 5MB, formats: JPEG, PNG, WebP)  
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "profile_picture_url": "https://s3.amazonaws.com/..."
-  }
-}
-```
-
-**cURL Example:**
-```bash
-curl -X POST http://localhost:5000/api/v1/users/uuid-123/profile-picture \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
-  -F "file=@profile.jpg"
-```
-
-**Errors:**
-- `400 Bad Request`: Invalid file format or size
-- `413 Payload Too Large`: File exceeds 5MB limit
-
-### Search Users
-
-**Endpoint:** `GET /users/search`  
-**Description:** Search for users by username or name  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
-
-**Query Parameters:**
-- `q` (string): Search query (required)
-- `limit` (int): Results per page (default: 20, max: 100)
-- `offset` (int): Pagination offset (default: 0)  
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid-123",
-      "username": "john_doe",
-      "first_name": "John",
-      "last_name": "Doe",
-      "profile_picture_url": "https://...",
-      "is_following": false
-    }
-  ],
-  "pagination": {
-    "total": 50,
-    "limit": 20,
-    "offset": 0,
-    "has_more": true
-  }
-}
-```
-
-## 📝 Posts
-
-### Create Post with Media Upload
-
-**Endpoint:** `POST /posts`
-**Description:** Create a new post with media files (images/videos)
-**Auth Required:** Yes
-**Rate Limit:** 10 requests per minute per user
 **Content-Type:** multipart/form-data
 
 **Form Data:**
-- `caption` (optional, string): Post caption (max 2200 chars)
-- `media` (required, file[]): Media files (max 10 files, 10MB per file)
-- Supported formats: JPEG, PNG, GIF, WebP, MP4, MOV
+- `profilePicture`: Image file
 
-**Response (201 Created):**
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Profile picture updated successfully",
+  "data": {
+    "profilePictureUrl": "url"
+  }
+}
+```
+
+#### GET /api/users/profile/:username
+
+Get user profile by username.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `username`: Username of the user
+
+**Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": "uuid-456",
-    "author": "uuid-123",
-    "content": "Beautiful sunset at campus! 🌅",
-    "media": [
-      {
-        "url": "https://cdn.example.com/media/optimized_sunset.jpg",
-        "type": "image",
-        "filename": "optimized_sunset.jpg"
-      }
-    ],
-    "mediaCount": 1,
-    "createdAt": "2025-01-15T10:30:00Z"
+    "user": { ... },
+    "posts": [ ... ],
+    "stats": { ... }
+  }
+}
+```
+
+#### GET /api/users/profile/:username/posts
+
+Get user's posts.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `username`: Username of the user
+- `page`: Page number (optional)
+- `limit`: Items per page (optional)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "posts": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### PUT /api/users/profile/settings
+
+Update user settings.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "setting": "value"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings updated successfully"
+}
+```
+
+#### GET /api/users/profile/stats
+
+Get user statistics.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "postsCount": 10,
+    "followersCount": 50,
+    "followingCount": 30
+  }
+}
+```
+
+#### DELETE /api/users/profile-picture
+
+Delete profile picture.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Profile picture deleted successfully"
+}
+```
+
+#### GET /api/users/
+
+Get all users (Admin only).
+
+**Headers:** Authorization required
+
+**Permissions:** VIEW_USERS
+
+**Query Parameters:**
+- `page`: Page number
+- `limit`: Items per page
+- `search`: Search term
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### DELETE /api/users/:userId
+
+Delete user (Admin only).
+
+**Headers:** Authorization required
+
+**Permissions:** DELETE_USER
+
+**Parameters:**
+- `userId`: ID of user to delete
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+### Posts
+
+<!-- Add posts endpoints here -->
+
+### Messages
+
+#### POST /api/messages/
+
+Send a new message.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "receiver": "user_id",
+  "content": "Message content",
+  "messageType": "text",
+  "attachmentUrl": "url"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "message": { ... }
   },
-  "message": "Post created successfully"
+  "message": "Message sent successfully"
 }
 ```
 
-**cURL Example:**
-```bash
-curl -X POST http://localhost:5000/api/posts \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..." \
-  -F "caption=Beautiful sunset!" \
-  -F "media=@sunset.jpg"
-```
+#### GET /api/messages/conversations
 
-**Errors:**
-- `400 Bad Request`: Invalid file type, file too large, or no media provided
-- `401 Unauthorized`: Invalid or missing authentication token
-- `413 Payload Too Large`: File exceeds 10MB limit
-- `422 Unprocessable Entity`: Unsupported media format
-- `500 Internal Server Error`: Server error during upload/processing
+Get user's conversations.
 
-### Get Feed
-
-**Endpoint:** `GET /posts/feed`  
-**Description:** Get user's personalized feed  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
+**Headers:** Authorization required
 
 **Query Parameters:**
-- `limit` (int): Posts per page (default: 20, max: 50)
-- `offset` (int): Pagination offset (default: 0)  
+- `page`: Page number
+- `limit`: Items per page
 
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid-456",
-      "user": {
-        "id": "uuid-123",
-        "username": "john_doe",
-        "profile_picture_url": "https://..."
-      },
-      "caption": "Beautiful sunset at campus! 🌅",
-      "media": [
-        {
-          "media_url": "https://s3.amazonaws.com/...",
-          "media_type": "image",
-          "width": 1920,
-          "height": 1080
-        }
-      ],
-      "hashtags": ["nature", "college"],
-      "like_count": 245,
-      "comment_count": 18,
-      "is_liked": true,
-      "created_at": "2025-01-15T10:30:00Z"
-    }
-  ],
-  "pagination": {
-    "total": 5000,
-    "limit": 20,
-    "offset": 0,
-    "has_more": true
-  }
-}
-```
-
-### Get Post Details
-
-**Endpoint:** `GET /posts/{post_id}`  
-**Description:** Get detailed post information with comments  
-**Auth Required:** Yes  
-**Rate Limit:** 200 requests per minute per user  
-
-**Path Parameters:**
-- `post_id` (UUID): Post ID  
-
-**Response (200 OK):**
+**Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "id": "uuid-456",
-    "user": { /* user object */ },
-    "caption": "Beautiful sunset...",
-    "media": [ /* media array */ ],
-    "hashtags": ["nature"],
-    "like_count": 245,
-    "comment_count": 18,
-    "is_liked": true,
-    "comments": [
-      {
-        "id": "uuid-789",
-        "user": { /* user object */ },
-        "content": "Amazing!",
-        "like_count": 5,
-        "is_liked": false,
-        "created_at": "2025-01-15T10:35:00Z"
-      }
-    ],
-    "created_at": "2025-01-15T10:30:00Z"
+    "conversations": [ ... ],
+    "pagination": { ... }
   }
 }
 ```
 
-### Update Post
+#### GET /api/messages/conversation/:userId
 
-**Endpoint:** `PUT /posts/{post_id}`  
-**Description:** Update post caption  
-**Auth Required:** Yes (own post only)  
-**Rate Limit:** 20 requests per minute per user  
+Get conversation with specific user.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `userId`: User ID
+
+**Query Parameters:**
+- `page`: Page number
+- `limit`: Items per page
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "messages": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### PUT /api/messages/:messageId/read
+
+Mark message as read.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `messageId`: Message ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Message marked as read"
+}
+```
+
+#### DELETE /api/messages/:messageId
+
+Delete a message.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `messageId`: Message ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Message deleted"
+}
+```
+
+#### GET /api/messages/unread/count
+
+Get unread messages count.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "count": 5
+  }
+}
+```
+
+#### PUT /api/messages/conversation/:userId/read-all
+
+Mark all messages in conversation as read.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `userId`: User ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "All messages marked as read"
+}
+```
+
+### Search
+
+#### GET /api/search/
+
+General search.
+
+**Headers:** Optional authorization
+
+**Query Parameters:**
+- `q`: Search query
+- `type`: Search type (users, posts, etc.)
+- `page`: Page number
+- `limit`: Items per page
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "results": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/search/users
+
+Search users.
+
+**Headers:** Optional authorization
+
+**Query Parameters:**
+- `q`: Search query
+- `page`: Page number
+- `limit`: Items per page
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/search/posts
+
+Search posts.
+
+**Headers:** Optional authorization
+
+**Query Parameters:**
+- `q`: Search query
+- `page`: Page number
+- `limit`: Items per page
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "posts": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+#### GET /api/search/trending
+
+Get trending topics.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "trending": [ ... ]
+  }
+}
+```
+
+#### GET /api/search/suggestions
+
+Get search suggestions.
+
+**Query Parameters:**
+- `q`: Partial query
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "suggestions": [ ... ]
+  }
+}
+```
+
+### Notifications
+
+#### POST /api/notifications/subscribe
+
+Subscribe to push notifications.
+
+**Headers:** Authorization required
 
 **Request Body:**
 ```json
 {
-  "caption": "Updated caption"
-}
-```
-
-### Delete Post
-
-**Endpoint:** `DELETE /posts/{post_id}`  
-**Description:** Delete a post  
-**Auth Required:** Yes (own post only)  
-**Rate Limit:** 10 requests per minute per user  
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "message": "Post deleted successfully"
-}
-```
-
-### Like Post
-
-**Endpoint:** `POST /posts/{post_id}/like`  
-**Description:** Like a post  
-**Auth Required:** Yes  
-**Rate Limit:** 300 requests per minute per user  
-
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "post_id": "uuid-456",
-    "like_count": 246,
-    "is_liked": true
+  "endpoint": "push_endpoint",
+  "keys": {
+    "p256dh": "key",
+    "auth": "auth_key"
   }
 }
 ```
 
-### Unlike Post
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Subscribed to notifications"
+}
+```
 
-**Endpoint:** `DELETE /posts/{post_id}/like`  
-**Description:** Unlike a post  
-**Auth Required:** Yes  
-**Rate Limit:** 300 requests per minute per user  
+#### GET /api/notifications/
 
-## 💬 Comments
+Get user notifications.
 
-### Create Comment
+**Headers:** Authorization required
 
-**Endpoint:** `POST /posts/{post_id}/comments`  
-**Description:** Add a comment to a post  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
+**Query Parameters:**
+- `page`: Page number
+- `limit`: Items per page
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "notifications": [ ... ],
+    "pagination": { ... }
+  }
+}
+```
+
+### Upload
+
+#### POST /api/upload/
+
+Upload a file.
+
+**Headers:** Authorization required
+
+**Content-Type:** multipart/form-data
+
+**Form Data:**
+- `file`: File to upload
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "file_url"
+  }
+}
+```
+
+### Resume
+
+#### POST /api/resume/
+
+Create a resume.
+
+**Headers:** Authorization required
 
 **Request Body:**
 ```json
 {
-  "content": "Amazing photo! 📸",
-  "parent_comment_id": null
+  "title": "Resume Title",
+  "content": { ... }
 }
 ```
 
-**Response (201 Created):**
+**Response (201):**
 ```json
 {
   "success": true,
   "data": {
-    "id": "uuid-789",
-    "user": {
-      "id": "uuid-123",
-      "username": "john_doe",
-      "profile_picture_url": "https://..."
-    },
-    "content": "Amazing photo! 📸",
-    "like_count": 0,
-    "is_liked": false,
-    "created_at": "2025-01-15T10:30:00Z"
+    "resumeId": "id"
   }
 }
 ```
 
-### Get Comments
+#### GET /api/resume/feed
 
-**Endpoint:** `GET /posts/{post_id}/comments`  
-**Description:** Get comments for a post  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
+Get resume feed.
 
-**Query Parameters:**
-- `limit` (int): Comments per page (default: 20, max: 100)
-- `offset` (int): Pagination offset (default: 0)  
+**Headers:** Authorization required
 
-### Like Comment
-
-**Endpoint:** `POST /comments/{comment_id}/like`  
-**Description:** Like a comment  
-**Auth Required:** Yes  
-**Rate Limit:** 300 requests per minute per user  
-
-## 👥 Follow System
-
-### Follow User
-
-**Endpoint:** `POST /users/{user_id}/follow`  
-**Description:** Follow a user  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
-
-**Response (200 OK):**
+**Response (200):**
 ```json
 {
   "success": true,
   "data": {
-    "user_id": "uuid-456",
-    "is_following": true,
-    "follower_count": 1251
+    "resumes": [ ... ]
   }
 }
 ```
 
-### Unfollow User
+#### POST /api/resume/:id/review
 
-**Endpoint:** `DELETE /users/{user_id}/follow`  
-**Description:** Unfollow a user  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
+Review a resume.
 
-### Get Followers
+**Headers:** Authorization required
 
-**Endpoint:** `GET /users/{user_id}/followers`  
-**Description:** Get user's followers  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
-
-**Query Parameters:**
-- `limit` (int): Results per page (default: 20, max: 100)
-- `offset` (int): Pagination offset (default: 0)  
-
-## 💌 Messages
-
-### Send Message
-
-**Endpoint:** `POST /messages`  
-**Description:** Send a direct message  
-**Auth Required:** Yes  
-**Rate Limit:** 30 requests per minute per user  
+**Parameters:**
+- `id`: Resume ID
 
 **Request Body:**
 ```json
 {
-  "recipient_id": "uuid-789",
-  "content": "Hey! How's it going?"
+  "rating": 5,
+  "comment": "Great resume"
 }
 ```
 
-### Get Conversation
-
-**Endpoint:** `GET /messages/{recipient_id}`  
-**Description:** Get message history with a user  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
-
-## 🔔 Notifications
-
-### Get Notifications
-
-**Endpoint:** `GET /notifications`  
-**Description:** Get user's notifications  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
-
-**Query Parameters:**
-- `limit` (int): Notifications per page (default: 20, max: 100)
-- `offset` (int): Pagination offset (default: 0)  
-
-### Mark as Read
-
-**Endpoint:** `PUT /notifications/{notification_id}/read`  
-**Description:** Mark notification as read  
-**Auth Required:** Yes  
-**Rate Limit:** 200 requests per minute per user  
-
-## 🔍 Search
-
-### Search Posts
-
-**Endpoint:** `GET /search/posts`  
-**Description:** Search posts by content  
-**Auth Required:** Yes  
-**Rate Limit:** 50 requests per minute per user  
-
-**Query Parameters:**
-- `q` (string): Search query (required)
-- `limit` (int): Results per page (default: 20, max: 100)
-- `offset` (int): Pagination offset (default: 0)  
-
-### Trending Hashtags
-
-**Endpoint:** `GET /trending/hashtags`  
-**Description:** Get trending hashtags  
-**Auth Required:** Yes  
-**Rate Limit:** 100 requests per minute per user  
-
-**Query Parameters:**
-- `limit` (int): Results count (default: 10, max: 50)  
-
-## 🔄 WebSocket Events
-
-**WebSocket URL:** `ws://localhost:5000`  
-**Authentication:** Include JWT token in connection auth  
-
-### Connection
-
-```javascript
-const socket = io('http://localhost:5000', {
-  auth: { token: 'your_jwt_token' }
-});
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Review submitted"
+}
 ```
+
+#### POST /api/resume/generate
+
+Generate resume using AI.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "data": { ... }
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "generatedResume": { ... }
+  }
+}
+```
+
+#### POST /api/resume/enhance/:section
+
+Enhance resume section.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `section`: Section name
+
+**Request Body:**
+```json
+{
+  "content": "section content"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "enhancedContent": "enhanced content"
+  }
+}
+```
+
+#### GET /api/resume/my-resume
+
+Get user's resume.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "resume": { ... }
+  }
+}
+```
+
+#### GET /api/resume/:id/download
+
+Download resume.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `id`: Resume ID
+
+**Response (200):**
+PDF file
+
+#### POST /api/resume/ats-check
+
+Check resume ATS compatibility.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "resumeContent": "resume text"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "score": 85,
+    "suggestions": [ ... ]
+  }
+}
+```
+
+#### POST /api/resume/optimize-for-job
+
+Optimize resume for job.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "resume": { ... },
+  "jobDescription": "job desc"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "optimizedResume": { ... }
+  }
+}
+```
+
+#### POST /api/resume/extract-job-description
+
+Extract job description from PDF.
+
+**Headers:** Authorization required
+
+**Content-Type:** multipart/form-data
+
+**Form Data:**
+- `jobDescriptionPdf`: PDF file
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "extractedText": "job description text"
+  }
+}
+```
+
+#### POST /api/resume/analyze-resume-for-job
+
+Analyze resume against job.
+
+**Headers:** Authorization required
+
+**Content-Type:** multipart/form-data
+
+**Form Data:**
+- `resumePdf`: Resume PDF
+
+**Request Body (additional):**
+```json
+{
+  "jobDescription": "job desc"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "analysis": { ... }
+  }
+}
+```
+
+### Geo
+
+#### GET /api/geo/posts
+
+Get posts by location.
+
+**Headers:** Authorization required
+
+**Query Parameters:**
+- `lat`: Latitude
+- `lng`: Longitude
+- `radius`: Radius in km
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "posts": [ ... ]
+  }
+}
+```
+
+#### GET /api/geo/users
+
+Get users by location.
+
+**Headers:** Authorization required
+
+**Query Parameters:**
+- `lat`: Latitude
+- `lng`: Longitude
+- `radius`: Radius in km
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": [ ... ]
+  }
+}
+```
+
+#### POST /api/geo/location
+
+Update user location.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "lat": 37.7749,
+  "lng": -122.4194
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Location updated"
+}
+```
+
+### Keys
+
+#### POST /api/keys/upload
+
+Upload encryption keys.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "keys": [ ... ]
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Keys uploaded"
+}
+```
+
+#### GET /api/keys/fetch/:userId
+
+Fetch user's keys.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `userId`: User ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "keys": [ ... ]
+  }
+}
+```
+
+#### GET /api/keys/count
+
+Get key count.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "count": 10
+  }
+}
+```
+
+### Tutor
+
+#### POST /api/tutor/upload
+
+Upload document for tutoring.
+
+**Headers:** Authorization required
+
+**Content-Type:** multipart/form-data
+
+**Form Data:**
+- `document`: Document file
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "documentId": "id"
+  }
+}
+```
+
+#### POST /api/tutor/ask
+
+Ask a question.
+
+**Headers:** Authorization required
+
+**Request Body:**
+```json
+{
+  "question": "What is machine learning?",
+  "documentId": "optional_id"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "answer": "Machine learning is..."
+  }
+}
+```
+
+#### GET /api/tutor/documents
+
+Get user's documents.
+
+**Headers:** Authorization required
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "documents": [ ... ]
+  }
+}
+```
+
+#### DELETE /api/tutor/documents/:documentId
+
+Delete document.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `documentId`: Document ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Document deleted"
+}
+```
+
+### Alumni
+
+<!-- Add alumni endpoints here -->
+
+### Admin
+
+#### GET /api/admin/tasks
+
+Get scheduled tasks.
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_SETTINGS
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "tasks": [ ... ]
+  }
+}
+```
+
+#### POST /api/admin/tasks/:name/trigger
+
+Trigger a task.
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_SETTINGS
+
+**Parameters:**
+- `name`: Task name
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Task triggered"
+}
+```
+
+#### POST /api/admin/tasks/:name/enable
+
+Enable a task.
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_SETTINGS
+
+**Parameters:**
+- `name`: Task name
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Task enabled"
+}
+```
+
+#### POST /api/admin/tasks/:name/disable
+
+Disable a task.
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_SETTINGS
+
+**Parameters:**
+- `name`: Task name
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Task disabled"
+}
+```
+
+#### GET /api/admin/analytics/dashboard
+
+Get dashboard analytics.
+
+**Headers:** Authorization required
+
+**Permissions:** VIEW_LOGS
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "analytics": { ... }
+  }
+}
+```
+
+#### GET /api/admin/analytics/metrics
+
+Get system metrics.
+
+**Headers:** Authorization required
+
+**Permissions:** VIEW_LOGS
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "metrics": { ... }
+  }
+}
+```
+
+#### GET /api/admin/analytics/health
+
+Get system health.
+
+**Headers:** Authorization required
+
+**Permissions:** VIEW_LOGS
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "health": { ... }
+  }
+}
+```
+
+#### POST /api/admin/analytics/refresh
+
+Refresh analytics.
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_SETTINGS
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Analytics refreshed"
+}
+```
+
+### External
+
+#### GET /api/external/status
+
+Check external service status.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "status": "operational"
+  }
+}
+```
+
+### Credentials
+
+#### POST /api/credentials/mint
+
+Mint a credential (Admin only).
+
+**Headers:** Authorization required
+
+**Permissions:** MANAGE_USERS
+
+**Request Body:**
+```json
+{
+  "userId": "user_id",
+  "credentialType": "achievement",
+  "metadata": { ... }
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "credential": { ... }
+  }
+}
+```
+
+#### GET /api/credentials/verify/:address
+
+Verify credential by address.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `address`: Blockchain address
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "isValid": true,
+    "credential": { ... }
+  }
+}
+```
+
+#### GET /api/credentials/user/:address
+
+Get user's credentials.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `address`: User address
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "credentials": [ ... ]
+  }
+}
+```
+
+### Streams
+
+#### POST /api/streams/upload
+
+Upload video stream.
+
+**Headers:** Authorization required
+
+**Content-Type:** multipart/form-data
+
+**Form Data:**
+- `video`: Video file
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "videoId": "id",
+    "status": "processing"
+  }
+}
+```
+
+#### GET /api/streams/:videoId/status
+
+Get video processing status.
+
+**Headers:** Authorization required
+
+**Parameters:**
+- `videoId`: Video ID
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "status": "processing|completed|failed",
+    "progress": 50
+  }
+}
+```
+
+#### GET /api/streams/:videoId/:file
+
+Stream video file.
+
+**Parameters:**
+- `videoId`: Video ID
+- `file`: File name (e.g., "playlist.m3u8")
+
+**Response (200):**
+Video stream or playlist file
+
+## GraphQL API
+
+The API also provides a GraphQL endpoint at `/graphql` for more flexible queries.
+
+<!-- Add GraphQL schema documentation here -->
+
+## WebSocket Events
+
+The API uses Socket.IO for real-time communication.
 
 ### Events
 
-#### New Message
-```javascript
-// Receive new message
-socket.on('message:new', (data) => {
-  console.log('New message:', data);
-  // data: { id, sender_id, recipient_id, content, created_at }
-});
+- `message`: New message received
+- `notification`: New notification
+- `live-stream-started`: Live stream started
+- `live-stream-ended`: Live stream ended
 
-// Send message
-socket.emit('message:send', {
-  recipient_id: 'uuid-789',
-  content: 'Hello!'
-});
-```
+<!-- Add more WebSocket documentation here -->
 
-#### New Notification
-```javascript
-socket.on('notification:new', (data) => {
-  console.log('New notification:', data);
-  // data: { type, actor, target_type, target_id, content }
-});
-```
+## SDKs and Libraries
 
-#### User Online Status
-```javascript
-socket.on('user:online', (data) => {
-  // data: { user_id }
-});
+<!-- Add information about available SDKs -->
 
-socket.on('user:offline', (data) => {
-  // data: { user_id }
-});
-```
+## Changelog
 
-## 🔗 Integration Guide
+<!-- Add API changelog here -->
 
-### React Frontend Integration
+## Support
 
-#### Authentication Setup
-```javascript
-// Store tokens
-localStorage.setItem('token', response.data.token);
-localStorage.setItem('refresh_token', response.data.refresh_token);
-
-// API client setup
-const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api/v1',
-  headers: {
-    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    'Content-Type': 'application/json'
-  }
-});
-
-// Token refresh interceptor
-apiClient.interceptors.response.use(
-  response => response,
-  async error => {
-    if (error.response?.status === 401) {
-      const refreshToken = localStorage.getItem('refresh_token');
-      const refreshResponse = await axios.post('/auth/refresh', {
-        refresh_token: refreshToken
-      });
-      localStorage.setItem('token', refreshResponse.data.token);
-      // Retry original request
-      return apiClient(error.config);
-    }
-    return Promise.reject(error);
-  }
-);
-```
-
-#### Fetching Feed
-```javascript
-const fetchFeed = async (page = 0) => {
-  try {
-    const response = await apiClient.get('/posts/feed', {
-      params: { limit: 20, offset: page * 20 }
-    });
-    setPosts(response.data.data);
-    setHasMore(response.data.pagination.has_more);
-  } catch (error) {
-    console.error('Failed to fetch feed:', error);
-  }
-};
-```
-
-#### Creating Post with Media
-```javascript
-const createPost = async (caption, files, hashtags) => {
-  const formData = new FormData();
-  formData.append('caption', caption);
-  files.forEach(file => formData.append('media', file));
-  formData.append('hashtags', JSON.stringify(hashtags));
-
-  try {
-    const response = await apiClient.post('/posts', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    });
-    return response.data.data;
-  } catch (error) {
-    console.error('Failed to create post:', error);
-  }
-};
-```
-
-#### WebSocket Setup
-```javascript
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:5000', {
-  auth: { token: localStorage.getItem('token') }
-});
-
-// Listen for real-time updates
-socket.on('notification:new', (notification) => {
-  // Update notifications state
-  setNotifications(prev => [notification, ...prev]);
-});
-
-socket.on('message:new', (message) => {
-  // Update messages state
-  setMessages(prev => [...prev, message]);
-});
-```
-
-## ❌ Error Codes
-
-| Code | Description | Example |
-|------|-------------|---------|
-| 400 | Bad Request | Invalid input data |
-| 401 | Unauthorized | Invalid or expired token |
-| 403 | Forbidden | Insufficient permissions |
-| 404 | Not Found | Resource doesn't exist |
-| 409 | Conflict | Resource already exists |
-| 413 | Payload Too Large | File upload exceeds limits |
-| 422 | Unprocessable Entity | Validation failed |
-| 429 | Too Many Requests | Rate limit exceeded |
-| 500 | Internal Server Error | Server error |
-
-**Error Response Format:**
-```json
-{
-  "success": false,
-  "error": {
-    "code": 400,
-    "message": "Validation failed",
-    "details": {
-      "field": "email",
-      "reason": "Invalid email format"
-    }
-  }
-}
-```
-
-## ⏱️ Rate Limits
-
-- **General API:** 100 requests per minute per IP
-- **Authentication:** 5 login attempts per minute per IP
-- **Registration:** 10 requests per hour per IP
-- **File Uploads:** 5 uploads per minute per user
-- **Social Actions:** 300 likes/comments per minute per user
-
-**Rate Limit Headers:**
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1640995200
-```
-
-## 🔒 Security Headers
-
-All responses include security headers:
-
-```
-Content-Security-Policy: default-src 'self'
-X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-X-XSS-Protection: 1; mode=block
-Strict-Transport-Security: max-age=31536000; includeSubDomains
-```
-
-## ⚠️ Edge Cases
-
-### Pagination
-- Maximum `limit`: 100 items per request
-- Default `limit`: 20 items per request
-- Use `has_more` flag for infinite scrolling
-- `offset` based pagination for large datasets
-
-### Media Upload Limits
-- **Single file:** 10MB maximum
-- **Total upload:** 50MB per post
-- **File count:** Maximum 10 files per post
-- **Supported formats:** JPEG, PNG, WebP, MP4, MOV
-- **Image optimization:** Automatic resizing and compression
-
-### Private Accounts
-- Followers-only content visibility
-- Follow requests for private accounts
-- Content filtering in search results
-
-### Content Moderation
-- Caption length: 2200 characters maximum
-- Hashtag limit: 30 hashtags per post
-- Message length: 1000 characters maximum
-- Automatic content filtering (future implementation)
-
-### Data Consistency
-- Optimistic UI updates with rollback on failure
-- Real-time synchronization across devices
-- Conflict resolution for concurrent edits
-
----
-
-**Note:** This document will be updated as the backend implementation progresses. Check for the latest version before integration.
+For API support, contact support@collegemedia.com
