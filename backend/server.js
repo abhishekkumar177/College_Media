@@ -37,6 +37,7 @@ const { Server: SocketIOServer } = require("socket.io");
 const { initDB } = require("./config/db");
 const { notFound } = require("./middleware/errorMiddleware");
 const logger = require("./utils/logger");
+const liveStreamService = require("./services/liveStreamService");
 
 const resumeRoutes = require("./routes/resume");
 const uploadRoutes = require("./routes/upload");
@@ -248,6 +249,7 @@ app.use("/api/credentials", require("./routes/credentials"));
 app.use("/api/tutor", require("./routes/tutor"));
 app.use("/api/whiteboard", require("./routes/whiteboard"));
 app.use("/api/payment", require("./routes/payment"));
+app.use("/api/live", require("./routes/live"));
 app.use("/api/account", require("./routes/account"));
 
 /* ============================================================
@@ -279,6 +281,9 @@ const startServer = async () => {
     User: require("./models/User"),
     Resume: require("./models/Resume"),
   });
+
+  // Start Broadcasting Service
+  liveStreamService.start();
 
   const apolloServer = new ApolloServer({
     typeDefs,
