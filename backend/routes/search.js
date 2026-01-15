@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const SearchController = require('../controllers/searchController');
+const SearchIndexService = require('../services/searchIndexService');
 const logger = require('../utils/logger');
 const { apiLimiter } = require('../middleware/rateLimitMiddleware');
 
@@ -59,7 +60,8 @@ router.get('/', optionalAuth, async (req, res) => {
             });
         }
 
-        const results = await SearchController.searchAll(q, { limit: parseInt(limit) });
+        // Use MeiliSearch for Global Search
+        const results = await SearchIndexService.searchGlobal(q, { limit: parseInt(limit) });
 
         res.json({
             success: true,
