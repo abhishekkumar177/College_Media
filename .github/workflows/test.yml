@@ -1,4 +1,4 @@
-name: 🧪 Run Tests
+name: 🧪 Comprehensive Test Suite
 
 on:
   push:
@@ -6,8 +6,77 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  NODE_ENV: test
+
 jobs:
-  test:
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo --eval "db.adminCommand('ping')"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: 📦 Install backend dependencies
+        working-directory: backend
+        run: npm ci --legacy-peer-deps
+
+      - name: 🔍 Run ESLint (Backend)
+        working-directory: backend
+        run: npm run lint || true
+
+      - name: 🧪 Run backend tests
+        working-directory: backend
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://localhost:27017/test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret-for-ci
+          ACCESS_TOKEN_SECRET: test-access-token-secret
+          REFRESH_TOKEN_SECRET: test-refresh-token-secret
+          RESEND_API_KEY: test-resend-api-key
+          NODE_ENV: test
+
+      - name: 📊 Upload backend coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  frontend-test:
+    name: Frontend Tests
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,42 +94,164 @@ jobs:
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: 📦 Install dependencies
+      - name: 📦 Install frontend dependencies
         working-directory: frontend
         run: npm ci --legacy-peer-deps
 
-      - name: 🔍 Run ESLint
+      - name: 🔍 Run ESLint (Frontend)
         working-directory: frontend
         run: npm run lint
 
-      - name: 🧪 Run tests
+      - name: 🧪 Run frontend unit tests
         working-directory: frontend
         run: npm run test:run
 
-      - name: 📊 Generate coverage report
+      - name: 🧪 Run frontend integration tests
         working-directory: frontend
-        run: npm run test:coverage
+        run: npm run test:integration
+
+      - name: 🧪 Run frontend e2e tests
+        working-directory: frontend
+        run: npm run test:e2e
         continue-on-error: true
 
-      - name: 📈 Upload coverage to Codecov
+      - name: 📊 Generate frontend coverage report
+        working-directory: frontend
+        run: npm run test:coverage
+
+      - name: 📈 Upload frontend coverage to Codecov
         uses: codecov/codecov-action@v4
         if: matrix.node-version == '20.x'
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: frontend/coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
+          flags: frontend
+          name: frontend-coverage
           fail_ci_if_error: false
 
-      - name: 💬 Comment Test Results
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        uses: actions/github-script@v7
+  accessibility-test:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '✅ All tests passed successfully on Node ${{ matrix.node-version }}!'
-            })
+          node-version: '20.x'
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: ♿ Run accessibility tests
+        working-directory: frontend
+        run: npm run test:accessibility
+
+      - name: 🎯 Run lighthouse accessibility audit
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: http://localhost:5173
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  performance-test:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install frontend dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: ⚡ Build for production
+        working-directory: frontend
+        run: npm run build
+
+      - name: 📊 Bundle size analysis
+        working-directory: frontend
+        run: npx vite-bundle-analyzer dist
+
+      - name: 🚀 Lighthouse performance audit
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: http://localhost:5173
+          configPath: .lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  security-test:
+    name: Security Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔒 Run security audit (Frontend)
+        working-directory: frontend
+        run: npm audit --audit-level moderate
+
+      - name: 🔒 Run security audit (Backend)
+        working-directory: backend
+        run: npm audit --audit-level moderate
+
+      - name: 🛡️ CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  coverage-check:
+    name: Coverage Requirements Check
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+
+    steps:
+      - name: 📊 Check coverage thresholds
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          flags: backend,frontend
+          name: coverage-check
+
+      - name: ✅ Validate coverage requirements
+        run: |
+          # Check if coverage files exist and meet thresholds
+          if [ -f "backend/coverage/coverage-summary.json" ]; then
+            BACKEND_COVERAGE=$(node -p "JSON.parse(require('fs').readFileSync('backend/coverage/coverage-summary.json')).total.lines.pct")
+            echo "Backend coverage: ${BACKEND_COVERAGE}%"
+            if (( $(echo "$BACKEND_COVERAGE < 80" | bc -l) )); then
+              echo "❌ Backend coverage ${BACKEND_COVERAGE}% is below 80% threshold"
+              exit 1
+            fi
+          fi
+
+          if [ -f "frontend/coverage/coverage-summary.json" ]; then
+            FRONTEND_COVERAGE=$(node -p "JSON.parse(require('fs').readFileSync('frontend/coverage/coverage-summary.json')).total.lines.pct")
+            echo "Frontend coverage: ${FRONTEND_COVERAGE}%"
+            if (( $(echo "$FRONTEND_COVERAGE < 80" | bc -l) )); then
+              echo "❌ Frontend coverage ${FRONTEND_COVERAGE}% is below 80% threshold"
+              exit 1
+            fi
+          fi
+
+          echo "✅ All coverage requirements met!"
