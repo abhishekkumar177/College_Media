@@ -1,6 +1,7 @@
 /* ============================================================
    🧠 JOB STATE MACHINE
 ============================================================ */
+const JobRunner = require('./jobRunner');
 const JOB_STATES = Object.freeze({
   IDLE: "IDLE",
   RUNNING: "RUNNING",

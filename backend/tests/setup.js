@@ -12,6 +12,14 @@ jest.mock('resend', () => {
     };
 });
 
+// Mock email service functions
+jest.mock('../services/emailService', () => ({
+    sendWelcomeEmail: jest.fn().mockResolvedValue(true),
+    sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
+    sendNotificationEmail: jest.fn().mockResolvedValue(true),
+    sendPasswordResetOTP: jest.fn().mockResolvedValue(true)
+}));
+
 // Also mock the emailService explicitly if needed, but mocking resend should be enough 
 // if the service just instantiates it. 
 // However, the error happened at instantiation time in the module scope.
