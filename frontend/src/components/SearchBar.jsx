@@ -12,6 +12,13 @@ import useVoiceSearch from '../hooks/useVoiceSearch';
 import AdvancedSearchFilters from './AdvancedSearchFilters';
 import toast from 'react-hot-toast';
 
+/**
+ * Search Bar Component
+ * A search input field with magnifying glass icon for finding users and posts, including voice search and advanced filters.
+ * @param {Object} props - The component props
+ * @param {string} [props.className=''] - Additional CSS classes for styling
+ * @returns {JSX.Element} The search bar JSX element
+ */
 const SearchBar = ({ className = '' }) => {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);

@@ -2,6 +2,11 @@ import { Link, useLocation } from "react-router-dom";
 import collegeMediaLogo from "../assets/logos.png";
 import { CreditCard, FilePlus, FileSearch } from 'lucide-react';
 
+/**
+ * Left Sidebar Component
+ * Navigation sidebar with menu items for different sections of the application.
+ * @returns {JSX.Element} The left sidebar JSX element
+ */
 function LeftSidebar() {
   const location = useLocation();
   
