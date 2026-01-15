@@ -94,6 +94,10 @@ const io = new SocketIOServer(server, {
 const initWhiteboardSockets = require("./sockets/whiteboard");
 initWhiteboardSockets(io);
 
+// Initialize WebRTC Signaling
+const initSignalingSockets = require("./sockets/signaling");
+initSignalingSockets(io);
+
 if (TRUST_PROXY) app.set("trust proxy", 1);
 app.disable("x-powered-by");
 
