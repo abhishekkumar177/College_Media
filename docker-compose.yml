@@ -38,9 +38,24 @@ services:
     networks:
       - college-network
 
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: college_ipfs
+    ports:
+      - "4001:4001"
+      - "5001:5001" # API
+      - "8080:8080" # Gateway
+    volumes:
+      - ipfs_staging:/export
+      - ipfs_data:/data/ipfs
+    networks:
+      - college-network
+
 networks:
   college-network:
     driver: bridge
 
 volumes:
   meili_data:
+  ipfs_data:
+  ipfs_staging:
