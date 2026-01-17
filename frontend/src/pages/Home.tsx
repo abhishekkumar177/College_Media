@@ -225,7 +225,7 @@ const Home = () => {
                 </div>
               </div>
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200">
-                <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 w-8 h-8 bg-bg-secondary/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
@@ -243,7 +243,7 @@ const Home = () => {
           onClick={() => setActiveReelIndex(null)}
         >
           <button
-            className="absolute top-4 right-4 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white z-10"
+            className="absolute top-4 right-4 w-10 h-10 bg-bg-secondary/10 hover:bg-bg-secondary/20 rounded-full flex items-center justify-center text-white z-10"
             onClick={() => setActiveReelIndex(null)}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,7 +322,7 @@ const Home = () => {
                   }}
                   className="flex flex-col items-center gap-1"
                 >
-                  <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-bg-secondary/10 backdrop-blur-sm rounded-full flex items-center justify-center">
                     {reelsData[activeReelIndex].isLiked ? (
                       <svg className="w-7 h-7 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -341,7 +341,7 @@ const Home = () => {
                 </button>
 
                 <button className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-bg-secondary/10 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
@@ -350,7 +350,7 @@ const Home = () => {
                 </button>
 
                 <button className="flex flex-col items-center gap-1">
-                  <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-bg-secondary/10 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                     </svg>
@@ -362,7 +362,7 @@ const Home = () => {
               {activeReelIndex > 0 && (
                 <button
                   onClick={() => setActiveReelIndex(activeReelIndex - 1)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-bg-secondary/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-bg-secondary/20"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -373,7 +373,7 @@ const Home = () => {
               {activeReelIndex < reelsData.length - 1 && (
                 <button
                   onClick={() => setActiveReelIndex(activeReelIndex + 1)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-bg-secondary/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-bg-secondary/20"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

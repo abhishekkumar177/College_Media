@@ -137,3 +137,4 @@ const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({ onFilterC
 };
 
 export default AdvancedSearchFilters;
+
