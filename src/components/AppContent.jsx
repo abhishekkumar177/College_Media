@@ -1,4 +1,5 @@
 import React from 'react';
+import LazyImage from './LazyImage';
 import NotificationList from './NotificationList';
 import NotificationPreferences from './NotificationPreferences';
 
@@ -44,10 +45,11 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
                         ? "border-gradient-to-r"
                         : "border-gray-300"
                     }`}>
-                      <img
+                      <LazyImage
                         src={story.avatar}
                         alt={`${story.username}'s profile picture`}
                         className="w-full h-full rounded-full object-cover"
+                        placeholder="skeleton"
                       />
                       {index === currentStoryIndex && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" aria-hidden="true"></div>
@@ -66,11 +68,11 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
                 <article key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden mb-6" aria-labelledby={`post-${post.id}-header`}>
                   {/* ========== POST HEADER ========== */}
                   <header className="flex items-center p-4 border-b border-gray-100">
-                    <img
+                    <LazyImage
                       src={post.user.avatar}
                       alt={`${post.user.username}'s profile picture`}
                       className="w-10 h-10 rounded-full mr-3 cursor-pointer hover:scale-110 transition-transform duration-300"
-                      role="img"
+                      placeholder="skeleton"
                     />
                     <h3 id={`post-${post.id}-header`} className="font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</h3>
                     <button
@@ -85,11 +87,11 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
 
                   {/* ========== POST MEDIA ========== */}
                   <div className="w-full cursor-pointer">
-                    <img
+                    <LazyImage
                       src={post.media}
                       alt={post.caption || `Post by ${post.user.username}`}
                       className="w-full object-cover hover:opacity-95 transition-opacity duration-300"
-                      role="img"
+                      placeholder="blur"
                     />
                   </div>
 
@@ -239,10 +241,11 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
             {suggestedAccounts.map((account, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <img
+                  <LazyImage
                     src={account.avatar}
                     alt={account.username}
                     className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
+                    placeholder="skeleton"
                   />
                   <div>
                     <p className="font-medium text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">{account.username}</p>
@@ -279,10 +282,11 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
             {onlineFriends.map((friend, index) => (
               <div key={index} className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300">
                 <div className="relative">
-                  <img
+                  <LazyImage
                     src={friend.avatar}
                     alt={friend.username}
                     className="w-12 h-12 rounded-full"
+                    placeholder="skeleton"
                   />
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                 </div>

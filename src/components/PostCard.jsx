@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import LazyImage from './LazyImage';
 
 /**
  * Post Card Component
@@ -29,20 +30,19 @@ const PostCard = ({ post, onLike, isLiked = false }) => {
   return (
     <article data-testid="post-card" className="post-card" role="article" aria-labelledby={`post-${post.id}-username`}>
       <header className="post-header">
-        <img
+        <LazyImage
           src={post.user.avatar}
           alt={`${post.user.username}'s profile picture`}
           className="user-avatar"
-          role="img"
+          placeholder="skeleton"
         />
         <span id={`post-${post.id}-username`} className="username">{post.user.username}</span>
       </header>
-      <img
+      <LazyImage
         src={post.media}
         alt={post.caption || "Post media"}
         className="post-media"
-        role="img"
-        aria-describedby={`post-${post.id}-caption`}
+        placeholder="blur"
       />
       <div className="post-content">
         <p id={`post-${post.id}-caption`} className="caption">{post.caption}</p>
