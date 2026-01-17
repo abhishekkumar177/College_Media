@@ -19,28 +19,56 @@ const PostCard = ({ post, onLike, isLiked = false }) => {
     if (onLike) onLike(post.id);
   };
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleLike();
+    }
+  };
+
   return (
-    <div data-testid="post-card" className="post-card">
-      <div className="post-header">
-        <img src={post.user.avatar} alt={post.user.username} className="user-avatar" />
-        <span className="username">{post.user.username}</span>
-      </div>
-      <img src={post.media} alt="Post media" className="post-media" />
+    <article data-testid="post-card" className="post-card" role="article" aria-labelledby={`post-${post.id}-username`}>
+      <header className="post-header">
+        <img
+          src={post.user.avatar}
+          alt={`${post.user.username}'s profile picture`}
+          className="user-avatar"
+          role="img"
+        />
+        <span id={`post-${post.id}-username`} className="username">{post.user.username}</span>
+      </header>
+      <img
+        src={post.media}
+        alt={post.caption || "Post media"}
+        className="post-media"
+        role="img"
+        aria-describedby={`post-${post.id}-caption`}
+      />
       <div className="post-content">
-        <p className="caption">{post.caption}</p>
+        <p id={`post-${post.id}-caption`} className="caption">{post.caption}</p>
         <div className="post-actions">
           <button
             data-testid="like-button"
             onClick={handleLike}
+            onKeyDown={handleKeyDown}
             className={`like-button ${liked ? 'liked' : ''}`}
+            aria-label={liked ? `Unlike post by ${post.user.username}` : `Like post by ${post.user.username}`}
+            aria-pressed={liked}
+            role="button"
+            tabIndex={0}
           >
             {liked ? '❤️' : '🤍'} Like
           </button>
-          <span data-testid="like-count">{likeCount}</span>
-          <span>Comments: {post.comments}</span>
+          <span
+            data-testid="like-count"
+            aria-label={`${likeCount} likes`}
+          >
+            {likeCount}
+          </span>
+          <span aria-label={`${post.comments} comments`}>Comments: {post.comments}</span>
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

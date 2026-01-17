@@ -16,13 +16,28 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
         return (
           <div className="lg:col-span-2 space-y-6">
             {/* ========== STORIES CAROUSEL ========== */}
-            <div className="bg-white rounded-2xl shadow-sm p-4">
-              <div className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide">
+            <section className="bg-white rounded-2xl shadow-sm p-4" aria-labelledby="stories-heading">
+              <h2 id="stories-heading" className="sr-only">Stories</h2>
+              <div
+                className="flex space-x-4 overflow-x-auto pb-2 scrollbar-hide"
+                role="tablist"
+                aria-label="Stories carousel"
+              >
                 {stories.map((story, index) => (
-                  <div
+                  <button
                     key={story.id}
-                    className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-transform duration-300"
+                    className="flex-shrink-0 flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-transform duration-300 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-offset-2 rounded-lg p-2"
                     onClick={() => setCurrentStoryIndex(index)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setCurrentStoryIndex(index);
+                      }
+                    }}
+                    role="tab"
+                    aria-selected={index === currentStoryIndex}
+                    aria-label={`View story by ${story.username}${index === currentStoryIndex ? ' (currently selected)' : ''}`}
+                    tabIndex={index === currentStoryIndex ? 0 : -1}
                   >
                     <div className={`relative w-16 h-16 rounded-full border-2 transition-all duration-500 ${
                       index === currentStoryIndex
@@ -31,78 +46,97 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
                     }`}>
                       <img
                         src={story.avatar}
-                        alt={story.username}
+                        alt={`${story.username}'s profile picture`}
                         className="w-full h-full rounded-full object-cover"
                       />
                       {index === currentStoryIndex && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" aria-hidden="true"></div>
                       )}
                     </div>
                     <span className="text-xs text-gray-600 truncate w-16 text-center">{story.username}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
-            </div>
+            </section>
 
             {/* ========== POSTS FEED ========== */}
-            {posts.map((post) => (
-              <div key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-                {/* ========== POST HEADER ========== */}
-                <div className="flex items-center p-4 border-b border-gray-100">
-                  <img
-                    src={post.user.avatar}
-                    alt={post.user.username}
-                    className="w-10 h-10 rounded-full mr-3 cursor-pointer hover:scale-110 transition-transform duration-300"
-                  />
-                  <span className="font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</span>
-                  <div className="ml-auto cursor-pointer hover:text-gray-500 transition-colors duration-300">
-                    <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
-                    </svg>
+            <section aria-labelledby="posts-feed-heading">
+              <h2 id="posts-feed-heading" className="sr-only">Posts Feed</h2>
+              {posts.map((post) => (
+                <article key={post.id} className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden mb-6" aria-labelledby={`post-${post.id}-header`}>
+                  {/* ========== POST HEADER ========== */}
+                  <header className="flex items-center p-4 border-b border-gray-100">
+                    <img
+                      src={post.user.avatar}
+                      alt={`${post.user.username}'s profile picture`}
+                      className="w-10 h-10 rounded-full mr-3 cursor-pointer hover:scale-110 transition-transform duration-300"
+                      role="img"
+                    />
+                    <h3 id={`post-${post.id}-header`} className="font-semibold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors duration-300">{post.user.username}</h3>
+                    <button
+                      className="ml-auto cursor-pointer hover:text-gray-500 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 rounded p-1"
+                      aria-label="Post options"
+                    >
+                      <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                      </svg>
+                    </button>
+                  </header>
+
+                  {/* ========== POST MEDIA ========== */}
+                  <div className="w-full cursor-pointer">
+                    <img
+                      src={post.media}
+                      alt={post.caption || `Post by ${post.user.username}`}
+                      className="w-full object-cover hover:opacity-95 transition-opacity duration-300"
+                      role="img"
+                    />
                   </div>
-                </div>
 
-                {/* ========== POST MEDIA ========== */}
-                <div className="w-full cursor-pointer">
-                  <img
-                    src={post.media}
-                    alt="Post content"
-                    className="w-full object-cover hover:opacity-95 transition-opacity duration-300"
-                  />
-                </div>
-
-                {/* ========== POST INTERACTIONS ========== */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex space-x-4">
-                      {/* LIKE BUTTON */}
-                      <button
-                        onClick={() => toggleLike(post.id)}
-                        className="flex items-center space-x-1 group"
-                      >
-                        <svg
-                          className={`w-6 h-6 transition-all duration-300 ${
-                            likedPosts[post.id]
-                              ? "fill-pink-500 text-pink-500 scale-110 animate-bounce"
-                              : "text-gray-600 group-hover:text-pink-500"
-                          }`}
-                          fill={likedPosts[post.id] ? "currentColor" : "none"}
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+                  {/* ========== POST INTERACTIONS ========== */}
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex space-x-4">
+                        {/* LIKE BUTTON */}
+                        <button
+                          onClick={() => toggleLike(post.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleLike(post.id);
+                            }
+                          }}
+                          className="flex items-center space-x-1 group focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 rounded p-1"
+                          aria-label={likedPosts[post.id] ? `Unlike post by ${post.user.username}` : `Like post by ${post.user.username}`}
+                          aria-pressed={likedPosts[post.id]}
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        <span className="font-medium text-gray-700">{likedPosts[post.id] ? post.likes + 1 : post.likes}</span>
-                      </button>
+                          <svg
+                            className={`w-6 h-6 transition-all duration-300 ${
+                              likedPosts[post.id]
+                                ? "fill-pink-500 text-pink-500 scale-110 animate-bounce"
+                                : "text-gray-600 group-hover:text-pink-500"
+                            }`}
+                            fill={likedPosts[post.id] ? "currentColor" : "none"}
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                          <span className="font-medium text-gray-700" aria-live="polite">{likedPosts[post.id] ? post.likes + 1 : post.likes}</span>
+                        </button>
 
-                      {/* COMMENT BUTTON */}
-                      <button className="flex items-center space-x-1 group cursor-pointer">
-                        <svg className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        <span className="font-medium text-gray-700">{post.comments}</span>
-                      </button>
-                    </div>
+                        {/* COMMENT BUTTON */}
+                        <button
+                          className="flex items-center space-x-1 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 rounded p-1"
+                          aria-label={`Comment on post by ${post.user.username}`}
+                        >
+                          <svg className="w-6 h-6 text-gray-600 group-hover:text-blue-500 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          <span className="font-medium text-gray-700">{post.comments}</span>
+                        </button>
+                      </div>
 
                     {/* SHARE BUTTON */}
                     <button className="group cursor-pointer">

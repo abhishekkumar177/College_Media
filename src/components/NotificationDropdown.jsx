@@ -11,23 +11,37 @@ const NotificationDropdown = ({ notifications, onClose }) => {
     await markAllAsRead();
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
   return (
-    <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
+    <div
+      className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="notification-header"
+      aria-describedby="notification-description"
+      onKeyDown={handleKeyDown}
+    >
       {/* Header */}
       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-800">
-        <h3 className="font-semibold text-gray-900 dark:text-white">
+        <h3 id="notification-header" className="font-semibold text-gray-900 dark:text-white">
           Notifications
           {unreadCount > 0 && (
-            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400" aria-live="polite">
               ({unreadCount} new)
             </span>
           )}
         </h3>
-        
+
         {unreadCount > 0 && (
           <button
             onClick={handleMarkAllAsRead}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 rounded px-1"
+            aria-label="Mark all notifications as read"
           >
             Mark all as read
           </button>
