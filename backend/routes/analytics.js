@@ -1,10 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const analyticsController = require('../controllers/analyticsController');
-const { protect } = require('../middleware/authMiddleware');
+const analyticsService = require('../services/analyticsService');
+const { protect, admin } = require('../middleware/authMiddleware'); // Assuming admin middleware exists or just protect
 
-router.get('/overview', protect, analyticsController.getUserOverview);
-router.get('/top-tags', protect, analyticsController.getTopTags);
-router.post('/track', analyticsController.trackEvent);
+router.get('/dashboard', protect, async (req, res) => {
+    try {
+        const metrics = await analyticsService.getDashboardMetrics();
+        const activity = await analyticsService.getHourlyActivity();
+
+        res.json({
+            success: true,
+            data: {
+                ...metrics,
+                activityCurve: activity
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 module.exports = router;

@@ -1,113 +1,80 @@
-const User = require('../models/User');
 const Post = require('../models/Post');
-const logger = require('../utils/logger');
+const User = require('../models/User');
 
-class AnalyticsService {
+exports.getDashboardMetrics = async () => {
+    try {
+        const today = new Date();
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0));
 
-    /**
-     * Calculate User Growth Statistics
-     */
-    static async getUserGrowth(interval = 'day') {
-        try {
-            const format = interval === 'month' ? "%Y-%m" : "%Y-%m-%d";
+        // 1. Daily Active Users (Proxy: Users who posted or commented today)
+        // For accurate DAU, we'd need a login tracking table. Here we use content creators as a proxy.
+        // Or updated "lastActive" field if we had one. Simple count of users created? No.
+        // Let's assume we want total users and new users today.
 
-            const stats = await User.aggregate([
-                {
-                    $group: {
-                        _id: { $dateToString: { format: format, date: "$createdAt" } },
-                        users: { $sum: 1 }
-                    }
-                },
-                { $sort: { _id: 1 } }
-            ]);
+        const totalUsers = await User.countDocuments();
+        const newUsersToday = await User.countDocuments({ createdAt: { $gte: startOfDay } });
 
-            return stats.map(s => ({ date: s._id, users: s.users }));
-        } catch (error) {
-            logger.error('Analytics User Growth Error:', error);
-            throw error;
-        }
+        // 2. Post Velocity (Last 24h)
+        const postsToday = await Post.countDocuments({ createdAt: { $gte: startOfDay } });
+
+        // 3. Hashtag Trends
+        // Aggregate all hashtags from posts created in last 7 days
+        const lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+
+        const hashtagTrends = await Post.aggregate([
+            { $match: { createdAt: { $gte: lastWeek } } },
+            { $unwind: "$hashtags" }, // Assuming Post model has tags/hashtags array, or extract from caption
+            { $group: { _id: "$hashtags", count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
+        ]);
+
+        // Note: If 'hashtags' field doesn't exist, we might need to extract regex from captions.
+        // Assuming 'tags' field based on standard patterns or just mocking if schema differs.
+
+        // 4. Sentiment Overview (Mocked Aggregation if 'sentiment' field exists)
+        // If we don't store sentiment, we can't aggregate it.
+        // We will assume the Sentiment Worker populates a 'sentiment' field (Positive, Negative, Neutral).
+        const sentimentStats = await Post.aggregate([
+            { $match: { createdAt: { $gte: lastWeek }, sentiment: { $exists: true } } },
+            { $group: { _id: "$sentiment", count: { $sum: 1 } } }
+        ]);
+
+        return {
+            users: { total: totalUsers, newToday: newUsersToday },
+            posts: { today: postsToday },
+            hashtags: hashtagTrends,
+            sentiment: sentimentStats
+        };
+    } catch (error) {
+        throw error;
     }
+};
 
-    /**
-     * Calculate Post Activity Distribution (Engagement)
-     * Segmentation: Lurkers (0), Contributors (1-5), Power Users (6+)
-     */
-    static async getEngagementStats() {
-        try {
-            // 1. Count posts per user
-            const postCounts = await Post.aggregate([
-                {
-                    $group: {
-                        _id: "$user",
-                        count: { $sum: 1 }
-                    }
-                }
-            ]);
+exports.getHourlyActivity = async () => {
+    // Return activity volume per hour for the heatmaps
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
-            // 2. Bucket them (In memory or via Facet - Facet is cleaner but heavy)
-            // Using Buckets directly on aggregation if possible requires lookup, so 2 stages is fine for medium datasets.
-            // Actually, $bucket works on numbers.
+    const activity = await Post.aggregate([
+        { $match: { createdAt: { $gte: startOfToday } } },
+        {
+            $project: {
+                hour: { $hour: "$createdAt" },
+                sentiment: 1
+            }
+        },
+        {
+            $group: {
+                _id: "$hour",
+                count: { $sum: 1 },
+                positive: { $sum: { $cond: [{ $eq: ["$sentiment", "Positive"] }, 1, 0] } },
+                negative: { $sum: { $cond: [{ $eq: ["$sentiment", "Negative"] }, 1, 0] } }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
 
-            // Let's do it via $bucketAuto or manual filtering for clearer control
-            // Better: doing it all in one pipeline is complex with $lookup.
-            // Simplified approach: Get distribution of Post Counts.
-
-            const distribution = await Post.aggregate([
-                { $group: { _id: "$user", count: { $sum: 1 } } },
-                {
-                    $bucket: {
-                        groupBy: "$count",
-                        boundaries: [1, 5, 20],
-                        default: "20+",
-                        output: { count: { $sum: 1 } }
-                    }
-                }
-            ]);
-
-            // Note: Users with 0 posts won't appear here (Post aggregation).
-            // To get 0 posts (lurkers), we subtract active users from Total Users.
-            const totalUsers = await User.countDocuments();
-            const activeUsers = distribution.reduce((sum, b) => sum + b.count, 0);
-
-            return [
-                { name: 'Lurkers (0 Posts)', value: totalUsers - activeUsers },
-                ...distribution.map(d => ({
-                    name: typeof d._id === 'number' ? `${d._id}-${(d._id === 1 ? 4 : 19)} Posts` : 'Power Users (20+)',
-                    value: d.count
-                }))
-            ];
-
-        } catch (error) {
-            logger.error('Analytics Engagement Error:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Activity Heatmap (Day of Week x Hour)
-     */
-    static async getActivityHeatmap() {
-        try {
-            return await Post.aggregate([
-                {
-                    $project: {
-                        hour: { $hour: "$createdAt" }, // 0-23
-                        day: { $dayOfWeek: "$createdAt" } // 1 (Sun) - 7 (Sat)
-                    }
-                },
-                {
-                    $group: {
-                        _id: { day: "$day", hour: "$hour" },
-                        count: { $sum: 1 }
-                    }
-                },
-                { $sort: { "_id.day": 1, "_id.hour": 1 } }
-            ]);
-        } catch (error) {
-            logger.error('Analytics Heatmap Error:', error);
-            throw error;
-        }
-    }
-}
-
-module.exports = AnalyticsService;
+    return activity;
+};

@@ -220,6 +220,11 @@ export const credentialsApi = {
   download: (id: string) => apiClient.get(`/credentials/${id}/download`, { responseType: 'blob' }),
 };
 
+// Analytics endpoints
+export const analyticsApi = {
+  getDashboard: () => apiClient.get('/analytics/dashboard'),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -238,4 +243,5 @@ export default {
   events: eventsApi,
   careerExpo: careerExpoApi,
   credentials: credentialsApi,
+  analytics: analyticsApi,
 };

@@ -58,6 +58,7 @@ const CollabDashboard = lazy(() => import("../pages/CollabDashboard"));
 const CollabDoc = lazy(() => import("../pages/CollabDoc"));
 const EventsHub = lazy(() => import("../pages/EventsHub"));
 const CareerFair = lazy(() => import("../pages/CareerFair"));
+const CampusPulse = lazy(() => import("../pages/admin/CampusPulse"));
 const CredentialsWallet = lazy(() => import("../pages/CredentialsWallet"));
 const Verifier = lazy(() => import("../pages/Verifier"));
 const NotFound = lazy(() => import("../pages/NotFound"));
@@ -504,6 +505,15 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
           element={
             <LazyWrapper>
               <Verifier />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="admin/pulse"
+          element={
+            <LazyWrapper>
+              <CampusPulse />
             </LazyWrapper>
           }
         />
