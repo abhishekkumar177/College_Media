@@ -109,6 +109,10 @@ initNotificationSockets(io);
 const initCollabSockets = require("./sockets/collab");
 initCollabSockets(io);
 
+// Initialize Career Expo Sockets
+const initCareerExpoSockets = require("./sockets/careerExpo");
+initCareerExpoSockets(io);
+
 if (TRUST_PROXY) app.set("trust proxy", 1);
 app.disable("x-powered-by");
 

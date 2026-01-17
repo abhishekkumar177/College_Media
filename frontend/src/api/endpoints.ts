@@ -206,6 +206,13 @@ export const eventsApi = {
   verifyTicket: (token: string) => apiClient.post('/events/verify-ticket', { token }),
 };
 
+// Career Expo endpoints
+export const careerExpoApi = {
+  getBooths: () => apiClient.get('/career/booths'),
+  createBooth: (data: any) => apiClient.post('/career/booths', data),
+  getMySessions: () => apiClient.get('/career/sessions/my'),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -222,4 +229,5 @@ export default {
   marketplace: marketplaceApi,
   collab: collabApi,
   events: eventsApi,
+  careerExpo: careerExpoApi,
 };

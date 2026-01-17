@@ -1,38 +1,40 @@
 const mongoose = require('mongoose');
 
 const interviewSessionSchema = new mongoose.Schema({
-    user: {
+    booth: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CareerBooth',
+        required: true
+    },
+    interviewer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true
-    },
-    question: {
-        type: String,
         required: true
     },
-    videoUrl: {
-        type: String, // URL to the recorded answer
+    candidate: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
-    transcript: {
-        type: String
+    startTime: {
+        type: Date,
+        default: Date.now
     },
-    analysis: {
-        confidenceScore: { type: Number, min: 0, max: 100 },
-        sentiment: String, // 'Positive', 'Neutral', 'Negative'
-        pace: String, // 'Too Fast', 'Good', 'Too Slow'
-        feedback: String, // Detailed AI feedback
-        emotions: {
-            happy: Number,
-            nervous: Number,
-            neutral: Number
+    endTime: Date,
+    feedback: {
+        technicalScore: { type: Number, min: 1, max: 10 },
+        communicationScore: { type: Number, min: 1, max: 10 },
+        notes: String,
+        decision: {
+            type: String,
+            enum: ['Shortlisted', 'Rejected', 'OnHold'],
+            default: 'OnHold'
         }
     },
     status: {
         type: String,
-        enum: ['processing', 'completed', 'failed'],
-        default: 'processing'
+        enum: ['Live', 'Completed', 'Cancelled'],
+        default: 'Live'
     }
 }, {
     timestamps: true
