@@ -1,116 +1,82 @@
 const express = require('express');
 const router = express.Router();
-const web3Service = require('../services/web3Service');
-const jwt = require('jsonwebtoken');
-const { checkPermission, PERMISSIONS } = require('../middleware/rbacMiddleware');
+const Credential = require('../models/Credential');
+const blockchainService = require('../services/blockchainService');
+const { protect } = require('../middleware/authMiddleware');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'college_media_secret_key';
-
-// Auth middleware
-const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ success: false, message: 'No token' });
+// Get My Credentials
+router.get('/my', protect, async (req, res) => {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.userId = decoded.userId;
-        req.userRole = decoded.role;
-        next();
-    } catch (error) {
-        res.status(401).json({ success: false, message: 'Invalid token' });
-    }
-};
-
-/**
- * @swagger
- * /api/credentials/mint:
- *   post:
- *     summary: Mint a new certificate NFT (Admin only)
- *     tags: [Credentials]
- */
-router.post('/mint', verifyToken, checkPermission(PERMISSIONS.MANAGE_USERS), async (req, res) => {
-    try {
-        const { recipientAddress, certificateType, metadata } = req.body;
-
-        if (!recipientAddress || !certificateType) {
-            return res.status(400).json({
-                success: false,
-                message: 'Missing recipientAddress or certificateType'
-            });
-        }
-
-        // Validate certificate type
-        const validTypes = ['EVENT_ATTENDANCE', 'COURSE_COMPLETION', 'ACHIEVEMENT_BADGE', 'HONOR_ROLL'];
-        if (!validTypes.includes(certificateType)) {
-            return res.status(400).json({
-                success: false,
-                message: `Invalid type. Must be one of: ${validTypes.join(', ')}`
-            });
-        }
-
-        const result = await web3Service.mintCertificate(
-            recipientAddress,
-            certificateType,
-            metadata || {}
-        );
-
-        res.status(201).json({
-            success: true,
-            message: 'Certificate minted successfully',
-            data: result
-        });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        const credentials = await Credential.find({ recipient: req.user.id });
+        res.json({ success: true, data: credentials });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 
-/**
- * @swagger
- * /api/credentials/verify/{address}:
- *   get:
- *     summary: Verify if address has a specific certificate type
- *     tags: [Credentials]
- */
-router.get('/verify/:address', verifyToken, async (req, res) => {
+// Issue Credential (Admin/System Only - simplified for demo)
+router.post('/issue', protect, async (req, res) => {
     try {
-        const { address } = req.params;
-        const { type } = req.query;
+        const { title, description, type, metadata } = req.body;
 
-        if (!type) {
-            return res.status(400).json({ success: false, message: 'Missing type query param' });
-        }
-
-        const result = await web3Service.verifyCertificate(address, type);
-
-        res.json({
-            success: true,
-            address,
-            certificateType: type,
-            ...result
+        // Generate Merkle Proof
+        const proofData = blockchainService.issueCredential({
+            recipient: req.user.id,
+            title,
+            timestamp: Date.now()
         });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+
+        const credential = await Credential.create({
+            recipient: req.user.id,
+            title,
+            description,
+            type,
+            metadata,
+            proof: {
+                root: proofData.root,
+                targetHash: proofData.targetHash,
+                path: proofData.proof
+            }
+        });
+
+        // Set Verification URL
+        credential.verificationUrl = `${req.protocol}://${req.get('host')}/verify/${credential._id}`;
+        await credential.save();
+
+        res.status(201).json({ success: true, data: credential });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 });
 
-/**
- * @swagger
- * /api/credentials/user/{address}:
- *   get:
- *     summary: Get all certificates for a wallet address
- *     tags: [Credentials]
- */
-router.get('/user/:address', verifyToken, async (req, res) => {
+// Verify Credential (Public)
+router.get('/verify/:id', async (req, res) => {
     try {
-        const { address } = req.params;
-        const result = await web3Service.getUserCertificates(address);
+        const credential = await Credential.findById(req.params.id).populate('recipient', 'username');
+        if (!credential) return res.status(404).json({ success: false, message: 'Invalid Credential ID' });
 
-        res.json({
-            success: true,
-            address,
-            ...result
+        res.json({ success: true, valid: true, data: credential });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Download PDF
+router.get('/:id/download', protect, async (req, res) => {
+    try {
+        const credential = await Credential.findById(req.params.id).populate('recipient', 'username');
+        if (!credential) return res.status(404).json({ message: 'Not Found' });
+
+        const pdfBuffer = await blockchainService.generatePDF(credential, credential.recipient);
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="certificate-${credential._id}.pdf"`,
+            'Content-Length': pdfBuffer.length
         });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.send(pdfBuffer);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
 

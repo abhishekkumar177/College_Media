@@ -213,6 +213,13 @@ export const careerExpoApi = {
   getMySessions: () => apiClient.get('/career/sessions/my'),
 };
 
+// Credentials endpoints
+export const credentialsApi = {
+  getMy: () => apiClient.get('/credentials/my'),
+  verify: (id: string) => apiClient.get(`/credentials/verify/${id}`),
+  download: (id: string) => apiClient.get(`/credentials/${id}/download`, { responseType: 'blob' }),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -230,4 +237,5 @@ export default {
   collab: collabApi,
   events: eventsApi,
   careerExpo: careerExpoApi,
+  credentials: credentialsApi,
 };

@@ -58,6 +58,8 @@ const CollabDashboard = lazy(() => import("../pages/CollabDashboard"));
 const CollabDoc = lazy(() => import("../pages/CollabDoc"));
 const EventsHub = lazy(() => import("../pages/EventsHub"));
 const CareerFair = lazy(() => import("../pages/CareerFair"));
+const CredentialsWallet = lazy(() => import("../pages/CredentialsWallet"));
+const Verifier = lazy(() => import("../pages/Verifier"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 interface ProtectedRouteProps {
@@ -483,6 +485,25 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
           element={
             <LazyWrapper>
               <CareerFair />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="credentials"
+          element={
+            <LazyWrapper>
+              <CredentialsWallet />
+            </LazyWrapper>
+          }
+        />
+
+        {/* Public Verifier Route - Outside MainLayout? Or keep it inside for navbar */}
+        <Route
+          path="verify/:id"
+          element={
+            <LazyWrapper>
+              <Verifier />
             </LazyWrapper>
           }
         />
