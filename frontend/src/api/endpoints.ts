@@ -196,6 +196,16 @@ export const collabApi = {
   deleteDocument: (id: string) => apiClient.delete(`/collab/documents/${id}`),
 };
 
+// Events endpoints
+export const eventsApi = {
+  create: (data: any) => apiClient.post('/events', data),
+  getAll: () => apiClient.get('/events'),
+  getById: (id: string) => apiClient.get(`/events/${id}`),
+  purchaseTicket: (eventId: string, tierName: string) => apiClient.post(`/events/${eventId}/tickets`, { tierName }),
+  getMyTickets: () => apiClient.get('/events/tickets/my'),
+  verifyTicket: (token: string) => apiClient.post('/events/verify-ticket', { token }),
+};
+
 // Export all APIs
 export default {
   auth: authApi,
@@ -211,4 +221,5 @@ export default {
   collections: collectionsApi,
   marketplace: marketplaceApi,
   collab: collabApi,
+  events: eventsApi,
 };

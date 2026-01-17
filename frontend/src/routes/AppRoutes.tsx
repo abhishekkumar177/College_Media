@@ -56,6 +56,7 @@ const AlumniConnect = lazy(() => import("../pages/AlumniConnect"));
 const Marketplace = lazy(() => import("../pages/Marketplace"));
 const CollabDashboard = lazy(() => import("../pages/CollabDashboard"));
 const CollabDoc = lazy(() => import("../pages/CollabDoc"));
+const EventsHub = lazy(() => import("../pages/EventsHub"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 interface ProtectedRouteProps {
@@ -463,6 +464,15 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
           element={
             <LazyWrapper>
               <CollabDoc />
+            </LazyWrapper>
+          }
+        />
+
+        <Route
+          path="events/*"
+          element={
+            <LazyWrapper>
+              <EventsHub />
             </LazyWrapper>
           }
         />

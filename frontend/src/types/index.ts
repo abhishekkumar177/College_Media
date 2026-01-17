@@ -110,3 +110,34 @@ export interface Document {
     lastModified: string;
     createdAt: string;
 }
+
+export interface Event {
+    _id: string;
+    organizer: User;
+    title: string;
+    description: string;
+    bannerUrl?: string;
+    date: string;
+    location: string;
+    category: 'Fest' | 'Workshop' | 'Seminar' | 'Concert' | 'Competition' | 'Other';
+    ticketTiers: {
+        name: string;
+        price: number;
+        quantity: number;
+        sold: number;
+    }[];
+    aiRiskScore?: number;
+    expectedAttendance?: number;
+    createdAt: string;
+}
+
+export interface Ticket {
+    _id: string;
+    event: Event;
+    user: User | string;
+    tierName: string;
+    pricePaid: number;
+    qrCode: string; // Data URL
+    status: 'Valid' | 'Used' | 'Cancelled';
+    checkedInAt?: string;
+}
