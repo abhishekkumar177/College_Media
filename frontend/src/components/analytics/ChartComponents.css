@@ -1,0 +1,107 @@
+/**
+ * Analytics Chart Components Styles
+ */
+
+.metric-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  font-size: 24px;
+}
+
+.metric-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.metric-trend.positive {
+  color: #10b981;
+}
+
+.metric-trend.negative {
+  color: #ef4444;
+}
+
+.trend-arrow {
+  font-size: 18px;
+}
+
+.trend-value {
+  margin-left: 4px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .metric-card {
+    background: #1f2937;
+  }
+
+  .metric-title {
+    color: #9ca3af;
+  }
+
+  .metric-value {
+    color: #f3f4f6;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .metric-card {
+    padding: 16px;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .metric-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+}

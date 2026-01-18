@@ -302,6 +302,7 @@ app.use("/api/storage", require("./routes/storage"));
 app.use("/api/account", require("./routes/account"));
 app.use("/api/federated", require("./routes/federated"));
 app.use("/api/verify", require("./routes/verification"));
+app.use("/api/advanced-analytics", require("./routes/advancedAnalytics"));
 
 /* ============================================================
    ❌ ERROR HANDLING
