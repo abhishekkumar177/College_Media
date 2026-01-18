@@ -34,13 +34,33 @@ test.describe('Posts E2E', () => {
     await expect(likeButton).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('should add comment to post', async ({ page }) => {
-    await page.click('[aria-label="Comment"]').first();
+  test('should copy post link', async ({ page }) => {
+    // Mock clipboard API
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: {
+          writeText: async (text) => {
+            // Store copied text for verification
+            window.copiedText = text;
+            return Promise.resolve();
+          }
+        },
+        writable: true
+      });
+    });
 
-    await page.fill('input[placeholder*="comment"]', 'Test comment');
-    await page.press('input[placeholder*="comment"]', 'Enter');
+    // Click the post menu (three dots)
+    await page.locator('[aria-label="More options"]').first().click();
 
-    await expect(page.locator('text=Test comment')).toBeVisible();
+    // Click Copy Link option
+    await page.click('text=Copy Link');
+
+    // Verify toast notification appears
+    await expect(page.locator('text=Link copied to clipboard')).toBeVisible();
+
+    // Verify clipboard contains correct URL
+    const copiedText = await page.evaluate(() => window.copiedText);
+    expect(copiedText).toMatch(/^http:\/\/localhost:5173\/post\/\d+$/);
   });
 
   test('should scroll and load more posts', async ({ page }) => {
