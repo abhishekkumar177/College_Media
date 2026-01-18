@@ -1,12 +1,7 @@
-# SSL/HTTPS Configuration Fixes
+# TODO: Downgrade React to 18.x for Compatibility
 
-## Tasks
-- [x] Modify backend/server.js to support HTTPS server creation when SSL certs are provided
-- [x] Update frontend/nginx.conf to support HTTPS on port 443
-- [x] Add TLS configuration to k8s/ingress.yaml
-- [x] Add HTTP to HTTPS redirects in netlify.toml
-- [x] Add HTTP to HTTPS redirects in frontend/vercel.json
-- [x] Generate SSL certificates for local development (optional)
-
-## Status
-Completed
+- [x] Update "react" to "^18.2.0" in dependencies in frontend/package.json
+- [x] Update "react-dom" to "^18.2.0" in dependencies in frontend/package.json
+- [x] Update "@types/react" to "^18.2.0" in devDependencies in frontend/package.json
+- [x] Update "@types/react-dom" to "^18.2.0" in devDependencies in frontend/package.json
+- [x] Run npm install in frontend directory to update dependencies
