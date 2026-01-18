@@ -1,87 +1,21 @@
-import React, { useState, useEffect } from "react";
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { SearchProvider } from './contexts/SearchContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import AppContent from './components/AppContent';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import { SearchProvider } from "./contexts/SearchContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import AppContent from "./components/AppContent";
+import NavigationBar from "./components/NavigationBar"; // <-- adjust path if needed
 
 /**
  * App Component - Main container and state management
- *
- * Manages:
- * - Post likes state (object with postId as key)
- * - Current story carousel position
- * - Search query input
- * - Active navigation tab
- *
- * @returns {React.ReactElement} Main application layout
  */
 const App = () => {
   // ============= STATE MANAGEMENT =============
-
-  /** Track liked posts with object: { postId: boolean } */
   const [likedPosts, setLikedPosts] = useState({});
-
-  /** Current story index for carousel rotation */
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-
-  /** Search input value for finding users/posts */
   const [searchQuery, setSearchQuery] = useState("");
-
-  /** Active navigation tab name */
   const [activeTab, setActiveTab] = useState("Home");
 
   // ============= MOCK DATA - Stories =============
-
-  /**
-   * Array of story objects with user avatars
-   * Stories are displayed in a horizontal carousel with auto-scroll
-   * In production, this would be fetched from a backend API
-   */
-  const stories = [
-=======
-import React, { useState, useEffect } from "react";
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { SearchProvider } from './contexts/SearchContext';
-import { NotificationProvider } from './contexts/NotificationContext';
-import AppContent from './components/AppContent';
-
-/**
- * App Component - Main container and state management
- *
- * Manages:
- * - Post likes state (object with postId as key)
- * - Current story carousel position
- * - Search query input
- * - Active navigation tab
- *
- * @returns {React.ReactElement} Main application layout
- */
-const App = () => {
-  // ============= STATE MANAGEMENT =============
-
-  /** Track liked posts with object: { postId: boolean } */
-  const [likedPosts, setLikedPosts] = useState({});
-
-  /** Current story index for carousel rotation */
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
-
-  /** Search input value for finding users/posts */
-  const [searchQuery, setSearchQuery] = useState("");
-
-  /** Active navigation tab name */
-  const [activeTab, setActiveTab] = useState("Home");
-
-  // ============= MOCK DATA - Stories =============
-
-  /**
-   * Array of story objects with user avatars
-   * Stories are displayed in a horizontal carousel with auto-scroll
-   * In production, this would be fetched from a backend API
-   */
   const stories = [
     { id: 1, username: "user1", avatar: "https://placehold.co/100x100/FF6B6B/FFFFFF?text=U1" },
     { id: 2, username: "user2", avatar: "https://placehold.co/100x100/4ECDC4/FFFFFF?text=U2" },
@@ -93,19 +27,6 @@ const App = () => {
   ];
 
   // ============= MOCK DATA - Feed Posts =============
-
-  /**
-   * Array of post objects representing social media posts
-   * Each post contains:
-   * - id: Unique identifier
-   * - user: Author info (username, avatar)
-   * - media: Image URL for post
-   * - caption: Text content with hashtags
-   * - likes: Like count (updated when user interacts)
-   * - comments: Comment count
-   *
-   * In production, this would be fetched from a backend API
-   */
   const posts = [
     {
       id: 1,
@@ -134,12 +55,6 @@ const App = () => {
   ];
 
   // ============= MOCK DATA - Suggested Accounts =============
-
-  /**
-   * Array of recommended user accounts to follow
-   * Displayed in the right sidebar with follow button
-   * Each account has username, avatar, and follower count
-   */
   const suggestedAccounts = [
     { username: "tech_guru", avatar: "https://placehold.co/32x32/FF6B6B/FFFFFF?text=TG", followers: "1.2M" },
     { username: "art_lover", avatar: "https://placehold.co/32x32/4ECDC4/FFFFFF?text=AL", followers: "850K" },
@@ -147,16 +62,9 @@ const App = () => {
   ];
 
   // ============= MOCK DATA - Trending Content =============
-
-  /** Array of popular hashtags to display in trending section */
   const trendingHashtags = ["#photography", "#travel", "#fashion", "#food", "#art", "#fitness"];
 
   // ============= MOCK DATA - Online Friends =============
-
-  /**
-   * Array of friends currently online
-   * Displayed with green status indicator in right sidebar
-   */
   const onlineFriends = [
     { username: "friend_one", avatar: "https://placehold.co/30x30/96CEB4/FFFFFF?text=F1" },
     { username: "friend_two", avatar: "https://placehold.co/30x30/DDA0DD/FFFFFF?text=F2" },
@@ -164,14 +72,6 @@ const App = () => {
   ];
 
   // ============= MOCK DATA - Navigation Menu =============
-
-  /**
-   * Navigation menu items for left sidebar
-   * Each item has:
-   * - icon: Emoji icon for visual identification
-   * - label: Navigation label
-   * - active: Boolean indicating if currently selected
-   */
   const menuItems = [
     { icon: "🏠", label: "Home", active: activeTab === "Home" },
     { icon: "🔍", label: "Explore", active: activeTab === "Explore" },
@@ -181,26 +81,16 @@ const App = () => {
     { icon: "⚙️", label: "Settings", active: activeTab === "Settings" },
   ];
 
-  // ============= EFFECTS & EVENT HANDLERS =============
-
-  /**
-   * Auto-scroll stories carousel every 3 seconds
-   * Cycles through stories continuously for continuous viewing experience
-   * Cleanup interval on component unmount to prevent memory leaks
-   */
+  // ============= EFFECTS =============
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentStoryIndex((prev) => (prev + 1) % stories.length);
     }, 3000);
+
     return () => clearInterval(interval);
   }, [stories.length]);
 
-  /**
-   * Toggle like state for a post
-   * Updates the likedPosts object and animates the heart icon
-   *
-   * @param {number} postId - ID of the post to like/unlike
-   */
+  // ============= HANDLERS =============
   const toggleLike = (postId) => {
     setLikedPosts((prev) => ({
       ...prev,
@@ -208,65 +98,21 @@ const App = () => {
     }));
   };
 
-  /**
-   * Handle navigation tab click
-   * Updates active tab to highlight current section
-   *
-   * @param {string} tabLabel - Name of the tab (e.g., "Home", "Explore")
-   */
   const handleTabClick = (tabLabel) => {
     setActiveTab(tabLabel);
   };
 
   // ============= RENDER =============
-
   return (
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> f2c7104a5d97a14576389aa5f41db426cca6a2f4
     <SearchProvider>
       <NotificationProvider>
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-          {/* ========== NAVIGATION BAR ========== */}
-          <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-              <div className="flex items-center justify-between h-16">
-                <div className="flex-shrink-0">
-                  <div className="w-24 h-8 bg-gradient-to-r from-pink-500 via-purple-500 to-orange-400 rounded-lg flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity duration-300">
-                    <span className="text-white font-bold text-xl">InstaClone</span>
-                  </div>
-                </div>
-
-                <div className="flex-1 max-w-lg mx-8">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white transition-all duration-300"
-                    />
-                    <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <button className="p-2 rounded-full hover:bg-gray-100 transition-all duration-300">
-                    <svg className="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </nav>
+          {/* NAVIGATION BAR */}
+          <NavigationBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Main content grid: Sidebar | Feed | Right Sidebar */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-              {/* ========== LEFT SIDEBAR ========== */}
+              {/* LEFT SIDEBAR */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-24">
                   <div className="space-y-4">
@@ -288,7 +134,7 @@ const App = () => {
                 </div>
               </div>
 
-              {/* ========== CENTRAL CONTENT ========== */}
+              {/* MAIN CONTENT */}
               <AppContent
                 activeTab={activeTab}
                 stories={stories}
@@ -303,43 +149,10 @@ const App = () => {
               />
             </div>
           </div>
-
-          {/* ========== GLOBAL STYLES ========== */}
-          <style jsx global>{`
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none;
-            }
-            .scrollbar-hide {
-              -ms-overflow-style: none;
-              scrollbar-width: none;
-            }
-            .border-gradient-to-r {
-              background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
-              border: 2px solid transparent;
-              background-clip: padding-box, border-box;
-              background-origin: padding-box, border-box;
-            }
-            @keyframes bounce {
-              0%, 100% { transform: scale(1); }
-              50% { transform: scale(1.2); }
-            }
-            .animate-bounce {
-              animation: bounce 0.5s ease-in-out;
-            }
-          `}</style>
-<<<<<<< HEAD
-=======
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
-      {/* ========== NAVIGATION BAR ========== */}
-      <NavigationBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-=======
         </div>
       </NotificationProvider>
     </SearchProvider>
   );
 };
 
->>>>>>> f2c7104a5d97a14576389aa5f41db426cca6a2f4
 export default App;
