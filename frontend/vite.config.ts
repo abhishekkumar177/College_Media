@@ -15,6 +15,7 @@ export default defineConfig(({ command }) => {
       VitePWA({
         registerType: 'autoUpdate',
         workbox: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
           runtimeCaching: [
             {
@@ -24,7 +25,7 @@ export default defineConfig(({ command }) => {
                 cacheName: 'api-cache',
                 expiration: {
                   maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
                 }
               }
             }
