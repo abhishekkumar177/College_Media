@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { GraduationCap, Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { GraduationCap, Mail, Lock, Eye, EyeOff, User, Loader2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
@@ -273,9 +273,16 @@ const Signup = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#e8684a] text-white py-3 rounded-xl font-semibold hover:bg-[#d65a3d] transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#e8684a] text-white py-3 rounded-xl font-semibold hover:bg-[#d65a3d] transition shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Creating account...
+                </>
+              ) : (
+                "Create Account"
+              )}
             </button>
           </form>
 

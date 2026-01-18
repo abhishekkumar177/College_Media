@@ -7,80 +7,88 @@ import apiClient from './client';
 
 // Auth endpoints
 export const authApi = {
-  register: (data) => apiClient.post('/auth/register', data),
-  login: (data) => apiClient.post('/auth/login', data),
+  register: (data: any) => apiClient.post('/auth/register', data),
+  login: (data: any) => apiClient.post('/auth/login', data),
   logout: () => apiClient.post('/auth/logout'),
   refreshToken: () => apiClient.post('/auth/refresh'),
   getCurrentUser: () => apiClient.get('/auth/me'),
-  updateProfile: (data) => apiClient.put('/auth/profile', data),
-  changePassword: (data) => apiClient.put('/auth/password', data),
+  updateProfile: (data: any) => apiClient.put('/auth/profile', data),
+  changePassword: (data: any) => apiClient.put('/auth/password', data),
+  
+  // MFA endpoints
+  setupMFA: () => apiClient.post('/auth/2fa/setup'),
+  enableMFA: (data: { secret: string; token: string }) => apiClient.post('/auth/2fa/enable', data),
+  disableMFA: (data: { token: string }) => apiClient.post('/auth/2fa/disable', data),
+  verifyMFALogin: (data: { userId: string; token: string }) => apiClient.post('/auth/2fa/verify-login', data),
+  getMFAStatus: () => apiClient.get('/auth/2fa/status'),
+  regenerateBackupCodes: (data: { token: string }) => apiClient.post('/auth/2fa/regenerate-codes', data),
 };
 
 // Posts endpoints
 export const postsApi = {
-  getAll: (params) => apiClient.get('/posts', { params }),
-  getById: (id) => apiClient.get(`/posts/${id}`),
-  create: (data) => apiClient.post('/posts', data),
-  update: (id, data) => apiClient.put(`/posts/${id}`, data),
-  delete: (id) => apiClient.delete(`/posts/${id}`),
-  like: (id) => apiClient.post(`/posts/${id}/like`),
-  unlike: (id) => apiClient.delete(`/posts/${id}/like`),
-  getFeed: (params) => apiClient.get('/posts/feed', { params }),
-  getTrending: (params) => apiClient.get('/posts/trending', { params }),
+  getAll: (params: any) => apiClient.get('/posts', { params }),
+  getById: (id: string) => apiClient.get(`/posts/${id}`),
+  create: (data: any) => apiClient.post('/posts', data),
+  update: (id: string, data: any) => apiClient.put(`/posts/${id}`, data),
+  delete: (id: string) => apiClient.delete(`/posts/${id}`),
+  like: (id: string) => apiClient.post(`/posts/${id}/like`),
+  unlike: (id: string) => apiClient.delete(`/posts/${id}/like`),
+  getFeed: (params: any) => apiClient.get('/posts/feed', { params }),
+  getTrending: (params: any) => apiClient.get('/posts/trending', { params }),
 };
 
 // Comments endpoints
 export const commentsApi = {
-  getByPost: (postId, params) => apiClient.get(`/posts/${postId}/comments`, { params }),
-  create: (postId, data) => apiClient.post(`/posts/${postId}/comments`, data),
-  update: (commentId, data) => apiClient.put(`/comments/${commentId}`, data),
-  delete: (commentId) => apiClient.delete(`/comments/${commentId}`),
-  like: (commentId) => apiClient.post(`/comments/${commentId}/like`),
+  getByPost: (postId: string, params: any) => apiClient.get(`/posts/${postId}/comments`, { params }),
+  create: (postId: string, data: any) => apiClient.post(`/posts/${postId}/comments`, data),
+  update: (commentId: string, data: any) => apiClient.put(`/comments/${commentId}`, data),
+  delete: (commentId: string) => apiClient.delete(`/comments/${commentId}`),
+  like: (commentId: string) => apiClient.post(`/comments/${commentId}/like`),
 };
 
 // Users endpoints
 export const usersApi = {
-  getById: (id) => apiClient.get(`/users/${id}`),
-  getProfile: (username) => apiClient.get(`/users/profile/${username}`),
-  follow: (id) => apiClient.post(`/users/${id}/follow`),
-  unfollow: (id) => apiClient.delete(`/users/${id}/follow`),
-  getFollowers: (id, params) => apiClient.get(`/users/${id}/followers`, { params }),
-  getFollowing: (id, params) => apiClient.get(`/users/${id}/following`, { params }),
-  search: (query, params) => apiClient.get('/users/search', { params: { q: query, ...params } }),
+  getById: (id: string) => apiClient.get(`/users/${id}`),
+  getProfile: (username: string) => apiClient.get(`/users/profile/${username}`),
+  follow: (id: string) => apiClient.post(`/users/${id}/follow`),
+  unfollow: (id: string) => apiClient.delete(`/users/${id}/follow`),
+  getFollowers: (id: string, params: any) => apiClient.get(`/users/${id}/followers`, { params }),
+  getFollowing: (id: string, params: any) => apiClient.get(`/users/${id}/following`, { params }),
+  search: (query: string, params: any) => apiClient.get('/users/search', { params: { q: query, ...params } }),
   getBlockedUsers: () => apiClient.get('/users/blocked'),
-  blockUser: (userId) => apiClient.post(`/users/${userId}/block`),
-  unblockUser: (userId) => apiClient.delete(`/users/${userId}/block`),
-  isUserBlocked: (userId) => apiClient.get(`/users/${userId}/is-blocked`),
+  blockUser: (userId: string) => apiClient.post(`/users/${userId}/block`),
+  unblockUser: (userId: string) => apiClient.delete(`/users/${userId}/block`),
+  isUserBlocked: (userId: string) => apiClient.get(`/users/${userId}/is-blocked`),
 };
 
 // Upload endpoints
 export const uploadApi = {
-  image: (file, onProgress) => {
+  image: (file: File, onProgress?: (p: number) => void) => {
     const formData = new FormData();
     formData.append('image', file);
 
     return apiClient.post('/upload/image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      onUploadProgress: (progressEvent) => {
+      onUploadProgress: (progressEvent: any) => {
         if (onProgress) {
           const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
+            (progressEvent.loaded * 100) / (progressEvent.total || progressEvent.loaded)
           );
           onProgress(percentCompleted);
         }
       },
     });
   },
-  video: (file, onProgress) => {
+  video: (file: File, onProgress?: (p: number) => void) => {
     const formData = new FormData();
     formData.append('video', file);
 
     return apiClient.post('/upload/video', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      onUploadProgress: (progressEvent) => {
+      onUploadProgress: (progressEvent: any) => {
         if (onProgress) {
           const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
+            (progressEvent.loaded * 100) / (progressEvent.total || progressEvent.loaded)
           );
           onProgress(percentCompleted);
         }
@@ -91,45 +99,47 @@ export const uploadApi = {
 
 // Notifications endpoints
 export const notificationsApi = {
-  getAll: (params) => apiClient.get('/notifications', { params }),
-  markAsRead: (id) => apiClient.put(`/notifications/${id}/read`),
+  getAll: (params: any) => apiClient.get('/notifications', { params }),
+  markAsRead: (id: string) => apiClient.put(`/notifications/${id}/read`),
   markAllAsRead: () => apiClient.put('/notifications/read-all'),
-  delete: (id) => apiClient.delete(`/notifications/${id}`),
+  delete: (id: string) => apiClient.delete(`/notifications/${id}`),
   clearAll: () => apiClient.delete('/notifications/clear-all'),
 };
 
 // Search endpoints
 export const searchApi = {
-  search: (query, params) => apiClient.get('/search', { params: { q: query, ...params } }),
-  getSuggestions: (query) => apiClient.get('/search/suggestions', { params: { q: query } }),
+  search: (query: string, params: any) => apiClient.get('/search', { params: { q: query, ...params } }),
+  getSuggestions: (query: string) => apiClient.get('/search/suggestions', { params: { q: query } }),
   getTrending: () => apiClient.get('/search/trending'),
 };
+
 // Messages endpoints
 export const messagesApi = {
   getConversations: () => apiClient.get('/messages/conversations'),
-  getConversation: (userId) => apiClient.get(`/messages/${userId}`),
-  send: (data) => apiClient.post('/messages/send', data),
-  markAllAsRead: (userId) => apiClient.put(`/messages/read/${userId}`),
+  getConversation: (userId: string) => apiClient.get(`/messages/${userId}`),
+  send: (data: any) => apiClient.post('/messages/send', data),
+  markAllAsRead: (userId: string) => apiClient.put(`/messages/read/${userId}`),
 };
+
 // Moderation endpoints
 export const moderationApi = {
   // Submit a report (regular users)
-  submitReport: (data) => apiClient.post('/reports', data),
+  submitReport: (data: any) => apiClient.post('/reports', data),
 
   // Get all reports (admin only)
-  getReports: (params) => apiClient.get('/admin/reports', { params }),
+  getReports: (params: any) => apiClient.get('/admin/reports', { params }),
 
   // Get single report details (admin only)
-  getReportDetails: (reportId) => apiClient.get(`/admin/reports/${reportId}`),
+  getReportDetails: (reportId: string) => apiClient.get(`/admin/reports/${reportId}`),
 
   // Take action on a report (admin only)
-  takeAction: (reportId, data) => apiClient.put(`/admin/reports/${reportId}/action`, data),
+  takeAction: (reportId: string, data: any) => apiClient.put(`/admin/reports/${reportId}/action`, data),
 
   // Bulk action on multiple reports (admin only)
-  bulkAction: (data) => apiClient.post('/admin/reports/bulk-action', data),
+  bulkAction: (data: any) => apiClient.post('/admin/reports/bulk-action', data),
 
   // Submit appeal for moderation action
-  submitAppeal: (data) => apiClient.post('/appeals', data),
+  submitAppeal: (data: any) => apiClient.post('/appeals', data),
 
   // Get moderation statistics (admin only)
   getStatistics: () => apiClient.get('/admin/statistics/reports'),
@@ -137,31 +147,31 @@ export const moderationApi = {
 
 // Account endpoints
 export const accountApi = {
-  deactivateAccount: (data) => apiClient.post('/account/deactivate', data),
+  deactivateAccount: (data: any) => apiClient.post('/account/deactivate', data),
   reactivateAccount: () => apiClient.post('/account/reactivate'),
-  deleteAccount: (data) => apiClient.delete('/account', { data }),
+  deleteAccount: (data: any) => apiClient.delete('/account', { data }),
   restoreAccount: () => apiClient.post('/account/restore'),
-  permanentDelete: (data) => apiClient.delete('/account/permanent', { data }),
+  permanentDelete: (data: any) => apiClient.delete('/account/permanent', { data }),
   getDeletionStatus: () => apiClient.get('/account/deletion-status'),
   exportData: () => apiClient.post('/account/export-data'),
   getSettings: () => apiClient.get('/account/settings'),
-  updateSettings: (data) => apiClient.put('/account/settings', data),
+  updateSettings: (data: any) => apiClient.put('/account/settings', data),
   getNotificationPreferences: () => apiClient.get('/account/notification-preferences'),
-  updateNotificationPreferences: (data) => apiClient.put('/account/notification-preferences', data),
+  updateNotificationPreferences: (data: any) => apiClient.put('/account/notification-preferences', data),
   getProfileVisibility: () => apiClient.get('/account/profile-visibility'),
-  updateProfileVisibility: (data) => apiClient.put('/account/profile-visibility', data),
+  updateProfileVisibility: (data: any) => apiClient.put('/account/profile-visibility', data),
   getProfile: () => apiClient.get('/account/profile'),
-  updateProfile: (data) => apiClient.put('/account/profile', data),
+  updateProfile: (data: any) => apiClient.put('/account/profile', data),
 };
 
 // Polls endpoints
 export const pollsApi = {
-  getAll: (params) => apiClient.get('/polls', { params }),
-  getById: (id) => apiClient.get(`/polls/${id}`),
-  create: (data) => apiClient.post('/polls', data),
-  vote: (id, data) => apiClient.post(`/polls/${id}/vote`, data),
-  getResults: (id) => apiClient.get(`/polls/${id}/results`),
-  delete: (id) => apiClient.delete(`/polls/${id}`),
+  getAll: (params: any) => apiClient.get('/polls', { params }),
+  getById: (id: string) => apiClient.get(`/polls/${id}`),
+  create: (data: any) => apiClient.post('/polls', data),
+  vote: (id: string, data: any) => apiClient.post(`/polls/${id}/vote`, data),
+  getResults: (id: string) => apiClient.get(`/polls/${id}/results`),
+  delete: (id: string) => apiClient.delete(`/polls/${id}`),
 };
 
 // Collections endpoints
@@ -171,6 +181,56 @@ export const collectionsApi = {
   addPost: (collectionId: string, postId: string) => apiClient.post('/collections/add-post', { collectionId, postId }),
   removePost: (collectionId: string, postId: string) => apiClient.post('/collections/remove-post', { collectionId, postId }),
   delete: (id: string) => apiClient.delete(`/collections/${id}`),
+};
+
+// Marketplace endpoints
+export const marketplaceApi = {
+  getProducts: (params: any) => apiClient.get('/marketplace/products', { params }),
+  getProduct: (id: string) => apiClient.get(`/marketplace/products/${id}`),
+  createProduct: (data: any) => apiClient.post('/marketplace/products', data),
+  updateProduct: (id: string, data: any) => apiClient.put(`/marketplace/products/${id}`, data),
+  deleteProduct: (id: string) => apiClient.delete(`/marketplace/products/${id}`),
+  createOrder: (productId: string) => apiClient.post('/marketplace/orders', { productId }),
+  getOrders: () => apiClient.get('/marketplace/orders'),
+  createPaymentIntent: (productId: string) => apiClient.post('/payment/create-payment-intent', { productId }),
+  confirmDelivery: (orderId: string) => apiClient.post(`/payment/confirm-delivery/${orderId}`),
+};
+
+// Collab endpoints
+export const collabApi = {
+  createDocument: (data: any) => apiClient.post('/collab/documents', data),
+  getDocuments: () => apiClient.get('/collab/documents'),
+  getDocument: (id: string) => apiClient.get(`/collab/documents/${id}`),
+  deleteDocument: (id: string) => apiClient.delete(`/collab/documents/${id}`),
+};
+
+// Events endpoints
+export const eventsApi = {
+  create: (data: any) => apiClient.post('/events', data),
+  getAll: () => apiClient.get('/events'),
+  getById: (id: string) => apiClient.get(`/events/${id}`),
+  purchaseTicket: (eventId: string, tierName: string) => apiClient.post(`/events/${eventId}/tickets`, { tierName }),
+  getMyTickets: () => apiClient.get('/events/tickets/my'),
+  verifyTicket: (token: string) => apiClient.post('/events/verify-ticket', { token }),
+};
+
+// Career Expo endpoints
+export const careerExpoApi = {
+  getBooths: () => apiClient.get('/career/booths'),
+  createBooth: (data: any) => apiClient.post('/career/booths', data),
+  getMySessions: () => apiClient.get('/career/sessions/my'),
+};
+
+// Credentials endpoints
+export const credentialsApi = {
+  getMy: () => apiClient.get('/credentials/my'),
+  verify: (id: string) => apiClient.get(`/credentials/verify/${id}`),
+  download: (id: string) => apiClient.get(`/credentials/${id}/download`, { responseType: 'blob' }),
+};
+
+// Analytics endpoints
+export const analyticsApi = {
+  getDashboard: () => apiClient.get('/analytics/dashboard'),
 };
 
 // Export all APIs
@@ -186,4 +246,10 @@ export default {
   moderation: moderationApi,
   polls: pollsApi,
   collections: collectionsApi,
+  marketplace: marketplaceApi,
+  collab: collabApi,
+  events: eventsApi,
+  careerExpo: careerExpoApi,
+  credentials: credentialsApi,
+  analytics: analyticsApi,
 };

@@ -1,0 +1,377 @@
+/**
+ * Advanced Analytics Dashboard Styles
+ */
+
+.advanced-analytics-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-left h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.header-left .subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date-range-selector {
+  display: flex;
+  gap: 8px;
+  background: white;
+  padding: 4px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.date-range-selector button {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-range-selector button:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.date-range-selector button.active {
+  background: #667eea;
+  color: white;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.export-buttons button {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.export-buttons button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Real-time Banner */
+.real-time-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Navigation Tabs */
+.dashboard-nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.dashboard-nav button {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+}
+
+.dashboard-nav button:hover {
+  color: #1f2937;
+}
+
+.dashboard-nav button.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+/* Charts Grid */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 24px 0;
+}
+
+/* Widget Content */
+.widget-content {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.widget-content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 16px 0;
+}
+
+.widget-content p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Loading State */
+.analytics-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.analytics-loading p {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Error State */
+.analytics-error {
+  background: white;
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analytics-error h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ef4444;
+  margin: 0 0 16px 0;
+}
+
+.analytics-error p {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+}
+
+.analytics-error button {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.analytics-error button:hover {
+  background: #5568d3;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .advanced-analytics-dashboard {
+    background: #111827;
+  }
+
+  .header-left h1 {
+    color: #f3f4f6;
+  }
+
+  .header-left .subtitle {
+    color: #9ca3af;
+  }
+
+  .date-range-selector,
+  .export-buttons button,
+  .chart-card,
+  .widget-content {
+    background: #1f2937;
+  }
+
+  .date-range-selector button,
+  .export-buttons button {
+    color: #9ca3af;
+  }
+
+  .date-range-selector button:hover,
+  .export-buttons button:hover {
+    background: #374151;
+    color: #f3f4f6;
+  }
+
+  .dashboard-nav {
+    border-bottom-color: #374151;
+  }
+
+  .dashboard-nav button {
+    color: #9ca3af;
+  }
+
+  .dashboard-nav button:hover {
+    color: #f3f4f6;
+  }
+
+  .chart-card h3,
+  .widget-content h2 {
+    color: #f3f4f6;
+  }
+
+  .widget-content p {
+    color: #9ca3af;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .advanced-analytics-dashboard {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+  }
+
+  .header-left h1 {
+    font-size: 24px;
+  }
+
+  .header-right {
+    width: 100%;
+  }
+
+  .date-range-selector,
+  .export-buttons {
+    width: 100%;
+  }
+
+  .date-range-selector button,
+  .export-buttons button {
+    flex: 1;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-nav button {
+    white-space: nowrap;
+  }
+}

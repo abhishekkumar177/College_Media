@@ -1,6 +1,6 @@
-# Environment Setup Guide
+# Frontend Environment Setup Guide
 
-This guide provides comprehensive instructions for setting up the College Media platform in various environments, from local development to production deployment.
+This guide provides comprehensive instructions for setting up the College Media frontend application in various environments, from local development to production deployment.
 
 ## Table of Contents
 

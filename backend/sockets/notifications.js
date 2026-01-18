@@ -1,17 +1,13 @@
 /**
  * Real-time Notifications Socket Handler
+ * Enhanced with delivery tracking, read receipts, and multi-device sync
  */
-const NotificationService = require('../services/notificationService');
+
+const realtimeNotificationService = require('../services/realtimeNotificationService');
 
 module.exports = (io) => {
-    NotificationService.init(io);
-
-    // We rely on the default namespace for general notifications
-    io.on('connection', (socket) => {
-        // Users join a room named after their userId for targeted emits
-        socket.on('join_notifications', (userId) => {
-            socket.join(userId.toString());
-            console.log(`Socket ${socket.id} joined notification room: ${userId}`);
-        });
-    });
+    // Initialize realtime notification service with Socket.IO
+    realtimeNotificationService.initialize(io);
+    
+    console.log('[Notifications] Socket service initialized');
 };

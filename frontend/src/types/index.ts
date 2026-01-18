@@ -73,3 +73,71 @@ export interface Collection {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface Product {
+    _id: string;
+    seller: User;
+    title: string;
+    description: string;
+    price: number;
+    category: 'Books' | 'Electronics' | 'Dorm Essentials' | 'Clothing' | 'Services' | 'Other';
+    images: string[];
+    condition: 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
+    status: 'Available' | 'Pending' | 'Sold';
+    location: string;
+    createdAt: string;
+}
+
+export interface Order {
+    _id: string;
+    buyer: User | string;
+    seller: User | string;
+    product: Product | string;
+    amount: number;
+    currency: string;
+    status: 'Pending' | 'Paid' | 'Delivered' | 'Completed' | 'Cancelled' | 'Refunded';
+    escrowStatus: 'Held' | 'Released' | 'Refunded' | 'N/A';
+    createdAt: string;
+}
+
+export interface Document {
+    _id: string;
+    title: string;
+    owner: User | string;
+    content?: any;
+    collaborators: { user: User | string; role: 'editor' | 'viewer' }[];
+    isPublic: boolean;
+    lastModified: string;
+    createdAt: string;
+}
+
+export interface Event {
+    _id: string;
+    organizer: User;
+    title: string;
+    description: string;
+    bannerUrl?: string;
+    date: string;
+    location: string;
+    category: 'Fest' | 'Workshop' | 'Seminar' | 'Concert' | 'Competition' | 'Other';
+    ticketTiers: {
+        name: string;
+        price: number;
+        quantity: number;
+        sold: number;
+    }[];
+    aiRiskScore?: number;
+    expectedAttendance?: number;
+    createdAt: string;
+}
+
+export interface Ticket {
+    _id: string;
+    event: Event;
+    user: User | string;
+    tierName: string;
+    pricePaid: number;
+    qrCode: string; // Data URL
+    status: 'Valid' | 'Used' | 'Cancelled';
+    checkedInAt?: string;
+}

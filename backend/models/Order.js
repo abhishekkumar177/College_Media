@@ -4,8 +4,7 @@ const orderSchema = new mongoose.Schema({
     buyer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true
+        required: true
     },
     seller: {
         type: mongoose.Schema.Types.ObjectId,
@@ -21,34 +20,28 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    platformFee: {
-        type: Number,
-        default: 0
-    },
     currency: {
         type: String,
         default: 'INR'
     },
     status: {
         type: String,
-        enum: ['pending', 'paid', 'completed', 'cancelled', 'refunded'],
-        default: 'pending',
-        index: true
+        enum: ['Pending', 'Paid', 'Delivered', 'Completed', 'Cancelled', 'Refunded'],
+        default: 'Pending'
     },
-    stripePaymentIntentId: {
+    paymentIntentId: {
+        type: String // Stripe Payment Intent ID
+    },
+    paymentStatus: {
         type: String,
-        unique: true,
-        sparse: true
+        enum: ['Pending', 'Succeeded', 'Failed', 'RequiresAction'],
+        default: 'Pending'
     },
-    idempotencyKey: {
+    escrowStatus: {
         type: String,
-        unique: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    completedAt: Date
-});
+        enum: ['Held', 'Released', 'Refunded', 'N/A'],
+        default: 'N/A'
+    }
+}, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

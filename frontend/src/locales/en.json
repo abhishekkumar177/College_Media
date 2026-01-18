@@ -36,6 +36,7 @@
         "moreOptions": "More options",
         "copyLink": "Copy Link",
         "linkCopied": "Link Copied",
+        "copyLinkError": "Failed to copy link. Please try again.",
         "likeError": "Failed to update like. Please try again."
     },
     "createPost": {
@@ -119,6 +120,8 @@
         "atsResume": "ATS Resume",
         "reviewRequests": "Review Requests",
         "alumniConnect": "Alumni Connect",
+        "studyDocs": "Study Docs",
+        "marketplace": "Marketplace",
         "profile": "Profile",
         "more": "More",
         "settings": "Settings"
@@ -196,5 +199,22 @@
         "noData": "No engagement data available for this period",
         "noTags": "No tags found in your posts",
         "errorLoading": "Failed to load analytics"
+    },
+    "mentorship": {
+        "title": "Alumni Mentorship Hub",
+        "subtitle": "Connect with experienced alumni and seniors who have walked the path you're on. Get guidance, career advice, and academic support.",
+        "aiPowered": "AI-Powered Matching",
+        "searchPlaceholder": "Search by major, skills, or username...",
+        "noMatches": "No mentors found",
+        "noMatchesSub": "Try adjusting your search or filters to find more mentors.",
+        "bookingSession": "Book a Session",
+        "bookingSuccess": "Mentorship session booked successfully!",
+        "whyMentorship": "Why Get Mentored?",
+        "benefit1": "Get personalized career guidance from industry professionals.",
+        "benefit2": "Learn exactly what it takes to land internships and jobs.",
+        "benefit3": "Clear your academic doubts with subject matter experts.",
+        "ctaText": "Select a mentor from the list to view their availability and book your first session today.",
+        "selectSlot": "Select a Slot",
+        "confirmBooking": "Confirm Booking"
     }
 }

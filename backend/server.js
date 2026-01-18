@@ -22,6 +22,8 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const http = require("http");
+const https = require("https");
+const fs = require("fs");
 const os = require("os");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
@@ -67,6 +69,8 @@ const ENV = process.env.NODE_ENV || "development";
 const PORT = process.env.PORT || 5000;
 const TRUST_PROXY = process.env.TRUST_PROXY === "true";
 const METRICS_TOKEN = process.env.METRICS_TOKEN || "metrics-secret";
+const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
+const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
 
 /* ============================================================
    🛡️ CSRF CONFIG
@@ -79,7 +83,47 @@ const CSRF_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
    🚀 APP INIT
 ============================================================ */
 const app = express();
-const server = http.createServer(app);
+
+// Create HTTP or HTTPS server based on SSL configuration
+let server;
+if (SSL_KEY_PATH && SSL_CERT_PATH) {
+  if (fs.existsSync(SSL_KEY_PATH) && fs.existsSync(SSL_CERT_PATH)) {
+    try {
+      const sslOptions = {
+        key: fs.readFileSync(SSL_KEY_PATH),
+        cert: fs.readFileSync(SSL_CERT_PATH),
+      };
+      server = https.createServer(sslOptions, app);
+      logger.info("HTTPS server configured", { keyPath: SSL_KEY_PATH, certPath: SSL_CERT_PATH });
+    } catch (error) {
+      if (ENV === "production") {
+        logger.error("Failed to load SSL certificates in production", { error: error.message, keyPath: SSL_KEY_PATH, certPath: SSL_CERT_PATH });
+        throw new Error("SSL certificates are required in production but could not be loaded");
+      } else {
+        logger.warn("Failed to load SSL certificates, falling back to HTTP", { error: error.message, keyPath: SSL_KEY_PATH, certPath: SSL_CERT_PATH });
+        server = http.createServer(app);
+        logger.info("HTTP server configured (SSL certificate loading failed)");
+      }
+    }
+  } else {
+    if (ENV === "production") {
+      logger.error("SSL certificates not found in production", { keyPath: SSL_KEY_PATH, certPath: SSL_CERT_PATH });
+      throw new Error("SSL certificates are required in production but files do not exist");
+    } else {
+      logger.warn("SSL certificate files not found, falling back to HTTP", { keyPath: SSL_KEY_PATH, certPath: SSL_CERT_PATH });
+      server = http.createServer(app);
+      logger.info("HTTP server configured (SSL certificates not found)");
+    }
+  }
+} else {
+  if (ENV === "production") {
+    logger.error("SSL_KEY_PATH and SSL_CERT_PATH must be set in production");
+    throw new Error("SSL configuration is required in production");
+  } else {
+    server = http.createServer(app);
+    logger.info("HTTP server configured (SSL not configured)");
+  }
+}
 
 // Socket.io Setup
 const io = new SocketIOServer(server, {
@@ -105,16 +149,61 @@ initCodeEditorSockets(io);
 const initNotificationSockets = require("./sockets/notifications");
 initNotificationSockets(io);
 
+// Initialize Collaboration Sockets
+const initCollabSockets = require("./sockets/collab");
+initCollabSockets(io);
+
+// Initialize Career Expo Sockets
+const initCareerExpoSockets = require("./sockets/careerExpo");
+initCareerExpoSockets(io);
+
 if (TRUST_PROXY) app.set("trust proxy", 1);
 app.disable("x-powered-by");
 
 /* ============================================================
    🔐 SECURITY MIDDLEWARE
 ============================================================ */
-app.use(helmet());
+// Enhanced Helmet configuration with CSP and HSTS
+const helmetConfig = {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Adjust based on needs
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  hsts: ENV === "production" ? { maxAge: 31536000, includeSubDomains: true, preload: true } : false,
+};
+app.use(helmet(helmetConfig));
 app.use(compression());
+
+// Environment-specific CORS configuration
+let corsOrigins;
+if (ENV === "production") {
+  if (!process.env.ALLOWED_ORIGINS) {
+    throw new Error("ALLOWED_ORIGINS must be set in production environment");
+  }
+  corsOrigins = process.env.ALLOWED_ORIGINS.split(',');
+  // Validate no localhost or wildcards in production
+  corsOrigins.forEach(origin => {
+    if (origin.includes('localhost') || origin.includes('*')) {
+      throw new Error(`Invalid origin in ALLOWED_ORIGINS: ${origin}. Localhost and wildcards not allowed in production.`);
+    }
+  });
+  logger.info("CORS configured for production", { origins: corsOrigins });
+} else {
+  corsOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000', 'http://localhost:5173'];
+  logger.info("CORS configured for development", { origins: corsOrigins });
+}
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+  origin: corsOrigins,
   credentials: true
 }));
 app.use(cookieParser());
@@ -263,15 +352,21 @@ app.use("/api/notifications", require("./routes/notifications"));
 app.use("/api/credentials", require("./routes/credentials"));
 app.use("/api/tutor", require("./routes/tutor"));
 app.use("/api/whiteboard", require("./routes/whiteboard"));
+app.use("/api/collab", require("./routes/collab"));
+app.use("/api/marketplace", require("./routes/marketplace"));
 app.use("/api/payment", require("./routes/payment"));
 app.use("/api/live", require("./routes/live"));
 app.use("/api/feed", require("./routes/recommendations"));
+app.use("/api/events", require("./routes/events"));
+app.use("/api/analytics", require("./routes/analytics"));
+app.use("/api/matchmaking", require("./routes/matchmaking"));
 app.use("/api/proctoring", require("./routes/proctoring"));
 app.use("/api/interview", require("./routes/interview"));
 app.use("/api/storage", require("./routes/storage"));
 app.use("/api/account", require("./routes/account"));
 app.use("/api/federated", require("./routes/federated"));
 app.use("/api/verify", require("./routes/verification"));
+app.use("/api/advanced-analytics", require("./routes/advancedAnalytics"));
 
 /* ============================================================
    ❌ ERROR HANDLING

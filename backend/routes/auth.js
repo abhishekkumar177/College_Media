@@ -346,20 +346,45 @@ router.post("/2fa/enable", verifyToken, async (req, res, next) => {
 router.post("/2fa/disable", verifyToken, async (req, res, next) => {
   try {
     const { token } = req.body; // Require OTP to disable
-    const user = await UserMongo.findById(req.userId).select('+twoFactorSecret');
-
-    const isValid = MFAService.verifyToken(token, user.twoFactorSecret);
-    if (!isValid) return res.status(401).json({ success: false, message: "Invalid token" });
-
-    await UserMongo.findByIdAndUpdate(req.userId, {
-      twoFactorEnabled: false,
-      twoFactorSecret: undefined,
-      backupCodes: []
-    });
+    await MFAService.disableMFA(req.userId, token);
 
     res.json({ success: true, message: "2FA disabled" });
   } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+/* ============================================================
+   📊 2FA STATUS
+   ============================================================ */
+router.get("/2fa/status", verifyToken, async (req, res, next) => {
+  try {
+    const status = await MFAService.getMFAStatus(req.userId);
+
+    res.json({
+      success: true,
+      data: status
+    });
+  } catch (err) {
     next(err);
+  }
+});
+
+/* ============================================================
+   🔄 2FA REGENERATE BACKUP CODES
+   ============================================================ */
+router.post("/2fa/regenerate-codes", verifyToken, async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    const backupCodes = await MFAService.regenerateBackupCodes(req.userId, token);
+
+    res.json({
+      success: true,
+      backupCodes,
+      message: "Backup codes regenerated successfully"
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 });
 

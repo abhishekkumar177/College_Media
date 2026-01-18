@@ -8,6 +8,8 @@ import ProgressiveImage from "./ProgressiveImage";
 import useOptimisticUpdate from "../hooks/useOptimisticUpdate";
 import { Post as IPost } from "../types";
 import BookmarkButton from "./BookmarkButton";
+import { copyPostLink } from "../utils/shareUtils";
+import toast from "react-hot-toast";
 
 interface PostProps {
   post: IPost;
@@ -45,6 +47,30 @@ const Post: React.FC<PostProps> = ({
     updateLike();
   };
 
+  const handleCopyLink = async () => {
+    const success = await copyPostLink(
+      post,
+      (postId) => {
+        toast.success(t('post.linkCopied') || 'Link copied to clipboard!');
+        setShowMenu(false);
+      },
+      () => {
+        toast.error(t('post.copyLinkError') || 'Failed to copy link. Please try again.');
+      }
+    );
+
+    if (!success) {
+      // Fallback: try to copy using the old method or show error
+      try {
+        await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+        toast.success(t('post.linkCopied') || 'Link copied to clipboard!');
+        setShowMenu(false);
+      } catch (fallbackError) {
+        toast.error(t('post.copyLinkError') || 'Failed to copy link. Please try again.');
+      }
+    }
+  };
+
   return (
     <div className="bg-bg-secondary rounded-lg shadow-md overflow-hidden mb-6">
       {/* Header */}
@@ -78,6 +104,18 @@ const Post: React.FC<PostProps> = ({
                 onClick={() => setShowMenu(false)}
               />
               <div className="absolute right-0 mt-2 w-48 bg-bg-secondary rounded-lg shadow-lg border border-border py-2 z-20">
+                {/* Copy Link Option */}
+                <button
+                  onClick={handleCopyLink}
+                  className="w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-bg-tertiary transition-colors flex items-center gap-2"
+                >
+                  <FaLink className="w-4 h-4" />
+                  {t('post.copyLink') || 'Copy Link'}
+                </button>
+
+                {/* Divider */}
+                <div className="border-t border-border my-1"></div>
+
                 <ReportButton
                   contentType="post"
                   contentId={post.id}

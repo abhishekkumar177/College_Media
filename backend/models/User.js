@@ -36,10 +36,19 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, trim: true },
   profilePicture: { type: String, default: '' },
   bio: { type: String, default: '' },
+  
+  // RBAC Fields (Issue #882)
   role: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Role',
+    description: 'User role for RBAC system'
+  },
+  // Legacy role field for backward compatibility
+  legacyRole: {
     type: String,
     enum: ['user', 'moderator', 'admin'],
-    default: 'user'
+    default: 'user',
+    description: 'Legacy role field (deprecated, use role ObjectId instead)'
   },
 
   // OAuth Fields

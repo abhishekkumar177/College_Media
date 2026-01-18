@@ -1,10 +1,14 @@
-# PWA Implementation TODO
+# Backend Status Clarification - TODO
 
-- [x] Install vite-plugin-pwa dependency
-- [x] Update vite.config.js with PWA plugin configuration
-- [x] Create public/manifest.json with app metadata
-- [x] Update index.html with PWA meta tags and manifest link
-- [x] Create app icons in public/icons/ (192x192 icon exists, 512x512 icon missing - needs to be added manually)
-- [x] Run npm install to install dependencies
-- [x] Build the app to generate service worker (service worker files generated: sw.js, workbox-*.js)
-- [ ] Test offline functionality and app installation (manual testing required)
+## Tasks
+- [x] Update README.md to reflect current backend implementation status
+- [x] Add clear backend development status section
+- [x] Include backend setup instructions in README
+- [x] Update roadmap to show backend evaluation phase
+
+## Progress
+- [x] Investigate current backend code and documentation
+- [x] Update README note about backend status
+- [x] Add backend status section with what's implemented vs planned
+- [x] Add backend setup instructions
+- [x] Update future roadmap section

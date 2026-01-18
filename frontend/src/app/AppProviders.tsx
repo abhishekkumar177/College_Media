@@ -6,6 +6,7 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { ErrorProvider } from "../context/ErrorContext";
 import { SettingsProvider } from "../context/SettingsContext";
 import { ThemeProvider } from "../context/ThemeContext";
+import { PermissionProvider } from "../context/PermissionContext";
 import { Toaster } from 'react-hot-toast';
 
 interface AppProvidersProps {
@@ -18,29 +19,31 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
             <SettingsProvider>
                 <ThemeProvider>
                     <ErrorProvider>
-                        <ErrorBoundary>
-                            <Toaster
-                                position="top-right"
-                                toastOptions={{
-                                    duration: 4000,
-                                    style: { background: "#363636", color: "#fff" },
-                                    success: {
-                                        duration: 3000,
-                                        iconTheme: { primary: "#10B981", secondary: "#fff" },
-                                    },
-                                    error: {
+                        <PermissionProvider>
+                            <ErrorBoundary>
+                                <Toaster
+                                    position="top-right"
+                                    toastOptions={{
                                         duration: 4000,
-                                        iconTheme: { primary: "#EF4444", secondary: "#fff" },
-                                    },
-                                }}
-                            />
-                            <BackButton />
+                                        style: { background: "#363636", color: "#fff" },
+                                        success: {
+                                            duration: 3000,
+                                            iconTheme: { primary: "#10B981", secondary: "#fff" },
+                                        },
+                                        error: {
+                                            duration: 4000,
+                                            iconTheme: { primary: "#EF4444", secondary: "#fff" },
+                                        },
+                                    }}
+                                />
+                                <BackButton />
 
-                            {children}
+                                {children}
 
-                            <InstallPWA />
-                            <OfflineIndicator />
-                        </ErrorBoundary>
+                                <InstallPWA />
+                                <OfflineIndicator />
+                            </ErrorBoundary>
+                        </PermissionProvider>
                     </ErrorProvider>
                 </ThemeProvider>
             </SettingsProvider>

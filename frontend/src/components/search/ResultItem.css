@@ -1,0 +1,158 @@
+.result-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.result-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
+}
+
+.result-item.result-post {
+  border-left: 4px solid #667eea;
+}
+
+.result-item.result-user {
+  border-left: 4px solid #50c878;
+}
+
+.result-item.result-event {
+  border-left: 4px solid #ffa500;
+}
+
+.result-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.result-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  font-size: 1.5rem;
+}
+
+.result-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verified-badge {
+  color: #50c878;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.result-username {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.result-description {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.meta-author,
+.meta-creator,
+.meta-date,
+.meta-location,
+.meta-score {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.meta-score {
+  background: #f0f4ff;
+  color: #667eea;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .result-item {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .result-icon,
+  .result-avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  .result-title {
+    font-size: 0.95rem;
+  }
+
+  .result-description {
+    font-size: 0.85rem;
+  }
+
+  .result-meta {
+    font-size: 0.75rem;
+    gap: 0.75rem;
+  }
+}

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const crypto = require('crypto');
 const RefreshToken = require("../models/RefreshToken");
+const MFAService = require("../services/mfaService");
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -45,7 +46,7 @@ exports.register = async (req, res) => {
 };
 
 /**
- * LOGIN
+ * LOGIN - Updated for MFA support
  */
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -77,7 +78,266 @@ exports.login = async (req, res) => {
 
     await user.resetLoginAttempts();
 
+    // Check if MFA is enabled
+    if (user.twoFactorEnabled) {
+      return res.json({
+        success: true,
+        requiresMFA: true,
+        userId: user._id,
+        message: "MFA verification required",
+      });
+    }
+
+    // Normal login flow (no MFA)
     const accessToken = generateAccessToken({
+      userId: user._id,
+      role: user.role,
+      mfaVerified: false,
+    });
+
+    const refreshToken = await generateRefreshToken(user._id);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "strict",
+    });
+
+    res.json({
+      success: true,
+      accessToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        mfaEnabled: false,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * VERIFY MFA - Complete login with MFA token
+ */
+exports.verifyMFA = async (req, res) => {
+  const { userId, token } = req.body;
+
+  try {
+    if (!userId || !token) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID and token are required",
+      });
+    }
+
+    const user = await User.findById(userId).select('+twoFactorSecret +backupCodes');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (!user.twoFactorEnabled) {
+      return res.status(400).json({
+        success: false,
+        message: "MFA is not enabled for this user",
+      });
+    }
+
+    // Authenticate with MFA service
+    const isAuthenticated = await MFAService.authenticate(user, token);
+
+    if (!isAuthenticated) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid MFA code",
+      });
+    }
+
+    // Generate tokens with MFA verified flag
+    const accessToken = generateAccessToken({
+      userId: user._id,
+      role: user.role,
+      mfaVerified: true,
+    });
+
+    const refreshToken = await generateRefreshToken(user._id);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: "strict",
+    });
+
+    res.json({
+      success: true,
+      accessToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        mfaEnabled: true,
+      },
+      message: "MFA verification successful",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * SETUP MFA - Generate QR code
+ */
+exports.setupMFA = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.userId;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate secret and QR code
+    const { secret, qrCodeUrl } = await MFAService.generateSecret(userId, user.email);
+
+    res.json({
+      success: true,
+      secret,
+      qrCodeUrl,
+      message: "Scan QR code with your authenticator app",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * ENABLE MFA - Verify and save
+ */
+exports.enableMFA = async (req, res) => {
+  try {
+    const { secret, token } = req.body;
+    const userId = req.user?.id || req.userId;
+
+    if (!secret || !token) {
+      return res.status(400).json({
+        success: false,
+        message: "Secret and verification token are required",
+      });
+    }
+
+    const { backupCodes } = await MFAService.enableMFA(userId, secret, token);
+
+    res.json({
+      success: true,
+      backupCodes,
+      message: "MFA enabled successfully. Save your backup codes in a safe place!",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * DISABLE MFA
+ */
+exports.disableMFA = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const userId = req.user?.id || req.userId;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token is required",
+      });
+    }
+
+    await MFAService.disableMFA(userId, token);
+
+    res.json({
+      success: true,
+      message: "MFA disabled successfully",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * GET MFA STATUS
+ */
+exports.getMFAStatus = async (req, res) => {
+  try {
+    const userId = req.user?.id || req.userId;
+
+    const status = await MFAService.getMFAStatus(userId);
+
+    res.json({
+      success: true,
+      data: status,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+/**
+ * REGENERATE BACKUP CODES
+ */
+exports.regenerateBackupCodes = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const userId = req.user?.id || req.userId;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Verification token is required",
+      });
+    }
+
+    const backupCodes = await MFAService.regenerateBackupCodes(userId, token);
+
+    res.json({
+      success: true,
+      backupCodes,
+      message: "Backup codes regenerated successfully",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
       userId: user._id,
       role: user.role,
     });

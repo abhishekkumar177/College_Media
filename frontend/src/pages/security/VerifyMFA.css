@@ -1,0 +1,218 @@
+.verify-mfa-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.verify-mfa-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  max-width: 450px;
+  width: 100%;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.icon-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.lock-icon {
+  font-size: 4rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.verify-mfa-card h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.description {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.alert-error {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+  text-align: center;
+}
+
+.verification-form {
+  margin-bottom: 1.5rem;
+}
+
+.input-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.code-input {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.8rem;
+  text-align: center;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  letter-spacing: 0.5rem;
+  font-family: 'Courier New', monospace;
+  transition: all 0.3s;
+  background: #f8f9fa;
+}
+
+.code-input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.code-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.alternative-options {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #e9ecef;
+}
+
+.back-to-login {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.3s;
+  padding: 0.5rem;
+}
+
+.link-button:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.help-text {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.help-text p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.help-text strong {
+  color: #333;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .verify-mfa-container {
+    padding: 1rem;
+  }
+
+  .verify-mfa-card {
+    padding: 2rem;
+  }
+
+  .verify-mfa-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .code-input {
+    font-size: 1.5rem;
+    padding: 1rem;
+  }
+
+  .lock-icon {
+    font-size: 3rem;
+  }
+}

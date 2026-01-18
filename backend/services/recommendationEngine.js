@@ -1,192 +1,424 @@
-const InteractionGraph = require('../models/InteractionGraph');
-const Post = require('../models/Post');
-const User = require('../models/User');
-const logger = require('../utils/logger');
+/**
+ * Recommendation Engine
+ * Issue #921: AI-Powered Content Recommendation Engine
+ * 
+ * Hybrid recommendation system combining multiple approaches.
+ */
 
-// Interaction Weights
-const WEIGHTS = {
-    VIEW: 1,
-    CLICK: 2,
-    LIKE: 5,
-    COMMENT: 8,
-    SHARE: 10,
-    FOLLOW: 5
-};
+const RecommendationScore = require('../models/RecommendationScore');
+const UserInteraction = require('../models/UserInteraction');
+const collaborativeFilteringService = require('./collaborativeFilteringService');
+const contentBasedFilteringService = require('./contentBasedFilteringService');
 
 class RecommendationEngine {
 
-    /**
-     * Track an interaction in the graph
-     * @param {string} userId - Who performed the action
-     * @param {string} targetId - Post/User ID
-     * @param {string} targetModel - 'Post' or 'User'
-     * @param {string} type - 'LIKE', 'VIEW', etc.
-     */
-    static async trackInteraction(userId, targetId, targetModel, type) {
-        try {
-            const weight = WEIGHTS[type] || 1;
+    constructor() {
+        // Algorithm weights
+        this.weights = {
+            collaborative: 0.4,
+            contentBased: 0.3,
+            popularity: 0.2,
+            recency: 0.1
+        };
 
-            // Upsert the interaction edge
-            await InteractionGraph.findOneAndUpdate(
-                { source: userId, target: targetId, type },
-                {
-                    source: userId,
-                    target: targetId,
-                    targetModel,
-                    type,
-                    weight,
-                    createdAt: new Date() // Reset expiry on new interaction
-                },
-                { upsert: true, new: true }
+        // Cache for frequent requests
+        this.recommendationCache = new Map();
+        this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    }
+
+    /**
+     * Get personalized recommendations
+     */
+    async getRecommendations(userId, options = {}) {
+        const {
+            type = 'post',
+            limit = 20,
+            includeExplanations = true,
+            minScore = 0.1
+        } = options;
+
+        try {
+            // Check cache
+            const cacheKey = `${userId}_${type}_${limit}`;
+            const cached = this.recommendationCache.get(cacheKey);
+
+            if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+                return cached.recommendations;
+            }
+
+            // Get recommendations from each algorithm
+            const [collaborative, contentBased, trending] = await Promise.all([
+                this.getCollaborativeRecommendations(userId, type, limit * 2),
+                this.getContentBasedRecommendations(userId, type, limit * 2),
+                this.getTrendingRecommendations(type, limit)
+            ]);
+
+            // Merge and score recommendations
+            const merged = this.mergeRecommendations(
+                collaborative,
+                contentBased,
+                trending,
+                userId
             );
+
+            // Apply diversity
+            const diversified = this.applyDiversity(merged, limit);
+
+            // Filter by minimum score
+            const filtered = diversified.filter(r => r.finalScore >= minScore);
+
+            // Add explanations if requested
+            const recommendations = includeExplanations
+                ? filtered.map(r => this.addExplanation(r))
+                : filtered;
+
+            // Cache results
+            this.recommendationCache.set(cacheKey, {
+                recommendations,
+                timestamp: Date.now()
+            });
+
+            // Store recommendations for metrics
+            await this.storeRecommendations(userId, type, recommendations);
+
+            return recommendations;
         } catch (error) {
-            logger.error('Error tracking interaction:', error);
+            console.error('[RecommendationEngine] Error:', error);
+            return [];
         }
     }
 
     /**
-     * Get Content-Based + Collaborative Filtering Recommendations
-     * Strategy:
-     * 1. Find users similar to current user (users who liked same posts).
-     * 2. Find posts those similar users liked, that current user hasn't seen.
-     * 3. Boost by recency and weight.
+     * Get collaborative filtering recommendations
      */
-    static async getFeedRecommendations(userId, limit = 20) {
+    async getCollaborativeRecommendations(userId, type, limit) {
+        return collaborativeFilteringService.getRecommendations(userId, type, limit);
+    }
+
+    /**
+     * Get content-based recommendations
+     */
+    async getContentBasedRecommendations(userId, type, limit) {
         try {
-            // Step 1: Find items (Posts) the user has interacted with tightly (Liked/Commented)
-            const userInteractions = await InteractionGraph.find({
-                source: userId,
-                type: { $in: ['LIKE', 'COMMENT', 'SHARE'] },
-                targetModel: 'Post'
-            }).select('target');
+            // Get user's liked posts
+            const likedPosts = await this.getUserLikedItems(userId, type);
 
-            const likedPostIds = userInteractions.map(i => i.target);
+            if (likedPosts.length === 0) {
+                return [];
+            }
 
-            // Step 2: Collaborative Filtering Aggregation
-            // "Users who liked what I liked, also liked..."
-            const recommendations = await InteractionGraph.aggregate([
-                // Match interactions on posts I liked (find similar users)
+            // Get candidate posts (simplified - would query posts collection)
+            const candidatePosts = await this.getCandidatePosts(userId, type, limit * 3);
+
+            return contentBasedFilteringService.getRecommendations(
+                userId,
+                likedPosts,
+                candidatePosts,
+                limit
+            );
+        } catch (error) {
+            console.error('[RecommendationEngine] Content-based error:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get trending recommendations
+     */
+    async getTrendingRecommendations(type, limit) {
+        try {
+            const trending = await UserInteraction.getTrendingItems(type, 24, limit);
+
+            return trending.map(item => ({
+                itemId: item.itemId,
+                score: item.trendScore / 100, // Normalize
+                reason: 'trending',
+                trendData: {
+                    interactions: item.interactionCount,
+                    uniqueUsers: item.uniqueUsers
+                }
+            }));
+        } catch (error) {
+            console.error('[RecommendationEngine] Trending error:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Merge recommendations from different sources
+     */
+    mergeRecommendations(collaborative, contentBased, trending, userId) {
+        const scoreMap = new Map();
+
+        // Add collaborative scores
+        for (const rec of collaborative) {
+            const key = rec.itemId.toString();
+            scoreMap.set(key, {
+                itemId: rec.itemId,
+                scores: {
+                    collaborative: rec.score * this.weights.collaborative,
+                    contentBased: 0,
+                    popularity: 0,
+                    recency: 0
+                },
+                reasons: [rec.reason],
+                metadata: rec
+            });
+        }
+
+        // Add content-based scores
+        for (const rec of contentBased) {
+            const key = rec.itemId.toString();
+            const existing = scoreMap.get(key);
+
+            if (existing) {
+                existing.scores.contentBased = rec.score * this.weights.contentBased;
+                existing.reasons.push(rec.reason);
+            } else {
+                scoreMap.set(key, {
+                    itemId: rec.itemId,
+                    scores: {
+                        collaborative: 0,
+                        contentBased: rec.score * this.weights.contentBased,
+                        popularity: 0,
+                        recency: 0
+                    },
+                    reasons: [rec.reason],
+                    metadata: rec
+                });
+            }
+        }
+
+        // Add trending scores
+        for (const rec of trending) {
+            const key = rec.itemId.toString();
+            const existing = scoreMap.get(key);
+
+            if (existing) {
+                existing.scores.popularity = rec.score * this.weights.popularity;
+                existing.reasons.push(rec.reason);
+            } else {
+                scoreMap.set(key, {
+                    itemId: rec.itemId,
+                    scores: {
+                        collaborative: 0,
+                        contentBased: 0,
+                        popularity: rec.score * this.weights.popularity,
+                        recency: 0
+                    },
+                    reasons: [rec.reason],
+                    metadata: rec
+                });
+            }
+        }
+
+        // Calculate final scores
+        const merged = Array.from(scoreMap.values()).map(item => {
+            const finalScore =
+                item.scores.collaborative +
+                item.scores.contentBased +
+                item.scores.popularity +
+                item.scores.recency;
+
+            return {
+                itemId: item.itemId,
+                scores: item.scores,
+                finalScore,
+                reasons: [...new Set(item.reasons)],
+                metadata: item.metadata
+            };
+        });
+
+        // Sort by final score
+        merged.sort((a, b) => b.finalScore - a.finalScore);
+
+        return merged;
+    }
+
+    /**
+     * Apply diversity to recommendations
+     */
+    applyDiversity(recommendations, limit) {
+        // Simple diversity: don't recommend too many items from same source
+        const diversified = [];
+        const authorCounts = {};
+        const maxPerAuthor = 3;
+
+        for (const rec of recommendations) {
+            if (diversified.length >= limit) break;
+
+            const author = rec.metadata?.author?.toString() || 'unknown';
+            authorCounts[author] = (authorCounts[author] || 0) + 1;
+
+            if (authorCounts[author] <= maxPerAuthor) {
+                diversified.push(rec);
+            }
+        }
+
+        return diversified;
+    }
+
+    /**
+     * Add explanation to recommendation
+     */
+    addExplanation(rec) {
+        const explanations = {
+            'liked_by_similar_users': 'People with similar interests liked this',
+            'similar_to_liked_content': 'Similar to posts you\'ve enjoyed',
+            'trending': 'Trending in your community',
+            'related_to_interests': 'Based on your interests'
+        };
+
+        const primaryReason = rec.reasons[0];
+
+        return {
+            ...rec,
+            explanation: {
+                text: explanations[primaryReason] || 'Recommended for you',
+                reasons: rec.reasons,
+                confidence: Math.min(rec.finalScore * 100, 100).toFixed(1)
+            }
+        };
+    }
+
+    /**
+     * Store recommendations for metrics
+     */
+    async storeRecommendations(userId, type, recommendations) {
+        try {
+            const operations = recommendations.slice(0, 50).map(rec => ({
+                updateOne: {
+                    filter: {
+                        userId,
+                        itemId: rec.itemId,
+                        type
+                    },
+                    update: {
+                        $set: {
+                            scores: rec.scores,
+                            finalScore: rec.finalScore,
+                            explanation: rec.explanation,
+                            algorithm: {
+                                version: '1.0',
+                                weights: this.weights
+                            },
+                            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+                        }
+                    },
+                    upsert: true
+                }
+            }));
+
+            await RecommendationScore.bulkWrite(operations);
+        } catch (error) {
+            console.error('[RecommendationEngine] Store error:', error);
+        }
+    }
+
+    /**
+     * Get user's liked items
+     */
+    async getUserLikedItems(userId, type) {
+        // In production, would join with Posts collection
+        return UserInteraction.find({
+            userId,
+            itemType: type,
+            interactionType: { $in: ['like', 'save'] }
+        })
+            .sort({ timestamp: -1 })
+            .limit(50)
+            .lean();
+    }
+
+    /**
+     * Get candidate posts for recommendations
+     */
+    async getCandidatePosts(userId, type, limit) {
+        // In production, would query Posts collection
+        // Excluding already seen posts
+        return [];
+    }
+
+    /**
+     * Handle cold start for new users
+     */
+    async getColdStartRecommendations(userId, limit = 20) {
+        // For new users, return popular and trending content
+        const trending = await this.getTrendingRecommendations('post', limit);
+
+        return trending.map(rec => ({
+            ...rec,
+            explanation: {
+                text: 'Popular in your community',
+                reasons: ['cold_start', 'trending'],
+                confidence: '75.0'
+            }
+        }));
+    }
+
+    /**
+     * Get user-to-follow recommendations
+     */
+    async getUserRecommendations(userId, limit = 10) {
+        try {
+            const similarUsers = await collaborativeFilteringService.findSimilarUsers(userId, limit * 2);
+
+            // Get who similar users follow
+            const followSuggestions = await UserInteraction.aggregate([
                 {
                     $match: {
-                        target: { $in: likedPostIds },
-                        targetModel: 'Post',
-                        source: { $ne: new mongoose.Types.ObjectId(userId) } // Exclude myself
+                        userId: { $in: similarUsers.map(u => u.userId) },
+                        interactionType: 'follow'
                     }
                 },
-                // Group by User to find "Similar Users"
                 {
                     $group: {
-                        _id: '$source',
-                        similarityScore: { $sum: 1 } // Simple intersection count
+                        _id: '$itemId',
+                        count: { $sum: 1 },
+                        similarUsers: { $push: '$userId' }
                     }
                 },
-                { $sort: { similarityScore: -1 } },
-                { $limit: 100 }, // Top 100 similar users
-
-                // Lookup what THESE users liked (that are NOT in my list)
                 {
-                    $lookup: {
-                        from: 'interactiongraphs',
-                        localField: '_id',
-                        foreignField: 'source',
-                        as: 'theirInteractions'
-                    }
+                    $match: { count: { $gte: 2 } }
                 },
-                { $unwind: '$theirInteractions' },
-                {
-                    $match: {
-                        'theirInteractions.targetModel': 'Post',
-                        'theirInteractions.type': { $in: ['LIKE', 'SHARE'] },
-                        'theirInteractions.target': { $nin: likedPostIds } // Something I haven't liked yet
-                    }
-                },
-                // Group by Post to calculate Recommendation Score
-                {
-                    $group: {
-                        _id: '$theirInteractions.target',
-                        score: { $sum: '$theirInteractions.weight' }, // Sum weights from similar users
-                        count: { $sum: 1 } // How many similar users liked it
-                    }
-                },
-                { $sort: { score: -1 } },
+                { $sort: { count: -1 } },
                 { $limit: limit }
             ]);
 
-            // If we have enough collaborative recommendations, fetch Post details
-            let postIds = recommendations.map(r => r._id);
-
-            // FALLBACK: If cold start (no/few recommendations), use Friends-of-Friends logic or Trending
-            if (postIds.length < limit) {
-                const friendsOfFriends = await this.getGraphRecommendations(userId, limit - postIds.length);
-                postIds = [...new Set([...postIds, ...friendsOfFriends])];
-            }
-
-            // Fetch actual post data
-            const posts = await Post.find({
-                _id: { $in: postIds },
-                isDeleted: false,
-                visibility: 'public' // Ensure public
-            })
-                .populate('user', 'username profilePicture')
-                .lean();
-
-            // Re-order based on score (since .find() doesn't preserve order)
-            const postsMap = new Map(posts.map(p => [p._id.toString(), p]));
-            const orderedPosts = postIds
-                .map(id => postsMap.get(id.toString()))
-                .filter(p => p); // Remove nulls
-
-            return orderedPosts;
-
+            return followSuggestions.map(s => ({
+                itemId: s._id,
+                score: s.count / similarUsers.length,
+                reason: 'followed_by_similar_users',
+                similarUsersCount: s.count
+            }));
         } catch (error) {
-            logger.error('Recommend Engine Error:', error);
-            // Fallback to chronological if engine fails
-            return await Post.find({ visibility: 'public' })
-                .sort({ createdAt: -1 })
-                .limit(limit)
-                .populate('user', 'username profilePicture');
+            console.error('[RecommendationEngine] User recommendations error:', error);
+            return [];
         }
     }
 
     /**
-     * Graph Strategy: Friends of Friends (FoF)
-     * "Posts created by people my friends follow"
+     * Update weights based on A/B testing
      */
-    static async getGraphRecommendations(userId, limit = 10) {
-        // 1. Find my Followings
-        const following = await InteractionGraph.find({
-            source: userId,
-            type: 'FOLLOW'
-        }).select('target');
+    updateWeights(newWeights) {
+        this.weights = { ...this.weights, ...newWeights };
+        this.recommendationCache.clear();
+    }
 
-        const myNetworkIds = following.map(f => f.target);
-
-        // 2. Find who THEY follow (2nd degree)
-        const secondDegree = await InteractionGraph.aggregate([
-            {
-                $match: {
-                    source: { $in: myNetworkIds },
-                    type: 'FOLLOW'
+    /**
+     * Clear cache
+     */
+    clearCache(userId = null) {
+        if (userId) {
+            for (const key of this.recommendationCache.keys()) {
+                if (key.startsWith(userId)) {
+                    this.recommendationCache.delete(key);
                 }
-            },
-            { $group: { _id: '$target' } }, // Unique users
-            { $match: { _id: { $nin: [...myNetworkIds, new mongoose.Types.ObjectId(userId)] } } }, // Exclude my direct network
-            { $limit: 20 }
-        ]);
-
-        const recommendedCreators = secondDegree.map(r => r._id);
-
-        // 3. Get recent posts from these creators
-        const posts = await Post.find({
-            user: { $in: recommendedCreators },
-            visibility: 'public'
-        })
-            .sort({ createdAt: -1 })
-            .limit(limit)
-            .select('_id');
-
-        return posts.map(p => p._id);
+            }
+        } else {
+            this.recommendationCache.clear();
+        }
     }
 }
 
-module.exports = RecommendationEngine;
+module.exports = new RecommendationEngine();

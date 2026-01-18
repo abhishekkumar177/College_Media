@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const SearchController = require('../controllers/searchController');
-const SearchIndexService = require('../services/searchIndexService');
 const logger = require('../utils/logger');
 const { apiLimiter } = require('../middleware/rateLimitMiddleware');
 
@@ -29,7 +28,8 @@ const optionalAuth = (req, res, next) => {
  * @swagger
  * /api/search:
  *   get:
- *     summary: Unified search across users and posts
+ *     summary: Global search across posts, users, and events
+ *     description: Search everything with optional type filter and advanced filters (type:post, date:last_week, etc.)
  *     tags: [Search]
  *     parameters:
  *       - in: query
@@ -39,44 +39,79 @@ const optionalAuth = (req, res, next) => {
  *         required: true
  *         description: Search query
  *       - in: query
+ *         name: filters
+ *         schema:
+ *           type: string
+ *         description: Filter string (e.g., "type:post date:last_week role:moderator")
+ *       - in: query
+ *         name: type
+ *         schema:
+ *           type: string
+ *           enum: [post, user, event]
+ *         description: Limit results to specific type
+ *     responses:
+ *       200:
+ *         description: Global search results
+ */
+router.get('/', optionalAuth, SearchController.globalSearch);
+
+/**
+ * @swagger
+ * /api/search/advanced:
+ *   get:
+ *     summary: Advanced search with pagination
+ *     description: Full-text search with filtering and pagination support
+ *     tags: [Search]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: query
+ *         name: filters
+ *         schema:
+ *           type: string
+ *         description: Filter string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           default: 10
- *         description: Results per category
+ *           default: 20
+ *           maximum: 100
  *     responses:
  *       200:
- *         description: Search results from all categories
+ *         description: Paginated search results
  */
-router.get('/', optionalAuth, async (req, res) => {
-    try {
-        const { q, limit = 10 } = req.query;
+router.get('/advanced', optionalAuth, SearchController.advancedSearch);
 
-        if (!q || q.trim().length < 2) {
-            return res.status(400).json({
-                success: false,
-                data: null,
-                message: 'Search query must be at least 2 characters'
-            });
-        }
-
-        // Use MeiliSearch for Global Search
-        const results = await SearchIndexService.searchGlobal(q, { limit: parseInt(limit) });
-
-        res.json({
-            success: true,
-            data: results,
-            message: 'Search completed successfully'
-        });
-    } catch (error) {
-        logger.error('Search error:', error);
-        res.status(500).json({
-            success: false,
-            data: null,
-            message: 'Search failed'
-        });
-    }
-});
+/**
+ * @swagger
+ * /api/search/posts:
+ *   get:
+ *     summary: Search posts only
+ *     tags: [Search]
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         required: true
+ *       - in: query
+ *         name: filters
+ *         schema:
+ *           type: string
+ *         description: Filter string (e.g., "date:last_week sort:popular")
+ *     responses:
+ *       200:
+ *         description: Post search results
+ */
+router.get('/posts', optionalAuth, SearchController.searchPosts);
 
 /**
  * @swagger
@@ -91,141 +126,38 @@ router.get('/', optionalAuth, async (req, res) => {
  *           type: string
  *         required: true
  *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 20
- *       - in: query
- *         name: sortBy
+ *         name: filters
  *         schema:
  *           type: string
- *           enum: [relevance, recent, followers]
+ *         description: Filter string (e.g., "verified:true role:moderator")
  *     responses:
  *       200:
  *         description: User search results
  */
-router.get('/users', optionalAuth, async (req, res) => {
-    try {
-        const { q, page = 1, limit = 20, sortBy = 'relevance', role } = req.query;
-
-        const skip = (parseInt(page) - 1) * parseInt(limit);
-
-        const results = await SearchController.searchUsers(q, {
-            limit: parseInt(limit),
-            skip,
-            sortBy,
-            filters: { role }
-        });
-
-        res.json({
-            success: true,
-            data: results,
-            message: 'User search completed'
-        });
-    } catch (error) {
-        logger.error('User search error:', error);
-        res.status(500).json({
-            success: false,
-            data: null,
-            message: 'User search failed'
-        });
-    }
-});
+router.get('/users', optionalAuth, SearchController.searchUsers);
 
 /**
  * @swagger
- * /api/search/posts:
+ * /api/search/events:
  *   get:
- *     summary: Search posts
+ *     summary: Search events
  *     tags: [Search]
  *     parameters:
  *       - in: query
  *         name: q
  *         schema:
  *           type: string
+ *         required: true
  *       - in: query
- *         name: tag
+ *         name: filters
  *         schema:
  *           type: string
- *         description: Filter by tag
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *           enum: [relevance, recent, popular]
+ *         description: Filter string (e.g., "date:last_month sort:upcoming")
  *     responses:
  *       200:
- *         description: Post search results
+ *         description: Event search results
  */
-router.get('/posts', optionalAuth, async (req, res) => {
-    try {
-        const { q, page = 1, limit = 20, sortBy = 'relevance', tag, author, dateFrom, dateTo } = req.query;
-
-        const skip = (parseInt(page) - 1) * parseInt(limit);
-
-        const results = await SearchController.searchPosts(q, {
-            limit: parseInt(limit),
-            skip,
-            sortBy,
-            filters: { tag, author, dateFrom, dateTo }
-        });
-
-        res.json({
-            success: true,
-            data: results,
-            message: 'Post search completed'
-        });
-    } catch (error) {
-        logger.error('Post search error:', error);
-        res.status(500).json({
-            success: false,
-            data: null,
-            message: 'Post search failed'
-        });
-    }
-});
-
-/**
- * @swagger
- * /api/search/trending:
- *   get:
- *     summary: Get trending tags
- *     tags: [Search]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *     responses:
- *       200:
- *         description: List of trending tags with counts
- */
-router.get('/trending', async (req, res) => {
-    try {
-        const { limit = 10 } = req.query;
-
-        const tags = await SearchController.getTrendingTags(parseInt(limit));
-
-        res.json({
-            success: true,
-            data: tags,
-            message: 'Trending tags retrieved'
-        });
-    } catch (error) {
-        logger.error('Trending tags error:', error);
-        res.status(500).json({
-            success: false,
-            data: null,
-            message: 'Failed to get trending tags'
-        });
-    }
-});
+router.get('/events', optionalAuth, SearchController.searchEvents);
 
 /**
  * @swagger
@@ -240,37 +172,16 @@ router.get('/trending', async (req, res) => {
  *           type: string
  *         required: true
  *         description: Partial query for suggestions
+ *         minLength: 2
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
  *     responses:
  *       200:
- *         description: Search suggestions
+ *         description: Search suggestions for autocomplete
  */
-router.get('/suggestions', async (req, res) => {
-    try {
-        const { q, limit = 5 } = req.query;
-
-        if (!q || q.length < 2) {
-            return res.json({
-                success: true,
-                data: { users: [], tags: [] },
-                message: 'Query too short'
-            });
-        }
-
-        const suggestions = await SearchController.getSuggestions(q, parseInt(limit));
-
-        res.json({
-            success: true,
-            data: suggestions,
-            message: 'Suggestions retrieved'
-        });
-    } catch (error) {
-        logger.error('Suggestions error:', error);
-        res.status(500).json({
-            success: false,
-            data: null,
-            message: 'Failed to get suggestions'
-        });
-    }
-});
+router.get('/suggestions', SearchController.getSuggestions);
 
 module.exports = router;

@@ -5,7 +5,14 @@ interface AuthContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   token: string | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; user?: User; message?: string }>;
+  login: (email: string, password: string) => Promise<{ 
+    success: boolean; 
+    user?: User; 
+    message?: string;
+    requiresMFA?: boolean;
+    userId?: string;
+  }>;
+  verifyMFA: (userId: string, token: string) => Promise<{ success: boolean; user?: User; message?: string }>;
   register: (formData: any) => Promise<{ success: boolean; message: string; errors?: any }>;
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -105,7 +112,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        const token = data.data.token || data.token;
+        // Check if MFA is required
+        if (data.requiresMFA) {
+          return { 
+            success: true, 
+            requiresMFA: true, 
+            userId: data.userId,
+            message: "MFA verification required" 
+          };
+        }
+
+        // Normal login flow (no MFA)
+        const token = data.data?.token || data.token || data.accessToken;
         const userData = { ...data.data };
         delete userData.token;
 
@@ -123,6 +141,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         message: !navigator.onLine
           ? "No internet connection."
           : "Login failed. Please try again.",
+      };
+    }
+  };
+
+  const verifyMFA = async (userId: string, mfaToken: string) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+        }/api/auth/2fa/verify-login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, token: mfaToken }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.success) {
+        const token = data.data?.token || data.token;
+        
+        // Fetch user profile
+        const profileResponse = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+          }/api/users/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const profileData = await profileResponse.json();
+        
+        if (profileData.success) {
+          localStorage.setItem("token", token);
+          setToken(token);
+          setUser(profileData.data);
+          setError(null);
+          return { success: true, user: profileData.data };
+        }
+      }
+
+      return { success: false, message: data.message || "MFA verification failed" };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: !navigator.onLine
+          ? "No internet connection."
+          : err.message || "MFA verification failed. Please try again.",
       };
     }
   };
@@ -296,6 +362,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser,
     token,
     login,
+    verifyMFA,
     register,
     resetPassword,
     logout,

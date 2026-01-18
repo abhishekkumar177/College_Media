@@ -1,6 +1,6 @@
-# Deployment Guide
+# Frontend Deployment Guide
 
-This guide provides comprehensive instructions for deploying the College Media platform to various hosting platforms and environments.
+This guide provides comprehensive instructions for deploying the College Media frontend application to various hosting platforms and environments.
 
 ## Table of Contents
 
@@ -11,7 +11,6 @@ This guide provides comprehensive instructions for deploying the College Media p
 - [Docker Deployment](#docker-deployment)
 - [AWS Deployment](#aws-deployment)
 - [Azure Deployment](#azure-deployment)
-- [Database Setup](#database-setup)
 - [Monitoring and Logging](#monitoring-and-logging)
 - [Troubleshooting](#troubleshooting)
 
@@ -21,16 +20,12 @@ Before deploying, ensure you have:
 
 - **Domain Name**: Registered domain for production
 - **SSL Certificate**: For HTTPS (most platforms provide this)
-- **Database**: MongoDB Atlas or self-hosted MongoDB
-- **File Storage**: AWS S3 or compatible service
-- **Email Service**: Resend, SendGrid, or similar
 - **Monitoring**: Application monitoring service (optional)
 
 ### Required Accounts
 
 - [Vercel](https://vercel.com) or [Netlify](https://netlify.com)
-- [MongoDB Atlas](https://cloud.mongodb.com)
-- [AWS Account](https://aws.amazon.com) (for S3 and optional EC2)
+- [AWS Account](https://aws.amazon.com) (optional for S3 hosting)
 - [Azure Account](https://azure.microsoft.com) (alternative to AWS)
 
 ## Environment Configuration
@@ -115,29 +110,7 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/college_media_st
    - Push to main branch or create deployment manually
    - Vercel will automatically build and deploy
 
-### Backend Deployment (Serverless)
 
-1. **API Routes Setup**
-   - Move API routes to `api/` directory in frontend
-   - Convert Express routes to serverless functions
-
-2. **Database Connection**
-   - Use MongoDB connection string in environment variables
-   - Implement connection pooling for serverless
-
-3. **CORS Configuration**
-   ```javascript
-   // api/cors.js
-   export default function handler(req, res) {
-     res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_URL);
-     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-     res.status(200).end();
-   }
-   ```
-
-4. **Environment Variables**
-   - Set all backend environment variables in Vercel
 
 ## Netlify Deployment
 
@@ -162,30 +135,7 @@ MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/college_media_st
    - Add custom domain
    - Configure DNS
 
-### Backend Deployment (Netlify Functions)
 
-1. **Functions Setup**
-   - Create `netlify/functions/` directory
-   - Convert Express routes to Netlify functions
-
-2. **Database Connection**
-   - Use MongoDB Atlas connection string
-   - Implement connection caching
-
-3. **CORS Headers**
-   ```javascript
-   exports.handler = async (event, context) => {
-     return {
-       statusCode: 200,
-       headers: {
-         'Access-Control-Allow-Origin': process.env.CLIENT_URL,
-         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-       },
-       body: JSON.stringify({ message: 'Success' }),
-     };
-   };
-   ```
 
 ## Docker Deployment
 
@@ -221,33 +171,6 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
-### Dockerfile (Backend)
-
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy source code
-COPY . .
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Change ownership
-RUN chown -R nextjs:nodejs /app
-USER nextjs
-
-EXPOSE 5000
-
-CMD ["npm", "start"]
-```
-
 ### Docker Compose
 
 ```yaml
@@ -262,43 +185,6 @@ services:
       - "3000:80"
     environment:
       - NODE_ENV=production
-    depends_on:
-      - backend
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongodb:27017/college_media
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - mongodb
-      - redis
-
-  mongodb:
-    image: mongo:6.0
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-
-volumes:
-  mongodb_data:
-  redis_data:
 ```
 
 ### Running Docker Deployment
@@ -309,9 +195,7 @@ docker-compose up --build
 
 # Or run individually
 docker build -t college-media-frontend ./frontend
-docker build -t college-media-backend ./backend
 docker run -p 3000:80 college-media-frontend
-docker run -p 5000:5000 college-media-backend
 ```
 
 ## AWS Deployment
@@ -437,55 +321,7 @@ docker run -p 5000:5000 college-media-backend
      --ports 80
    ```
 
-## Database Setup
 
-### MongoDB Atlas
-
-1. **Create Cluster**
-   - Go to [MongoDB Atlas](https://cloud.mongodb.com)
-   - Create new project and cluster
-   - Choose cloud provider and region
-
-2. **Configure Database Access**
-   - Create database user
-   - Add IP whitelist (0.0.0.0/0 for development, specific IPs for production)
-
-3. **Create Database**
-   - Connect to cluster
-   - Create database: `college_media`
-   - Create collections as needed
-
-4. **Connection String**
-   - Get connection string from Atlas dashboard
-   - Replace credentials and database name
-   - Use in environment variables
-
-### Database Migration
-
-```javascript
-// migration script example
-const mongoose = require('mongoose');
-
-async function migrate() {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI);
-
-    // Add new fields to existing documents
-    await mongoose.connection.collection('users').updateMany(
-      { twoFactorEnabled: { $exists: false } },
-      { $set: { twoFactorEnabled: false } }
-    );
-
-    console.log('Migration completed');
-  } catch (error) {
-    console.error('Migration failed:', error);
-  } finally {
-    await mongoose.disconnect();
-  }
-}
-
-migrate();
-```
 
 ## Monitoring and Logging
 
@@ -515,88 +351,27 @@ Sentry.init({
 });
 ```
 
-**Backend Error Tracking**
-```javascript
-const Sentry = require("@sentry/node");
 
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  tracesSampleRate: 1.0,
-});
-```
 
 ### Logging Setup
 
-#### Winston Logger Configuration
-```javascript
-const winston = require('winston');
+Frontend applications typically use browser developer tools and external monitoring services for logging. For production deployments:
 
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json()
-  ),
-  defaultMeta: { service: 'college-media' },
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
-  ],
-});
-
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple(),
-  }));
-}
-
-module.exports = logger;
-```
+- **Vercel/Netlify**: Built-in logging in deployment dashboards
+- **Browser Console**: Use `console.log()`, `console.warn()`, `console.error()`
+- **External Services**: Sentry, LogRocket, or similar for error tracking
 
 #### Log Aggregation
 
-**AWS CloudWatch (for AWS deployments)**
-- Automatic log collection from EC2/ECS
-- Log insights and monitoring
-- Integration with CloudWatch alarms
+**Vercel Analytics**
+- Real-time log streaming
+- Error tracking and alerting
+- Performance metrics
 
-**Azure Application Insights**
-- Comprehensive application monitoring
-- Performance metrics and error tracking
-- Integration with Azure Monitor
-
-### Health Checks
-
-```javascript
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    // Check database connection
-    await mongoose.connection.db.admin().ping();
-
-    // Check Redis connection (if used)
-    if (redisClient) {
-      await redisClient.ping();
-    }
-
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        database: 'connected',
-        redis: redisClient ? 'connected' : 'not configured'
-      }
-    });
-  } catch (error) {
-    res.status(503).json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: error.message
-    });
-  }
-});
-```
+**Netlify Logs**
+- Build logs and runtime logs
+- Function logs (if using Netlify Functions)
+- Access logs and error logs
 
 ## Troubleshooting
 

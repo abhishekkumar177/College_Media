@@ -6,58 +6,106 @@ import Post from "../components/Post";
 import SkeletonPost from "../components/SkeletonPost";
 import SearchFilterBar from "./SearchFilterBar";
 import { mockPosts } from "../data/post";
+import postsAPI, { Post as IPost } from "../services/postsService";
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
+import toast from "react-hot-toast";
 
 const PAGE_SIZE = 10;
 
 const PostFeed = () => {
   const { t } = useTranslation();
-  const [posts, setPosts] = useState([]);
-  const [newPosts, setNewPosts] = useState([]);
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const [newPosts, setNewPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(null);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [filterType, setFilterType] = useState("all");
 
-  // Simulate API fetch function
-  const fetchPosts = useCallback(async (startIndex) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // In a real app, you would pass filter/sort params to backend here.
-        // For mock data, we just slice the array.
-        const newChunk = mockPosts.slice(startIndex, startIndex + PAGE_SIZE);
-        resolve(newChunk);
-      }, 1000);
-    });
-  }, []);
+  // Check if mock data should be used
+  const useMockData = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
+
+  // API fetch function
+  const fetchPosts = useCallback(async (page: number = 1, isLoadMore: boolean = false) => {
+    try {
+      if (useMockData) {
+        // Use mock data
+        return new Promise<IPost[]>((resolve) => {
+          setTimeout(() => {
+            const startIndex = (page - 1) * PAGE_SIZE;
+            const newChunk = mockPosts.slice(startIndex, startIndex + PAGE_SIZE);
+            resolve(newChunk);
+          }, 1000);
+        });
+      } else {
+        // Use real API
+        const response = await postsAPI.getFeed({
+          page,
+          limit: PAGE_SIZE,
+          sortBy: sortBy as 'newest' | 'oldest' | 'popular',
+          filter: filterType !== 'all' ? filterType : undefined,
+        });
+
+        if (response.success) {
+          return response.data;
+        } else {
+          throw new Error(response.message || 'Failed to fetch posts');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      throw error;
+    }
+  }, [useMockData, sortBy, filterType]);
 
   // Initial Load
   useEffect(() => {
     const init = async () => {
-      const initialPosts = await fetchPosts(0);
-      setPosts(initialPosts);
-      setLoading(false);
-      if (initialPosts.length < PAGE_SIZE) setHasMore(false);
+      try {
+        setLoading(true);
+        setError(null);
+        const initialPosts = await fetchPosts(1, false);
+        setPosts(initialPosts);
+        setHasMore(initialPosts.length === PAGE_SIZE);
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        setError('Failed to load posts. Please try again.');
+        toast.error('Failed to load posts');
+      } finally {
+        setLoading(false);
+      }
     };
     init();
   }, [fetchPosts]);
 
   // Infinite Scroll Callback
   const loadMorePosts = useCallback(async () => {
-    const nextPosts = await fetchPosts(posts.length);
-    if (nextPosts.length === 0) {
-      setHasMore(false);
-    } else {
-      setPosts((prev) => [...prev, ...nextPosts]);
-      // If we fetched fewer than PAGE_SIZE, we reached the end
-      if (nextPosts.length < PAGE_SIZE) setHasMore(false);
+    if (loadingMore) return;
+
+    try {
+      setLoadingMore(true);
+      const currentPage = Math.floor(posts.length / PAGE_SIZE) + 1;
+      const nextPosts = await fetchPosts(currentPage, true);
+
+      if (nextPosts.length === 0) {
+        setHasMore(false);
+      } else {
+        setPosts((prev) => [...prev, ...nextPosts]);
+        // If we fetched fewer than PAGE_SIZE, we reached the end
+        if (nextPosts.length < PAGE_SIZE) setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+      toast.error('Failed to load more posts');
+    } finally {
+      setLoadingMore(false);
     }
-  }, [posts.length, fetchPosts]);
+  }, [posts.length, fetchPosts, loadingMore]);
 
   const { lastElementRef, isFetching } = useInfiniteScroll(loadMorePosts, {
     hasMore,
@@ -84,18 +132,50 @@ const PostFeed = () => {
     throttleLimit: 500 // Configurable limit
   });
 
-  const handleLike = (postId) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === postId
-          ? {
-            ...post,
-            liked: !post.liked,
-            likes: post.liked ? post.likes - 1 : post.likes + 1,
-          }
-          : post
-      )
-    );
+  const handleLike = async (postId: string) => {
+    try {
+      // Find the post to update optimistically
+      const post = posts.find(p => p.id === postId);
+      if (!post) return;
+
+      // Optimistic update
+      const wasLiked = post.liked;
+      const newLikes = wasLiked ? post.likes - 1 : post.likes + 1;
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+              ...p,
+              liked: !wasLiked,
+              likes: newLikes,
+            }
+            : p
+        )
+      );
+
+      // Make API call
+      if (wasLiked) {
+        await postsAPI.unlike(postId);
+      } else {
+        await postsAPI.like(postId);
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      // Revert optimistic update on error
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === postId
+            ? {
+              ...p,
+              liked: post.liked,
+              likes: post.likes,
+            }
+            : p
+        )
+      );
+      toast.error('Failed to update like');
+    }
   };
 
   const getPostUrl = (post) => `https://collegemedia.com/post/${post.id}`;

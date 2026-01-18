@@ -130,4 +130,214 @@ router.put('/resolve/:reportId', verifyToken, checkPermission(PERMISSIONS.RESOLV
     }
 });
 
+// ===== AI-Powered Moderation Routes (Issue #901) =====
+
+const enhancedModerationService = require('../services/enhancedModerationService');
+const aiModerationService = require('../services/aiModerationService');
+const ContentFilter = require('../models/ContentFilter');
+const ModerationQueue = require('../models/ModerationQueue');
+const Appeal = require('../models/Appeal');
+
+/**
+ * @swagger
+ * /api/moderation/ai/analyze:
+ *   post:
+ *     summary: Analyze content with AI
+ *     tags: [AI Moderation]
+ */
+router.post('/ai/analyze', verifyToken, async (req, res) => {
+    try {
+        const { text, imageUrls, videoUrls } = req.body;
+
+        const analysis = await aiModerationService.analyzeContent({
+            text,
+            imageUrls: imageUrls || [],
+            videoUrls: videoUrls || []
+        });
+
+        const recommendation = aiModerationService.getRecommendedAction(analysis);
+
+        res.json({
+            success: true,
+            data: { analysis, recommendation }
+        });
+    } catch (error) {
+        logger.error('AI analyze error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/ai/queue:
+ *   get:
+ *     summary: Get AI moderation queue
+ *     tags: [AI Moderation]
+ */
+router.get('/ai/queue', verifyToken, checkPermission(PERMISSIONS.VIEW_REPORTS), async (req, res) => {
+    try {
+        const { status, limit, page, category, priority } = req.query;
+
+        const result = await enhancedModerationService.getQueue({
+            status: status || 'pending',
+            limit: parseInt(limit) || 20,
+            page: parseInt(page) || 1,
+            category,
+            priority: priority ? parseInt(priority) : null
+        });
+
+        res.json({ success: true, data: result });
+    } catch (error) {
+        logger.error('Get AI queue error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/ai/queue/:id/action:
+ *   post:
+ *     summary: Take action on AI queue item
+ *     tags: [AI Moderation]
+ */
+router.post('/ai/queue/:id/action', verifyToken, checkPermission(PERMISSIONS.RESOLVE_REPORTS), async (req, res) => {
+    try {
+        const { action, reason, notes } = req.body;
+
+        const result = await enhancedModerationService.takeAction(
+            req.params.id,
+            req.userId,
+            action,
+            reason,
+            notes
+        );
+
+        res.json({ success: true, data: result });
+    } catch (error) {
+        logger.error('AI action error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/appeals:
+ *   get:
+ *     summary: Get appeals list
+ *     tags: [AI Moderation]
+ */
+router.get('/appeals', verifyToken, checkPermission(PERMISSIONS.VIEW_REPORTS), async (req, res) => {
+    try {
+        const { status, limit, page } = req.query;
+        const query = {};
+        if (status) query.status = status;
+
+        const skip = ((parseInt(page) || 1) - 1) * (parseInt(limit) || 20);
+
+        const [appeals, total] = await Promise.all([
+            Appeal.find(query)
+                .sort({ priority: 1, submittedAt: 1 })
+                .skip(skip)
+                .limit(parseInt(limit) || 20)
+                .populate('userId', 'username profilePicture')
+                .lean(),
+            Appeal.countDocuments(query)
+        ]);
+
+        res.json({ success: true, data: { appeals, total } });
+    } catch (error) {
+        logger.error('Get appeals error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/appeals:
+ *   post:
+ *     summary: Submit an appeal
+ *     tags: [AI Moderation]
+ */
+router.post('/appeals', verifyToken, async (req, res) => {
+    try {
+        const { actionId, reason, evidence } = req.body;
+
+        const appeal = await enhancedModerationService.submitAppeal(
+            actionId,
+            req.userId,
+            reason,
+            evidence
+        );
+
+        res.status(201).json({ success: true, data: appeal });
+    } catch (error) {
+        logger.error('Submit appeal error:', error);
+        res.status(400).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/filters:
+ *   get:
+ *     summary: Get content filters
+ *     tags: [AI Moderation]
+ */
+router.get('/filters', verifyToken, checkPermission(PERMISSIONS.VIEW_REPORTS), async (req, res) => {
+    try {
+        const { category, isActive } = req.query;
+        const query = {};
+        if (category) query.category = category;
+        if (isActive !== undefined) query.isActive = isActive === 'true';
+
+        const filters = await ContentFilter.find(query).sort({ category: 1, name: 1 }).lean();
+        res.json({ success: true, data: filters });
+    } catch (error) {
+        logger.error('Get filters error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/filters:
+ *   post:
+ *     summary: Create content filter
+ *     tags: [AI Moderation]
+ */
+router.post('/filters', verifyToken, checkPermission(PERMISSIONS.RESOLVE_REPORTS), async (req, res) => {
+    try {
+        const { name, description, filterType, pattern, regexFlags, category, severity, action, applyTo } = req.body;
+
+        const filter = await ContentFilter.create({
+            name, description, filterType, pattern, regexFlags, category, severity, action, applyTo,
+            createdBy: req.userId
+        });
+
+        aiModerationService.clearCache();
+        res.status(201).json({ success: true, data: filter });
+    } catch (error) {
+        logger.error('Create filter error:', error);
+        res.status(400).json({ success: false, message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/moderation/statistics:
+ *   get:
+ *     summary: Get moderation statistics
+ *     tags: [AI Moderation]
+ */
+router.get('/statistics', verifyToken, checkPermission(PERMISSIONS.VIEW_REPORTS), async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+        const stats = await enhancedModerationService.getStatistics(startDate, endDate);
+        res.json({ success: true, data: stats });
+    } catch (error) {
+        logger.error('Get statistics error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 module.exports = router;
