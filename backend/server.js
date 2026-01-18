@@ -33,6 +33,8 @@ const crypto = require("crypto");
 const { randomUUID } = require("crypto");
 const { ApolloServer } = require("apollo-server-express");
 const { Server: SocketIOServer } = require("socket.io");
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 /* ============================================================
    🔧 INTERNAL IMPORTS
@@ -71,6 +73,83 @@ const TRUST_PROXY = process.env.TRUST_PROXY === "true";
 const METRICS_TOKEN = process.env.METRICS_TOKEN || "metrics-secret";
 const SSL_KEY_PATH = process.env.SSL_KEY_PATH;
 const SSL_CERT_PATH = process.env.SSL_CERT_PATH;
+
+/* ============================================================
+   📚 SWAGGER CONFIG
+============================================================ */
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'College Media API',
+    version: '1.0.0',
+    description: 'RESTful API for the College Media social platform',
+  },
+  servers: [
+    {
+      url: ENV === 'production' ? 'https://api.collegemedia.com' : `http://localhost:${PORT}`,
+      description: ENV === 'production' ? 'Production server' : 'Development server',
+    },
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+    },
+    schemas: {
+      User: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description: 'User ID'
+          },
+          username: {
+            type: 'string',
+            description: 'Unique username'
+          },
+          email: {
+            type: 'string',
+            format: 'email',
+            description: 'User email'
+          },
+          firstName: {
+            type: 'string',
+            description: 'First name'
+          },
+          lastName: {
+            type: 'string',
+            description: 'Last name'
+          },
+          profilePicture: {
+            type: 'string',
+            description: 'Profile picture URL'
+          },
+          bio: {
+            type: 'string',
+            description: 'User bio'
+          },
+          isVerified: {
+            type: 'boolean',
+            description: 'Whether user is verified'
+          }
+        }
+      }
+    }
+  },
+  security: [{
+    bearerAuth: [],
+  }],
+};
+
+const options = {
+  swaggerDefinition,
+  apis: ['./routes/*.js'], // paths to files containing OpenAPI definitions
+};
+
+const swaggerSpec = swaggerJsdoc(options);
 
 /* ============================================================
    🛡️ CSRF CONFIG
@@ -335,7 +414,16 @@ app.get("/", (req, res) => {
 });
 
 /* ============================================================
-   🔐 ROUTES
+   � API DOCUMENTATION
+============================================================ */
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
+/* ============================================================
+   �🔐 ROUTES
 ============================================================ */
 app.use("/api/auth", distributedRateLimit('auth'), require("./routes/auth"));
 app.use("/api/users", require("./routes/users"));

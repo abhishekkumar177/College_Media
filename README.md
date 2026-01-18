@@ -15,7 +15,7 @@
 
 **A stunning, fully-responsive social media dashboard built for college communities**
 
-[Overview](#-overview) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Contributing](#-contributing) • [Roadmap](#-future-roadmap)
+[Overview](#-overview) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Installation](#-installation) • [Documentation](#-documentation) • [Contributing](#-contributing) • [Roadmap](#-future-roadmap)
 
 </div>
 
@@ -73,7 +73,37 @@ Whether you're sharing campus moments, connecting with classmates, or building y
 
 ---
 
-## 📦 Installation & Setup
+## � Documentation
+
+College Media provides comprehensive documentation for developers, administrators, and users:
+
+### 📖 API Documentation
+- **[Swagger/OpenAPI Docs](http://localhost:5000/api-docs)** - Interactive API documentation (when backend is running)
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API endpoint documentation
+- **[GraphQL Schema](docs/GRAPHQL_SCHEMA.md)** - GraphQL API documentation
+
+### 🏗️ Architecture & Development
+- **[System Architecture](docs/ARCHITECTURE.md)** - System design, components, and data flow
+- **[Services Documentation](docs/SERVICES.md)** - All microservices and their responsibilities
+- **[Environment Setup](docs/ENVIRONMENT_SETUP.md)** - Development environment configuration
+
+### 🚀 Deployment & Operations
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment instructions
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Testing Guide](docs/TESTING.md)** - Testing strategies and procedures
+
+### 🤝 Contributing
+- **[Contributing Guide](CONTRIBUTING.md)** - Development workflow and standards
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines
+- **[Security Policy](SECURITY.md)** - Security reporting and practices
+
+### 📋 Additional Resources
+- **[Change Log](CHANGELOG.md)** - Version history and updates
+- **[TODO](TODO.md)** - Current development priorities
+
+---
+
+## �📦 Installation & Setup
 
 ### Prerequisites
 - **Node.js** (v18.0.0 or higher) - [Download](https://nodejs.org/)
