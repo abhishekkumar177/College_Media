@@ -67,6 +67,18 @@ Unit Tests
 
 ### Dependencies
 
+#### Root Package (Jest-based)
+```json
+{
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "msw": "^2.7.1"
+  }
+}
+```
+
+#### Frontend Package (Vitest-based)
 ```json
 {
   "devDependencies": {
@@ -76,8 +88,18 @@ Unit Tests
     "@vitest/ui": "^0.34.6",
     "jsdom": "^22.1.0",
     "playwright": "^1.40.1",
-    "supertest": "^6.3.3",
     "vitest": "^0.34.6"
+  }
+}
+```
+
+#### Backend Package (Jest-based)
+```json
+{
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "mongodb-memory-server": "^8.15.0"
   }
 }
 ```
@@ -122,6 +144,39 @@ expect.extend(matchers)
 afterEach(() => {
   cleanup()
 })
+```
+
+#### Jest Configuration (jest.config.cjs)
+
+```javascript
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
+  moduleNameMapping: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/src/__mocks__/fileMock.js'
+  },
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!src/main.jsx',
+    '!src/vite-env.d.ts'
+  ],
+  coverageThreshold: {
+    global: {
+      statements: 80,
+      branches: 75,
+      functions: 85,
+      lines: 80
+    }
+  },
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}'
+  ],
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
+  }
+}
 ```
 
 #### Playwright Configuration (playwright.config.ts)
@@ -664,6 +719,275 @@ test.describe('Visual Regression', () => {
     await expect(page.locator('[data-testid="post-card"]').first()).toHaveScreenshot('post-card.png')
   })
 })
+```
+
+## Performance Testing
+
+Performance testing ensures that the application meets performance requirements and can handle expected load.
+
+### Types of Performance Tests
+
+#### Load Testing
+- **API Load Testing**: Test API endpoints under various load conditions
+- **Database Load Testing**: Test database queries and operations under load
+- **Frontend Load Testing**: Test UI performance with multiple concurrent users
+
+#### Stress Testing
+- **Breaking Point Testing**: Find the maximum capacity of the system
+- **Recovery Testing**: Test system recovery after failure
+- **Spike Testing**: Test sudden increases in load
+
+#### Endurance Testing
+- **Memory Leak Testing**: Ensure no memory leaks over extended periods
+- **Resource Usage Testing**: Monitor CPU, memory, and disk usage
+
+### Performance Testing Tools
+
+#### Lighthouse
+```javascript
+// lighthouse.config.js
+module.exports = {
+  ci: {
+    collect: {
+      numberOfRuns: 3,
+      startServerCommand: 'npm run dev',
+      startServerReadyPattern: 'ready on',
+      url: ['http://localhost:3000']
+    },
+    assert: {
+      assertions: {
+        'categories:performance': ['error', { minScore: 0.9 }],
+        'categories:accessibility': ['error', { minScore: 0.9 }],
+        'categories:best-practices': ['error', { minScore: 0.9 }],
+        'categories:seo': ['error', { minScore: 0.9 }]
+      }
+    },
+    upload: {
+      target: 'temporary-public-storage'
+    }
+  }
+}
+```
+
+#### Artillery
+```yaml
+# artillery.yml
+config:
+  target: 'http://localhost:3000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: Warm up
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+      name: Ramp up load
+    - duration: 60
+      arrivalRate: 50
+      name: Sustained load
+
+scenarios:
+  - name: 'User journey'
+    weight: 60
+    flow:
+      - get:
+          url: '/'
+      - post:
+          url: '/api/auth/login'
+          json:
+            email: 'test@example.com'
+            password: 'password123'
+          capture:
+            json: '$.accessToken'
+            as: 'token'
+      - get:
+          url: '/api/posts'
+          headers:
+            Authorization: 'Bearer {{ token }}'
+      - post:
+          url: '/api/posts'
+          headers:
+            Authorization: 'Bearer {{ token }}'
+          json:
+            title: 'Performance Test Post'
+            content: 'Testing performance under load'
+
+  - name: 'API endpoints'
+    weight: 40
+    flow:
+      - get:
+          url: '/api/posts'
+      - get:
+          url: '/api/posts/featured'
+```
+
+#### k6
+```javascript
+// performance-test.js
+import http from 'k6/http'
+import { check, sleep } from 'k6'
+
+export let options = {
+  stages: [
+    { duration: '2m', target: 100 }, // below normal load
+    { duration: '5m', target: 100 },
+    { duration: '2m', target: 200 }, // normal load
+    { duration: '5m', target: 200 },
+    { duration: '2m', target: 300 }, // around the breaking point
+    { duration: '5m', target: 300 },
+    { duration: '2m', target: 400 }, // beyond the breaking point
+    { duration: '5m', target: 400 },
+    { duration: '10m', target: 0 }, // scale down. Recovery stage.
+  ],
+  thresholds: {
+    http_req_duration: ['p(99)<1500'], // 99% of requests must complete below 1.5s
+    http_req_failed: ['rate<0.1'], // Error rate must be below 10%
+  },
+}
+
+const BASE_URL = 'http://localhost:3000'
+
+export default function () {
+  let response = http.get(`${BASE_URL}/api/posts`)
+  check(response, { 'status is 200': (r) => r.status === 200 })
+
+  sleep(1)
+}
+```
+
+### Performance Metrics
+
+#### Frontend Metrics
+- **First Contentful Paint (FCP)**: Time for first content to appear
+- **Largest Contentful Paint (LCP)**: Time for largest content element
+- **First Input Delay (FID)**: Responsiveness to user input
+- **Cumulative Layout Shift (CLS)**: Visual stability
+
+#### Backend Metrics
+- **Response Time**: API response times under load
+- **Throughput**: Requests per second
+- **Error Rate**: Percentage of failed requests
+- **Memory Usage**: RAM consumption patterns
+- **CPU Usage**: Processor utilization
+
+#### Database Metrics
+- **Query Execution Time**: Database query performance
+- **Connection Pool Usage**: Database connection efficiency
+- **Index Hit Rate**: Query optimization effectiveness
+
+### Performance Testing in CI/CD
+
+```yaml
+# .github/workflows/performance.yml
+name: Performance Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Run Lighthouse
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        configPath: './lighthouse.config.js'
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+
+  load-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Start application
+      run: npm run dev &
+      env:
+        NODE_ENV: production
+
+    - name: Wait for app to be ready
+      run: |
+        timeout 60 bash -c 'until curl -f http://localhost:3000 > /dev/null 2>&1; do sleep 1; done'
+
+    - name: Run load tests
+      run: npx artillery run artillery.yml --output report.json
+
+    - name: Upload load test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: load-test-report
+        path: report.json
+```
+
+### Performance Budgets
+
+```javascript
+// performance-budget.json
+{
+  "budgets": [
+    {
+      "path": "/",
+      "resourceSizes": [
+        {
+          "resourceType": "document",
+          "budget": 18
+        },
+        {
+          "resourceType": "script",
+          "budget": 150
+        },
+        {
+          "resourceType": "stylesheet",
+          "budget": 50
+        }
+      ],
+      "resourceCounts": [
+        {
+          "resourceType": "total",
+          "budget": 50
+        }
+      ],
+      "timings": [
+        {
+          "metric": "interactive",
+          "budget": 3000
+        },
+        {
+          "metric": "first-meaningful-paint",
+          "budget": 2000
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ## Test Coverage
