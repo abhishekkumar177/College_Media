@@ -54,10 +54,11 @@ const resolvers = require('./graphql/resolvers');
 const context = require('./graphql/context');
 
 const distributedRateLimit = require("./middleware/distributedRateLimit");
-const { warmUpCache } = require("./utils/cache");
-
-const metricsMiddleware = require("./middleware/metrics.middleware");
-const { client: metricsClient } = require("./utils/metrics");
+const { requestDeadlineMiddleware } = require("./middleware/requestDeadline");
+const dataConsistencyService = require("./services/dataConsistencyService");
+const runawayJobProtectionService = require("./services/runawayJobProtectionService");
+const distributedSagaService = require("./services/distributedSagaService");
+const { circuitBreakerService } = require("./services/circuitBreakerService");
 
 /* ============================================================
    🌱 ENV SETUP
@@ -228,6 +229,11 @@ app.use((req, res, next) => {
 });
 
 /* ============================================================
+   ⏰ REQUEST DEADLINE PROPAGATION
+============================================================ */
+app.use(requestDeadlineMiddleware);
+
+/* ============================================================
    🧾 REQUEST LOGGER
 ============================================================ */
 app.use((req, res, next) => {
@@ -331,6 +337,104 @@ app.get("/", (req, res) => {
     memory: process.memoryUsage(),
     cpu: os.loadavg(),
     timestamp: new Date().toISOString(),
+  });
+});
+
+/* ============================================================
+   🔧 ADVANCED FEATURES ENDPOINTS
+============================================================ */
+
+// Data consistency status
+app.get("/api/system/consistency", (req, res) => {
+  const status = dataConsistencyService.getConsistencyStatus();
+  res.json({
+    success: true,
+    data: status,
+    correlationId: req.correlationId
+  });
+});
+
+// Job protection status
+app.get("/api/system/jobs", (req, res) => {
+  const stats = runawayJobProtectionService.getStats();
+  res.json({
+    success: true,
+    data: stats,
+    correlationId: req.correlationId
+  });
+});
+
+// Get specific job status
+app.get("/api/system/jobs/:jobId", (req, res) => {
+  const jobStatus = runawayJobProtectionService.getJobStatus(req.params.jobId);
+  if (!jobStatus) {
+    return res.status(404).json({
+      success: false,
+      message: "Job not found",
+      correlationId: req.correlationId
+    });
+  }
+  res.json({
+    success: true,
+    data: jobStatus,
+    correlationId: req.correlationId
+  });
+});
+
+// Cancel job
+app.delete("/api/system/jobs/:jobId", (req, res) => {
+  const cancelled = runawayJobProtectionService.cancelJob(req.params.jobId);
+  res.json({
+    success: cancelled,
+    message: cancelled ? "Job cancelled" : "Job not found or already completed",
+    correlationId: req.correlationId
+  });
+});
+
+// Saga status
+app.get("/api/system/sagas", (req, res) => {
+  const stats = distributedSagaService.getSagaStats();
+  res.json({
+    success: true,
+    data: stats,
+    correlationId: req.correlationId
+  });
+});
+
+// Circuit breaker status
+app.get("/api/system/circuits", (req, res) => {
+  const statuses = circuitBreakerService.getAllStatuses();
+  res.json({
+    success: true,
+    data: statuses,
+    correlationId: req.correlationId
+  });
+});
+
+// Get specific circuit breaker status
+app.get("/api/system/circuits/:serviceName", (req, res) => {
+  const status = circuitBreakerService.getStatus(req.params.serviceName);
+  if (!status) {
+    return res.status(404).json({
+      success: false,
+      message: "Circuit breaker not found",
+      correlationId: req.correlationId
+    });
+  }
+  res.json({
+    success: true,
+    data: status,
+    correlationId: req.correlationId
+  });
+});
+
+// Reset circuit breaker
+app.post("/api/system/circuits/:serviceName/reset", (req, res) => {
+  const reset = circuitBreakerService.reset(req.params.serviceName);
+  res.json({
+    success: reset,
+    message: reset ? "Circuit breaker reset" : "Circuit breaker not found",
+    correlationId: req.correlationId
   });
 });
 
