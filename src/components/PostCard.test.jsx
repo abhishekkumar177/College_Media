@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PostCard from './PostCard';
 
@@ -22,7 +22,7 @@ describe('PostCard', () => {
     expect(screen.getByText('testuser')).toBeInTheDocument();
     expect(screen.getByText(/Test post caption/)).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.getByText('Comments: 7')).toBeInTheDocument();
   });
 
   test('handles like button click', async () => {
@@ -45,10 +45,12 @@ describe('PostCard', () => {
       const [likes, setLikes] = React.useState(likedPosts);
 
       const handleLike = (postId) => {
-        setLikes(prev => ({
-          ...prev,
-          [postId]: !prev[postId]
-        }));
+        act(() => {
+          setLikes(prev => ({
+            ...prev,
+            [postId]: !prev[postId]
+          }));
+        });
       };
 
       return (
@@ -71,6 +73,6 @@ describe('PostCard', () => {
   test('displays correct comment count', () => {
     render(<PostCard post={mockPost} />);
 
-    expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.getByText('Comments: 7')).toBeInTheDocument();
   });
 });

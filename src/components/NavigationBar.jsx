@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 /**
  * NavigationBar Component
@@ -11,10 +11,19 @@ import React from 'react';
  * @param {function} props.onSearchChange - Handler for search input changes
  * @returns {React.ReactElement} Navigation bar JSX
  */
-const NavigationBar = ({ searchQuery, onSearchChange }) => {
+const NavigationBar = ({ searchQuery = '', onSearchChange }) => {
+  const [localQuery, setLocalQuery] = useState(searchQuery);
+
   const handleSearchKeyDown = (event) => {
     if (event.key === 'Escape') {
       event.target.blur();
+    }
+  };
+
+  const handleChange = (value) => {
+    setLocalQuery(value);
+    if (onSearchChange) {
+      onSearchChange(value);
     }
   };
 
@@ -39,8 +48,8 @@ const NavigationBar = ({ searchQuery, onSearchChange }) => {
                 id="search-input"
                 type="text"
                 placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
+                value={localQuery}
+                onChange={(e) => handleChange(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 focus:bg-white transition-all duration-300"
                 aria-describedby="search-icon"

@@ -7,7 +7,19 @@ import NotificationPreferences from './NotificationPreferences';
  * AppContent Component
  * Renders the main content based on the active tab
  */
-const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryIndex, posts, likedPosts, toggleLike, suggestedAccounts, trendingHashtags, onlineFriends }) => {
+// Defaults keep tests from crashing when props are omitted.
+const AppContent = ({
+  activeTab = 'Home',
+  stories = [],
+  currentStoryIndex = 0,
+  setCurrentStoryIndex = () => {},
+  posts = [],
+  likedPosts = {},
+  toggleLike = () => {},
+  suggestedAccounts = [],
+  trendingHashtags = [],
+  onlineFriends = [],
+}) => {
   /**
    * Render content based on active tab
    */
@@ -161,8 +173,9 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
                     View all {post.comments} comments
                   </button>
                 </div>
-              </div>
-            ))}
+              </article>
+              ))}
+            </section>
           </div>
         );
 
@@ -223,79 +236,99 @@ const AppContent = ({ activeTab, stories, currentStoryIndex, setCurrentStoryInde
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      {/* ========== LEFT SIDEBAR ========== */}
-      <div className="lg:col-span-1">
-        {/* Sidebar content will be handled in App.jsx */}
-      </div>
+    <div>
+      <nav role="navigation" className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <button aria-label="Menu" className="p-2">☰</button>
+          <span className="font-bold text-lg">College Media</span>
+        </div>
+        <div className="flex items-center space-x-3">
+          <input
+            aria-label="Search"
+            placeholder="Search"
+            className="border rounded px-2 py-1"
+          />
+          <button aria-label="Notifications" className="p-2">🔔</button>
+        </div>
+      </nav>
 
-      {/* ========== CENTRAL CONTENT ========== */}
-      {renderTabContent()}
+      <main role="main" className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* ========== LEFT SIDEBAR ========== */}
+        <div className="lg:col-span-1">
+          {/* Sidebar content will be handled in App.jsx */}
+        </div>
 
-      {/* ========== RIGHT SIDEBAR ========== */}
-      <div className="lg:col-span-1 space-y-6">
-        {/* ========== SUGGESTED ACCOUNTS ========== */}
-        <div className="bg-white rounded-2xl shadow-sm p-4">
-          <h3 className="font-bold text-gray-800 mb-4">Suggested for you</h3>
-          <div className="space-y-3">
-            {suggestedAccounts.map((account, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <LazyImage
-                    src={account.avatar}
-                    alt={account.username}
-                    className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
-                    placeholder="skeleton"
-                  />
-                  <div>
-                    <p className="font-medium text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">{account.username}</p>
-                    <p className="text-gray-500 text-xs">{account.followers} followers</p>
+        {/* ========== CENTRAL CONTENT ========== */}
+        <div className="lg:col-span-2 space-y-4">
+          <h1 className="sr-only">Feed</h1>
+          {renderTabContent()}
+        </div>
+
+        {/* ========== RIGHT SIDEBAR ========== */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* ========== SUGGESTED ACCOUNTS ========== */}
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <h3 className="font-bold text-gray-800 mb-4">Suggested for you</h3>
+            <div className="space-y-3">
+              {suggestedAccounts.map((account, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <LazyImage
+                      src={account.avatar}
+                      alt={account.username}
+                      className="w-8 h-8 rounded-full cursor-pointer hover:scale-110 transition-transform duration-300"
+                      placeholder="skeleton"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors duration-300">{account.username}</p>
+                      <p className="text-gray-500 text-xs">{account.followers} followers</p>
+                    </div>
                   </div>
+                  <button className="px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full hover:bg-blue-600 transition-colors duration-300">
+                    Follow
+                  </button>
                 </div>
-                <button className="px-3 py-1 bg-blue-500 text-white text-sm font-semibold rounded-full hover:bg-blue-600 transition-colors duration-300">
-                  Follow
-                </button>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* ========== TRENDING HASHTAGS ========== */}
-        <div className="bg-white rounded-2xl shadow-sm p-4">
-          <h3 className="font-bold text-gray-800 mb-4">Trending</h3>
-          <div className="flex flex-wrap gap-2">
-            {trendingHashtags.map((hashtag, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm"
-              >
-                {hashtag}
-              </span>
-            ))}
+          {/* ========== TRENDING HASHTAGS ========== */}
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <h3 className="font-bold text-gray-800 mb-4">Trending</h3>
+            <div className="flex flex-wrap gap-2">
+              {trendingHashtags.map((hashtag, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 rounded-full text-sm font-medium hover:from-pink-200 hover:to-purple-200 transition-all duration-300 cursor-pointer hover:shadow-sm"
+                >
+                  {hashtag}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* ========== ONLINE FRIENDS ========== */}
-        <div className="bg-white rounded-2xl shadow-sm p-4">
-          <h3 className="font-bold text-gray-800 mb-4">Online Friends</h3>
-          <div className="flex space-x-3">
-            {onlineFriends.map((friend, index) => (
-              <div key={index} className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300">
-                <div className="relative">
-                  <LazyImage
-                    src={friend.avatar}
-                    alt={friend.username}
-                    className="w-12 h-12 rounded-full"
-                    placeholder="skeleton"
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+          {/* ========== ONLINE FRIENDS ========== */}
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <h3 className="font-bold text-gray-800 mb-4">Online Friends</h3>
+            <div className="flex space-x-3">
+              {onlineFriends.map((friend, index) => (
+                <div key={index} className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-300">
+                  <div className="relative">
+                    <LazyImage
+                      src={friend.avatar}
+                      alt={friend.username}
+                      className="w-12 h-12 rounded-full"
+                      placeholder="skeleton"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+                  <span className="text-xs text-gray-600 mt-1 truncate w-12 text-center">{friend.username}</span>
                 </div>
-                <span className="text-xs text-gray-600 mt-1 truncate w-12 text-center">{friend.username}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

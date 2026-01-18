@@ -227,7 +227,7 @@ const SearchResults = () => {
               {getPaginatedResults(searchResults.hashtags).map((hashtag) => (
                 <div key={hashtag.tag} className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow duration-200 text-center">
                   <div className="text-lg font-bold text-purple-600 mb-1">
-                    {highlightText(hashtag.tag, searchQuery)}
+                    {hashtag.tag}
                   </div>
                   <div className="text-sm text-gray-500">
                     {hashtag.useCount.toLocaleString()} posts

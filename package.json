@@ -10,7 +10,14 @@
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch",
-    "test:coverage": "jest --config jest.config.cjs --coverage"
+    "test:coverage": "jest --config jest.config.cjs --coverage",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "jest --config jest.config.cjs --testPathPattern=src",
+    "test:integration": "jest --config jest.config.cjs --testPathPattern=backend",
+    "test:ci": "npm run lint && npm run test:coverage && npm run test:integration",
+    "test:report": "npm run test:coverage && open coverage/lcov-report/index.html",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
@@ -21,9 +28,17 @@
     "@opentelemetry/semantic-conventions": "^1.39.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^7.12.0",
     "styled-jsx": "^5.1.6"
   },
   "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/preset-react": "^7.23.3",
+    "@playwright/test": "^1.40.1",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
@@ -31,10 +46,11 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.7.1",
-    "vite": "^5.2.0",
-    "vite-plugin-pwa": "^0.19.8"
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0"
   }
 }
