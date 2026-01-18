@@ -2,18 +2,16 @@
 
 ## Overview
 
-College Media is a comprehensive social media platform designed for educational institutions, built with modern web technologies to provide a secure, scalable, and user-friendly experience for students, faculty, and staff.
+College Media is a modern frontend-only social media platform designed for educational institutions, built with React and modern web technologies to provide an intuitive and visually appealing experience for students, faculty, and staff. The application uses comprehensive mock data services for development and demonstration purposes.
 
 ### Core Components
 
 - **Frontend**: React 19 application with modern UI components
-- **Backend**: Node.js/Express API server with RESTful endpoints
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT-based authentication with refresh tokens
-- **File Storage**: AWS S3 for media uploads
-- **Real-time Features**: Socket.IO for live notifications and chat
-- **Caching**: Redis for session management and rate limiting
-- **Email Service**: Resend for transactional emails
+- **Mock Data Services**: MSW (Mock Service Worker) for API simulation
+- **State Management**: React hooks and context for local state
+- **Styling**: Tailwind CSS with custom gradient themes
+- **Build Tool**: Vite for fast development and optimized production builds
+- **Testing**: Jest and React Testing Library for unit and integration tests
 
 ## Component Architecture
 
@@ -50,42 +48,21 @@ src/
 └── styles/             # Global styles and Tailwind config
 ```
 
-### Backend Architecture
+### Mock Data & Services
 
 ```
-backend/
-├── routes/             # API route handlers
-│   ├── auth.js
-│   ├── posts.js
-│   ├── users.js
-│   └── admin.js
-├── controllers/        # Business logic layer
-│   ├── authController.js
-│   ├── postController.js
-│   └── userController.js
-├── models/            # Database models
-│   ├── User.js
-│   ├── Post.js
-│   ├── Comment.js
-│   └── RefreshToken.js
-├── middleware/        # Express middleware
-│   ├── auth.js
-│   ├── rateLimiter.js
-│   ├── validation.js
-│   └── errorHandler.js
-├── services/          # Business services
-│   ├── emailService.js
-│   ├── notificationService.js
-│   └── fileUploadService.js
-├── utils/             # Utility functions
-│   ├── tokenUtil.js
-│   ├── logger.js
-│   └── validators.js
-├── config/            # Configuration files
-│   ├── db.js
-│   ├── aws.js
-│   └── passport.js
-└── tests/             # Test files
+src/
+├── __mocks__/         # Mock data and API handlers
+│   ├── handlers.js    # MSW request handlers
+│   └── data/          # Static mock data files
+├── services/          # Client-side service layer
+│   ├── api.js         # API service functions
+│   ├── mockApi.js     # Mock API implementations
+│   └── localStorage.js # Local storage utilities
+└── utils/             # Utility functions
+    ├── formatters.js
+    ├── validators.js
+    └── constants.js
 ```
 
 ## Data Flow Diagrams
@@ -96,16 +73,13 @@ backend/
 sequenceDiagram
     participant U as User
     participant F as Frontend
-    participant B as Backend
-    participant DB as Database
+    participant M as Mock API
 
     U->>F: Submit login form
-    F->>B: POST /api/auth/login
-    B->>DB: Validate credentials
-    DB-->>B: User data
-    B->>B: Generate JWT tokens
-    B-->>F: Access token + Refresh cookie
-    F->>F: Store access token
+    F->>M: POST /api/auth/login (intercepted by MSW)
+    M->>M: Validate against mock data
+    M->>F: Mock JWT token response
+    F->>F: Store token in localStorage
     F-->>U: Login success
 ```
 
@@ -115,22 +89,15 @@ sequenceDiagram
 sequenceDiagram
     participant U as User
     participant F as Frontend
-    participant B as Backend
-    participant S3 as AWS S3
-    participant DB as Database
-    participant WS as WebSocket
+    participant M as Mock API
 
     U->>F: Fill post form
     F->>F: Client-side validation
-    F->>B: POST /api/posts (with JWT)
-    B->>B: Authenticate user
-    B->>S3: Upload media files
-    S3-->>B: File URLs
-    B->>DB: Save post data
-    DB-->>B: Post saved
-    B->>WS: Emit notification
-    WS-->>F: Real-time update
-    B-->>F: Post created response
+    F->>M: POST /api/posts (intercepted by MSW)
+    M->>M: Validate and store in mock data
+    M->>F: Mock post creation response
+    F->>F: Update local state
+    F-->>U: Post created success
 ```
 
 ### API Request Flow
@@ -158,93 +125,78 @@ sequenceDiagram
     MW-->>C: HTTP Response
 ```
 
-## Database Schema Documentation
+## Mock Data Structure
 
-### User Model
+### User Data Structure
 ```javascript
 {
-  _id: ObjectId,
-  username: String (required, unique),
-  email: String (required, unique, lowercase),
-  password: String (required, hashed),
+  id: String,
+  username: String,
+  email: String,
   firstName: String,
   lastName: String,
   profilePicture: String,
   bio: String,
-  role: Enum ['user', 'moderator', 'admin'] (default: 'user'),
-  isActive: Boolean (default: true),
-  isVerified: Boolean (default: false),
-  lastLoginAt: Date,
-  failedLoginAttempts: Number (default: 0),
-  lockUntil: Date,
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-  followers: [ObjectId],
-  following: [ObjectId],
-  blockedUsers: [ObjectId],
+  role: String, // 'user', 'moderator', 'admin'
+  isActive: Boolean,
+  isVerified: Boolean,
+  followers: Array<String>, // User IDs
+  following: Array<String>, // User IDs
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
-### Post Model
+### Post Data Structure
 ```javascript
 {
-  _id: ObjectId,
-  author: ObjectId (ref: 'User'),
-  content: String (required),
-  media: [{
-    type: String (enum: ['image', 'video']),
+  id: String,
+  authorId: String,
+  content: String,
+  media: Array<{
+    type: String, // 'image', 'video'
     url: String,
     thumbnail: String
-  }],
-  likes: [ObjectId],
-  comments: [ObjectId],
-  tags: [String],
-  visibility: String (enum: ['public', 'friends', 'private']),
-  isDeleted: Boolean (default: false),
+  }>,
+  likes: Array<String>, // User IDs
+  comments: Array<{
+    id: String,
+    authorId: String,
+    content: String,
+    createdAt: Date
+  }>,
+  tags: Array<String>,
+  visibility: String, // 'public', 'friends', 'private'
   createdAt: Date,
   updatedAt: Date
 }
 ```
 
-### RefreshToken Model
-```javascript
-{
-  _id: ObjectId,
-  userId: ObjectId (ref: 'User'),
-  token: String (required, unique),
-  expiresAt: Date,
-  revoked: Boolean (default: false),
-  createdAt: Date
-}
-```
+## Frontend Design Principles
 
-## API Design Principles
+### Component Design
+- Modular and reusable components
+- Consistent prop interfaces
+- Proper separation of concerns
+- Accessibility-first approach
 
-### RESTful Design
-- Resource-based URLs (`/api/users`, `/api/posts`)
-- HTTP methods for CRUD operations
-- Consistent response format
-- Proper HTTP status codes
+### State Management
+- Local component state for UI concerns
+- Context API for shared application state
+- Custom hooks for complex state logic
+- Immutable state updates
 
-### Authentication
-- JWT Bearer tokens for API access
-- Refresh tokens in httpOnly cookies
-- Token rotation on refresh
-- Secure token storage
-
-### Validation
-- Input sanitization and validation
-- Type checking and schema validation
-- Error messages without sensitive data
-- Rate limiting per endpoint
+### Performance Optimization
+- Code splitting with dynamic imports
+- Lazy loading of components and images
+- Memoization of expensive computations
+- Efficient re-rendering with React.memo
 
 ### Error Handling
-- Consistent error response format
-- Appropriate HTTP status codes
-- Logging for debugging
+- Graceful error boundaries
 - User-friendly error messages
+- Logging for debugging
+- Fallback UI states
 
 ## Security Architecture
 
@@ -282,25 +234,19 @@ sequenceDiagram
   - Rate Limit Violations: Automatic blocking
   - Security Incidents: Immediate notification
 
-## Scalability Considerations
+## Performance Optimization
 
-### Horizontal Scaling
-- **Stateless API**: No server-side sessions
-- **Database Sharding**: MongoDB sharding for large datasets
-- **Load Balancing**: Nginx for distributing traffic
-- **CDN**: CloudFront for static assets
-
-### Performance Optimization
-- **Caching**: Redis for frequently accessed data
-- **Database Indexing**: Optimized indexes for queries
-- **File Compression**: Gzip compression for responses
+### Frontend Performance
+- **Code Splitting**: Dynamic imports for route-based splitting
 - **Lazy Loading**: Components and images loaded on demand
+- **Bundle Optimization**: Vite's tree shaking and minification
+- **Caching Strategies**: Browser caching for static assets
 
 ### Monitoring & Metrics
-- **Application Metrics**: Response times, error rates
-- **System Metrics**: CPU, memory, disk usage
-- **Database Metrics**: Query performance, connection pools
-- **User Metrics**: Active users, engagement rates
+- **Application Metrics**: Component render times, bundle sizes
+- **User Experience**: Loading states, error boundaries
+- **Performance Budgets**: Bundle size limits and performance thresholds
+- **Development Tools**: React DevTools and performance profiling
 
 ## Technology Choices Rationale
 
@@ -310,41 +256,29 @@ sequenceDiagram
 - **Ecosystem**: Rich ecosystem of libraries and tools
 - **Performance**: Virtual DOM and efficient rendering
 
-### Backend: Node.js/Express
-- **JavaScript Full-Stack**: Consistent language across stack
-- **Non-Blocking I/O**: Efficient handling of concurrent requests
-- **NPM Ecosystem**: Extensive libraries for various needs
-- **Microservices Ready**: Easy to scale and deploy
+### Build Tool: Vite
+- **Fast Development**: Instant hot module replacement (HMR)
+- **Optimized Production**: Advanced bundling and code splitting
+- **Modern Standards**: Native ES modules and TypeScript support
+- **Developer Experience**: Rich plugins and configuration options
 
-### Database: MongoDB
-- **Document Model**: Flexible schema for social media data
-- **Scalability**: Horizontal scaling with sharding
-- **JSON-like**: Natural fit for JavaScript applications
-- **Indexing**: Powerful indexing for complex queries
+### Styling: Tailwind CSS
+- **Utility-First**: Rapid UI development with predefined classes
+- **Responsive Design**: Mobile-first responsive utilities
+- **Customizable**: Easy theme customization and extension
+- **Performance**: Purge unused CSS in production builds
 
-### Authentication: JWT
-- **Stateless**: No server-side session storage
-- **Scalable**: Works well with distributed systems
-- **Secure**: Cryptographically signed tokens
-- **Flexible**: Can include custom claims
+### Mock Data: MSW (Mock Service Worker)
+- **Realistic Simulation**: Intercept and mock network requests
+- **Development Focused**: Seamless API simulation without backend
+- **Testing Support**: Consistent data for unit and integration tests
+- **Service Worker Based**: Runs in the browser for realistic behavior
 
-### File Storage: AWS S3
-- **Scalable**: Handles large amounts of media files
-- **Reliable**: High availability and durability
-- **Cost-Effective**: Pay-as-you-go pricing
-- **Integrated**: Works well with other AWS services
-
-### Real-time: Socket.IO
-- **Cross-Platform**: Works on all modern browsers
-- **Fallback**: Falls back to HTTP polling if needed
-- **Scalable**: Supports clustering and load balancing
-- **Feature-Rich**: Rooms, namespaces, and middleware support
-
-### Caching: Redis
-- **High Performance**: In-memory data structure store
-- **Persistence**: Optional data persistence
-- **Pub/Sub**: Built-in publish/subscribe messaging
-- **Data Structures**: Rich data types for complex caching
+### State Management: React Hooks & Context
+- **Built-in Solutions**: No external dependencies for simple state
+- **Local State**: Component-level state with useState
+- **Shared State**: Application-wide state with Context API
+- **Custom Hooks**: Reusable stateful logic across components
 
 ## Deployment Architecture
 
@@ -367,24 +301,24 @@ sequenceDiagram
 
 ## Future Considerations
 
-### Microservices Migration
-- Break down monolithic backend into microservices
-- Independent deployment and scaling
-- Technology diversity per service
+### Enhanced Mock Data
+- Expand mock data scenarios for comprehensive testing
+- Implement data persistence in localStorage/indexedDB
+- Add more realistic API response delays and errors
 
-### Advanced Caching
-- Implement CDN for global content delivery
-- Edge computing for reduced latency
-- Intelligent cache invalidation strategies
+### Progressive Web App (PWA)
+- Service worker implementation for offline functionality
+- App manifest for installable web app experience
+- Push notifications and background sync
 
-### AI/ML Integration
-- Content moderation with machine learning
-- Personalized recommendations
-- Automated content tagging
+### Advanced Frontend Features
+- Real-time features with WebSockets (if backend is added)
+- Advanced state management with Zustand or Redux Toolkit
+- Component library extraction for reusability
 
-### Advanced Security
-- Multi-factor authentication (MFA)
-- Zero-trust architecture
-- Advanced threat detection
+### Performance Enhancements
+- Implement virtual scrolling for large lists
+- Advanced code splitting and lazy loading strategies
+- Bundle analysis and optimization tools
 
 This documentation provides a comprehensive overview of the College Media system architecture and serves as a guide for developers, maintainers, and stakeholders to understand the system's design and make informed decisions about future development.

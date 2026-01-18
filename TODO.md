@@ -1,7 +1,9 @@
-# TODO: Downgrade React to 18.x for Compatibility
+# TODO: Clarify Backend Status - Remove Incomplete Backend Code
 
-- [x] Update "react" to "^18.2.0" in dependencies in frontend/package.json
-- [x] Update "react-dom" to "^18.2.0" in dependencies in frontend/package.json
-- [x] Update "@types/react" to "^18.2.0" in devDependencies in frontend/package.json
-- [x] Update "@types/react-dom" to "^18.2.0" in devDependencies in frontend/package.json
-- [x] Run npm install in frontend directory to update dependencies
+- [x] Remove the entire `backend/` directory
+- [x] Update README.md to remove backend references from project structure and roadmap
+- [x] Update docs/ARCHITECTURE.md to reflect frontend-only architecture with mock data
+- [x] Update docs/DEPLOYMENT.md to focus on frontend deployment
+- [x] Update docs/ENVIRONMENT_SETUP.md title to reflect frontend-only setup
+- [x] Verify frontend still works after backend removal
+- [x] Test project builds and runs correctly
