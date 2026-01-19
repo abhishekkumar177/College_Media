@@ -10,7 +10,11 @@ This guide provides solutions to common issues encountered during development, t
 - [Authentication Problems](#authentication-problems)
 - [Performance Issues](#performance-issues)
 - [Testing Failures](#testing-failures)
-- [Deployment Problems](#deployment-problems)
+- [Frontend Issues (React/Vite)](#frontend-issues-reactvite)
+- [Backend Issues (Node.js/Express)](#backend-issues-nodejsexpress)
+- [Database Problems (MongoDB/Redis)](#database-problems-mongodbredis)
+- [Deployment Failures](#deployment-failures)
+- [Searchable FAQ](#searchable-faq)
 - [Common Commands](#common-commands)
 
 ## Build Errors
@@ -316,7 +320,250 @@ Timeout - Async callback was not invoked within the 5000ms timeout
    npm run test -- --updateSnapshot
    ```
 
-## Deployment Problems
+## Frontend Issues (React/Vite)
+
+### Component Rendering Errors (FE001)
+
+**Error Message:**
+```
+Error: Objects are not valid as a React child
+```
+
+**Symptoms:**
+- Components fail to render
+- Console shows "Objects are not valid as a React child"
+
+**Solutions:**
+1. Ensure you're not passing objects directly to JSX:
+   ```jsx
+   // Incorrect
+   <div>{someObject}</div>
+
+   // Correct
+   <div>{JSON.stringify(someObject)}</div>
+   ```
+2. Check for undefined or null values in render
+3. Verify component props are properly typed
+
+### Vite Build Failures (FE002)
+
+**Error Message:**
+```
+[vite] Internal server error: Transform failed with 1 error
+```
+
+**Symptoms:**
+- Development server crashes during build
+- Hot module replacement fails
+
+**Solutions:**
+1. Clear Vite cache:
+   ```bash
+   rm -rf node_modules/.vite
+   ```
+2. Check for syntax errors in imported files
+3. Verify Vite configuration in `vite.config.js`
+4. Update Node.js to a compatible version
+
+### State Management Problems (FE003)
+
+**Error Message:**
+```
+Cannot update during an existing state transition
+```
+
+**Symptoms:**
+- State updates not reflecting in UI
+- Infinite re-render loops
+
+**Solutions:**
+1. Avoid state updates inside render:
+   ```jsx
+   // Incorrect
+   const [count, setCount] = useState(0);
+   setCount(count + 1); // Don't do this in render
+
+   // Correct: Use useEffect
+   useEffect(() => {
+     setCount(count + 1);
+   }, []);
+   ```
+2. Use functional state updates for dependent state
+3. Check for missing dependencies in useEffect
+
+### Routing Issues (FE004)
+
+**Error Message:**
+```
+No routes matched location
+```
+
+**Symptoms:**
+- Page navigation fails
+- 404 on client-side routes
+
+**Solutions:**
+1. Ensure routes are properly defined in React Router
+2. Check for missing `<BrowserRouter>` wrapper
+3. Verify route paths match component expectations
+4. Add catch-all route for 404 handling
+
+## Backend Issues (Node.js/Express)
+
+### Server Startup Failures (BE001)
+
+**Error Message:**
+```
+Error: listen EADDRINUSE: address already in use :::3000
+```
+
+**Symptoms:**
+- Server fails to start
+- Port already in use error
+
+**Solutions:**
+1. Kill existing process on the port:
+   ```bash
+   # Find process
+   lsof -i :3000
+   # Kill process
+   kill -9 <PID>
+   ```
+2. Change server port in environment variables
+3. Check for multiple server instances running
+
+### Middleware Errors (BE002)
+
+**Error Message:**
+```
+TypeError: Cannot read property 'X' of undefined
+```
+
+**Symptoms:**
+- Requests fail at middleware level
+- CORS or authentication middleware issues
+
+**Solutions:**
+1. Verify middleware order in `server.js`
+2. Check for missing error handling in custom middleware
+3. Validate request object properties before access
+4. Add proper error logging
+
+### API Response Errors (BE003)
+
+**Error Message:**
+```
+500 Internal Server Error
+```
+
+**Symptoms:**
+- API endpoints return unexpected errors
+- Database operations fail
+
+**Solutions:**
+1. Check server logs for detailed error messages
+2. Verify database connections are active
+3. Validate input data types and sanitization
+4. Implement proper error handling with try-catch blocks
+
+### Memory Leaks (BE004)
+
+**Error Message:**
+```
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed
+```
+
+**Symptoms:**
+- Server crashes with out of memory
+- Increasing memory usage over time
+
+**Solutions:**
+1. Use memory profiling:
+   ```bash
+   npm install -g clinic
+   clinic heapprofiler -- node server.js
+   ```
+2. Check for circular references in code
+3. Properly close database connections
+4. Implement garbage collection monitoring
+
+## Database Problems (MongoDB/Redis)
+
+### MongoDB Connection Pool Exhaustion (DB001)
+
+**Error Message:**
+```
+MongoError: connection pool exhausted
+```
+
+**Symptoms:**
+- Database queries timeout
+- High connection count in MongoDB
+
+**Solutions:**
+1. Increase connection pool size in MongoDB driver config
+2. Implement connection pooling properly
+3. Close connections after use
+4. Monitor connection usage
+
+### Redis Cache Misses (DB002)
+
+**Error Message:**
+```
+Cache miss for key: 'user:123'
+```
+
+**Symptoms:**
+- Slow performance due to cache misses
+- Inconsistent data between cache and database
+
+**Solutions:**
+1. Verify Redis server is running:
+   ```bash
+   redis-cli ping
+   ```
+2. Check Redis configuration and connection string
+3. Implement proper cache invalidation strategies
+4. Monitor cache hit/miss ratios
+
+### MongoDB Replication Issues (DB003)
+
+**Error Message:**
+```
+MongoError: not master and slaveOk=false
+```
+
+**Symptoms:**
+- Write operations fail on replica sets
+- Read operations blocked
+
+**Solutions:**
+1. Configure replica set properly
+2. Set `slaveOk` or `readPreference` for reads
+3. Check replica set status:
+   ```bash
+   rs.status()
+   ```
+4. Ensure primary node is available
+
+### Redis Memory Issues (DB004)
+
+**Error Message:**
+```
+OOM command not allowed when used memory > 'maxmemory'
+```
+
+**Symptoms:**
+- Redis rejects commands due to memory limits
+- Cache eviction not working properly
+
+**Solutions:**
+1. Increase Redis maxmemory setting
+2. Implement proper cache eviction policies (LRU, LFU)
+3. Monitor Redis memory usage
+4. Optimize data structures for memory efficiency
+
+## Deployment Failures
 
 ### Environment Variable Issues
 
@@ -368,6 +615,108 @@ EADDRINUSE: address already in use
 2. Verify build output directory
 3. Check file permissions
 4. Validate CDN configuration if used
+
+### CI/CD Pipeline Failures (DP001)
+
+**Error Message:**
+```
+Build failed: npm run build exited with code 1
+```
+
+**Symptoms:**
+- Automated builds failing in CI/CD
+- Deployment pipelines stopping at build stage
+
+**Solutions:**
+1. Check CI/CD logs for specific error details
+2. Ensure all dependencies are properly installed in CI environment
+3. Verify Node.js version matches between local and CI
+4. Check for missing environment variables in CI
+5. Validate build scripts in `package.json`
+
+### Docker Container Issues (DP002)
+
+**Error Message:**
+```
+docker: Error response from daemon: OCI runtime create failed
+```
+
+**Symptoms:**
+- Containers fail to start
+- Application not accessible in containers
+
+**Solutions:**
+1. Verify Dockerfile configuration
+2. Check exposed ports match application ports
+3. Ensure environment variables are passed to containers
+4. Validate volume mounts and permissions
+5. Check container logs:
+   ```bash
+   docker logs <container_name>
+   ```
+
+### Cloud Deployment Errors (DP003)
+
+**Error Message:**
+```
+Deployment failed: Health check failed
+```
+
+**Symptoms:**
+- Application deploys but health checks fail
+- Services unavailable after deployment
+
+**Solutions:**
+1. Verify health check endpoints are properly configured
+2. Check application startup time vs. health check timeout
+3. Validate environment-specific configurations
+4. Ensure database connectivity in cloud environment
+5. Check cloud provider logs and metrics
+
+### Kubernetes Deployment Issues (DP004)
+
+**Error Message:**
+```
+CrashLoopBackOff
+```
+
+**Symptoms:**
+- Pods continuously restarting
+- Services not becoming ready
+
+**Solutions:**
+1. Check pod logs:
+   ```bash
+   kubectl logs <pod_name>
+   ```
+2. Verify resource limits and requests
+3. Check ConfigMaps and Secrets
+4. Validate service discovery and networking
+5. Monitor pod events:
+   ```bash
+   kubectl describe pod <pod_name>
+   ```
+
+## Searchable FAQ
+
+| Error Code | Issue | Quick Solution |
+|------------|-------|----------------|
+| FE001 | Component Rendering Errors | Check for objects passed to JSX; use JSON.stringify() or proper rendering |
+| FE002 | Vite Build Failures | Clear Vite cache with `rm -rf node_modules/.vite` and check syntax |
+| FE003 | State Management Problems | Avoid state updates in render; use useEffect for side effects |
+| FE004 | Routing Issues | Ensure React Router is properly configured with BrowserRouter |
+| BE001 | Server Startup Failures | Kill existing process on port or change port in environment |
+| BE002 | Middleware Errors | Verify middleware order and add error handling |
+| BE003 | API Response Errors | Check server logs and validate input data types |
+| BE004 | Memory Leaks | Use memory profiling tools and check for circular references |
+| DB001 | MongoDB Connection Pool Exhaustion | Increase pool size and monitor connection usage |
+| DB002 | Redis Cache Misses | Verify Redis server status and check connection string |
+| DB003 | MongoDB Replication Issues | Configure replica set and check primary node availability |
+| DB004 | Redis Memory Issues | Increase maxmemory or implement proper eviction policies |
+| DP001 | CI/CD Pipeline Failures | Check CI logs and ensure dependencies match local environment |
+| DP002 | Docker Container Issues | Verify Dockerfile and check container logs |
+| DP003 | Cloud Deployment Errors | Validate health checks and environment configurations |
+| DP004 | Kubernetes Deployment Issues | Check pod logs and resource configurations |
 
 ## Common Commands
 
