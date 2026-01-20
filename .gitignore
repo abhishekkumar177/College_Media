@@ -1,7 +1,0 @@
-node_modules
-.env
-dist
-.DS_Store
-
-# Logs
-backend/logs/

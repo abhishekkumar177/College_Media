@@ -1,178 +1,68 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
-  html {
-    overflow-x: hidden;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
   :root {
-    /* Light Mode Tokens (RGB values for Tailwind opacity support) */
-    --bg-primary: 248 250 252;
-    /* slate-50 */
-    --bg-secondary: 255 255 255;
-    /* white */
-    --bg-tertiary: 241 245 249;
-    /* slate-100 */
-
-    --text-primary: 15 23 42;
-    /* slate-900 */
-    --text-secondary: 51 65 85;
-    /* slate-700 */
-    --text-muted: 100 116 139;
-    /* slate-500 */
-
-    --border-color: 226 232 240;
-    /* slate-200 */
-    --brand-primary: 59 130 246;
-    /* blue-500 */
+    color: #213547;
+    background-color: #ffffff;
   }
-
-  .dark {
-    --bg-primary: 2 6 23;
-    /* slate-950 */
-    --bg-secondary: 15 23 42;
-    /* slate-900 */
-    --bg-tertiary: 30 41 59;
-    /* slate-800 */
-
-    --text-primary: 248 250 252;
-    /* slate-50 */
-    --text-secondary: 203 213 225;
-    /* slate-300 */
-    --text-muted: 148 163 184;
-    /* slate-400 */
-
-    --border-color: 30 41 59;
-    /* slate-800 */
-    --brand-primary: 96 165 250;
-    /* blue-400 */
+  a:hover {
+    color: #747bff;
   }
-
-  /* Font Size Settings */
-  html.text-small {
-    font-size: 14px;
+  button {
+    background-color: #f9f9f9;
   }
-
-  html.text-medium {
-    font-size: 16px;
-  }
-
-  html.text-large {
-    font-size: 18px;
-  }
-
-  body {
-    @apply bg-bg-primary text-text-primary transition-colors duration-300;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: hidden;
-    width: 100%;
-    position: relative;
-  }
-
-  body::before {
-    content: none !important;
-  }
-
-  #root {
-    min-height: 100vh;
-    position: relative;
-    width: 100%;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Reset list styles */
-  ol,
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-}
-
-/* Pro tier entrance animation base */
-.pro-entrance {
-  opacity: 0;
-  filter: blur(16px);
-  transform: translateY(12px) scale(0.98);
-  will-change: transform, opacity, filter;
-}
-
-/* Custom utilities used in App.jsx */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.border-gradient-to-r {
-  background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
-  border: 2px solid transparent;
-  background-clip: padding-box, border-box;
-  background-origin: padding-box, border-box;
-}
-
-@keyframes bounce {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.2);
-  }
-}
-
-.animate-bounce {
-  animation: bounce 0.5s ease-in-out;
-}
-
-/* Custom scrollbar for webkit */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Glassmorphism utility */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-.glass-dark {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }

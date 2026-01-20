@@ -1,6 +1,0 @@
-apiVersion: v2
-name: college-media
-description: A Helm chart for deploying the College Media Platform
-type: application
-version: 0.1.0
-appVersion: "1.0.0"
