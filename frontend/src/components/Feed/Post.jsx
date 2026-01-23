@@ -21,21 +21,33 @@ const Post = ({ post }) => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      if (!dateString) return 'Unknown date';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid date';
+    }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
       <div className="flex items-start space-x-3">
         <img 
-          src={`https://placehold.co/40x40/3b82f6/ffffff?text=${post.user?.name?.charAt(0) || 'U'}`} 
-          alt={post.user?.name} 
-          className="w-10 h-10 rounded-full" 
+          src={`https://placehold.co/40x40/3b82f6/ffffff?text=${encodeURIComponent(post.user?.name?.charAt(0) || 'U')}`} 
+          alt={post.user?.name || 'User'} 
+          className="w-10 h-10 rounded-full"
+          onError={(e) => {
+            e.target.src = 'https://placehold.co/40x40/gray/ffffff?text=U';
+          }}
         />
         <div className="flex-1">
           <h4 className="font-bold text-gray-900">{post.user?.name}</h4>

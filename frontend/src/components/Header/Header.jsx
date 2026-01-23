@@ -40,11 +40,14 @@ const Header = () => {
             <div className="flex items-center space-x-2">
               <div className="flex items-center space-x-2 cursor-pointer group">
                 <img
-                  src={`https://placehold.co/32x32/3b82f6/ffffff?text=${user?.name?.charAt(0) || 'U'}`}
+                  src={`https://placehold.co/32x32/3b82f6/ffffff?text=${encodeURIComponent(user?.name?.charAt(0) || 'U')}`}
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
+                  onError={(e) => {
+                    e.target.src = 'https://placehold.co/32x32/gray/ffffff?text=U';
+                  }}
                 />
-                <p className="text-sm font-medium text-gray-600 group-hover:text-blue-500">{user?.name}</p>
+                <p className="text-sm font-medium text-gray-600 group-hover:text-blue-500">{user?.name || 'User'}</p>
               </div>
               <button
                 onClick={logout}

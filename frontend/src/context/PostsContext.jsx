@@ -40,7 +40,7 @@ export const PostsProvider = ({ children }) => {
   const likePost = async (postId) => {
     try {
       const response = await postsAPI.likePost(postId);
-      setPosts(posts.map(post => 
+      setPosts(prevPosts => prevPosts.map(post => 
         post._id === postId ? response.data : post
       ));
     } catch (error) {

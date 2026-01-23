@@ -32,9 +32,12 @@ const InputBox = () => {
       <form onSubmit={handleSubmit}>
         <div className="flex items-center space-x-3">
           <img
-            src={`https://placehold.co/40x40/3b82f6/ffffff?text=${user?.name?.charAt(0) || 'U'}`}
+            src={`https://placehold.co/40x40/3b82f6/ffffff?text=${encodeURIComponent(user?.name?.charAt(0) || 'U')}`}
             alt="User"
             className="w-10 h-10 rounded-full"
+            onError={(e) => {
+              e.target.src = 'https://placehold.co/40x40/gray/ffffff?text=U';
+            }}
           />
           <input
             type="text"
