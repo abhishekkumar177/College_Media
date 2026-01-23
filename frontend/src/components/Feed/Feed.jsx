@@ -1,45 +1,38 @@
 import React from 'react';
 import InputBox from './InputBox';
 import Post from './Post';
+import { usePosts } from '../../context/PostsContext';
 
 const Feed = () => {
-  const posts = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      description: "Senior Frontend Developer at TechCorp",
-      message: "Just shipped a new feature using React 18! The concurrent rendering is a game changer for user experience.",
-      photoUrl: "https://placehold.co/40x40/f59e0b/ffffff?text=SJ"
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      description: "Full Stack Engineer | Open Source Contributor",
-      message: "Working on an exciting open-source project that combines AI with web development. Looking for contributors!",
-      photoUrl: "https://placehold.co/40x40/10b981/ffffff?text=MC"
-    },
-    {
-      id: 3,
-      name: "Emily Rodriguez",
-      description: "UX Designer & Product Manager",
-      message: "The key to great design isn't just aesthetics—it's understanding user behavior and solving real problems.",
-      photoUrl: "https://placehold.co/40x40/8b5cf6/ffffff?text=ER"
-    }
-  ];
+  const { posts, loading } = usePosts();
+
+  if (loading) {
+    return (
+      <div className="flex-1 max-w-2xl mx-auto px-4">
+        <InputBox />
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 max-w-2xl mx-auto px-4">
       <InputBox />
       <div className="space-y-4">
-        {posts.map(post => (
-          <Post
-            key={post.id}
-            name={post.name}
-            description={post.description}
-            message={post.message}
-            photoUrl={post.photoUrl}
-          />
-        ))}
+        {posts.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No posts yet. Be the first to share something!</p>
+          </div>
+        ) : (
+          posts.map(post => (
+            <Post
+              key={post._id}
+              post={post}
+            />
+          ))
+        )}
       </div>
     </div>
   );
