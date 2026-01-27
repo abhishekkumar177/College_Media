@@ -1,0 +1,13 @@
+/* Chatbot isolation reset */
+#chatbot-root * {
+  all: unset;
+  box-sizing: border-box;
+}
+
+#chatbot-root {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
