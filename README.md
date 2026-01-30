@@ -76,6 +76,117 @@ A full-stack social media platform built for college students to connect, share 
    ```
    The app will run on `http://localhost:5173` (default Vite port).
 
+## Local Development Setup Guide
+
+This guide provides a comprehensive step-by-step process to set up the College Media project for local development. It includes prerequisites, environment configuration, and troubleshooting for common issues.
+
+### Prerequisites
+
+Before starting, ensure you have the following installed on your system:
+
+- **Node.js**: Version 14 or higher. Download from [nodejs.org](https://nodejs.org/). This includes npm (Node Package Manager).
+- **MongoDB**: A local MongoDB instance or a cloud service like MongoDB Atlas.
+  - For local MongoDB: Install from [mongodb.com](https://www.mongodb.com/try/download/community).
+  - For MongoDB Atlas: Create a free cluster at [mongodb.com/atlas](https://www.mongodb.com/atlas).
+- **Package Manager**: npm (comes with Node.js) or yarn (optional, install via `npm install -g yarn`).
+
+Verify installations:
+```bash
+node --version
+npm --version
+mongod --version  # For local MongoDB
+```
+
+### Environment Setup
+
+1. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd college-media
+   ```
+
+2. **Backend Setup**:
+   - Navigate to the backend directory:
+     ```bash
+     cd backend
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Create a `.env` file based on `.env.example`:
+     ```bash
+     cp .env.example .env
+     ```
+     Edit `.env` with your configurations:
+     ```
+     PORT=5000
+     MONGODB_URI=mongodb://localhost:27017/college-media  # Or your Atlas URI
+     JWT_SECRET=your_secure_jwt_secret_here
+     ```
+   - Start MongoDB (if using local):
+     ```bash
+     mongod  # On macOS/Linux, or use brew services start mongodb/brew/mongodb-community on macOS
+     ```
+     On Windows, start MongoDB as a service via Services panel or command prompt.
+   - Run the backend server:
+     ```bash
+     npm run dev
+     ```
+     Server should start on `http://localhost:5000`.
+
+3. **Frontend Setup**:
+   - Open a new terminal and navigate to the frontend directory:
+     ```bash
+     cd ../frontend
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+   - Run the development server:
+     ```bash
+     npm run dev
+     ```
+     App should start on `http://localhost:5173`.
+
+4. **Verify Setup**:
+   - Backend: Visit `http://localhost:5000` (may show a simple message or API docs).
+   - Frontend: Visit `http://localhost:5173` to see the app.
+
+### Common Setup Errors and Fixes
+
+- **Error: `npm install` fails with permission issues**:
+  - Fix: Use `sudo npm install` (not recommended) or fix npm permissions: `sudo chown -R $(whoami) ~/.npm`.
+  - Alternative: Use nvm for Node.js management.
+
+- **Error: MongoDB connection fails**:
+  - Ensure MongoDB is running: Check with `ps aux | grep mongod` or Services panel.
+  - Verify `MONGODB_URI` in `.env`: For Atlas, ensure IP whitelist includes your IP (0.0.0.0/0 for testing).
+  - Local: Ensure MongoDB is installed and started on default port 27017.
+
+- **Error: Port already in use**:
+  - Backend: Change `PORT` in `.env` to an available port (e.g., 5001).
+  - Frontend: Vite may auto-assign a port; check console for the actual port.
+
+- **Error: `JWT_SECRET` not set**:
+  - Ensure `.env` file exists and contains `JWT_SECRET=your_secret_here`.
+  - Regenerate a new secret for security.
+
+- **Error: CORS issues in browser**:
+  - Ensure backend has CORS enabled (check `server.js`).
+  - Frontend proxy: In `vite.config.js`, add proxy for API calls.
+
+- **Error: Module not found during `npm install`**:
+  - Clear npm cache: `npm cache clean --force`.
+  - Delete `node_modules` and `package-lock.json`, then reinstall.
+
+- **Error: Vite dev server not starting**:
+  - Check for port conflicts: Kill processes on port 5173 with `lsof -ti:5173 | xargs kill -9`.
+  - Ensure Node.js version is compatible.
+
+If issues persist, check the console logs for detailed error messages and refer to the project's GitHub issues or community forums.
+
 ## Usage
 
 1. Ensure both backend and frontend servers are running.
