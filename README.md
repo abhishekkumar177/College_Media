@@ -57,6 +57,12 @@ Before you begin, ensure you have the following installed:
    JWT_SECRET=your_super_secret_jwt_key_here
    PORT=5000
    NODE_ENV=development
+   # Optional: Email configuration for welcome emails
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   EMAIL_FROM=your-email@gmail.com
    ```
 
 4. **Install dependencies and start services:**
@@ -96,6 +102,12 @@ Before you begin, ensure you have the following installed:
    JWT_SECRET=your_jwt_secret_here
    PORT=5000
    NODE_ENV=development
+   # Optional: Email configuration for welcome emails
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   EMAIL_FROM=your-email@gmail.com
    ```
 
 4. Start the backend server:
@@ -198,6 +210,48 @@ Replace `npm install` with `yarn install` and `npm run dev` with `yarn dev`.
 - `PUT /api/posts/:id/like` - Like or unlike a post (requires authentication)
 
 For detailed API documentation, see [API.md](backend/API.md).
+
+## Environment Variables
+
+The backend requires several environment variables to function properly. These are configured in the `.env` file in the `backend` directory.
+
+### Required Variables
+
+| Variable Name | Description | Required |
+|---------------|-------------|----------|
+| `MONGODB_URI` | MongoDB connection string for the database | Yes |
+| `JWT_SECRET` | Secret key used for JWT token signing and verification | Yes |
+| `PORT` | Port number for the backend server to listen on | No (defaults to 5000) |
+| `NODE_ENV` | Environment mode (development/production) | No (defaults to development) |
+
+### Optional Variables (Email Configuration)
+
+| Variable Name | Description | Required |
+|---------------|-------------|----------|
+| `EMAIL_HOST` | SMTP server host for sending emails | No |
+| `EMAIL_PORT` | SMTP server port | No |
+| `EMAIL_USER` | SMTP server username | No |
+| `EMAIL_PASS` | SMTP server password | No |
+| `EMAIL_FROM` | Email address to send emails from | No |
+
+### Variable Descriptions
+
+- **MONGODB_URI**: The connection string for your MongoDB database. For local MongoDB, use `mongodb://localhost:27017/college-media`. For MongoDB Atlas, use the provided connection string with your credentials.
+
+- **JWT_SECRET**: A secure secret key for signing JWT tokens. This should be a long, random string and kept confidential. Change this in production to prevent token forgery.
+
+- **PORT**: The port number the backend server will run on. Defaults to 5000 if not specified.
+
+- **NODE_ENV**: Set to `development` for development mode or `production` for production. Affects cookie security settings and other behaviors.
+
+- **Email Variables**: Used for sending welcome emails and other notifications. Configure with your SMTP provider details (e.g., Gmail, SendGrid). If not provided, email functionality will be disabled.
+
+### Security Notes
+
+- Never commit the `.env` file to version control.
+- Use strong, unique values for `JWT_SECRET`.
+- For production, use environment-specific values and secure credential management.
+- The `.env.example` file provides template values for all variables.
 
 ## Project Structure
 
