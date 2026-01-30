@@ -1,0 +1,51 @@
+name: "🔌 API Documentation"
+description: Document or improve backend API endpoints
+title: "[API DOCS] Add documentation for "
+labels: ["documentation", "backend"]
+assignees: ""
+body:
+  - type: textarea
+    id: api-details
+    attributes:
+      label: "🔍 API Details"
+      description: "Provide details about the API endpoint"
+      value: |
+        **Endpoint:** 
+        **HTTP Method:** 
+        **Authentication Required:** Yes / No
+        **Description:**
+    validations:
+      required: true
+  - type: textarea
+    id: request-example
+    attributes:
+      label: "📥 Request Example"
+      description: "Provide an example of the request body (if applicable)"
+      value: |
+        ```json
+        {
+          "example": "data"
+        }
+        ```
+    validations:
+      required: false
+  - type: textarea
+    id: response-example
+    attributes:
+      label: "📤 Response Example"
+      description: "Provide an example of the response"
+      value: |
+        ```json
+        {
+          "example": "response"
+        }
+        ```
+    validations:
+      required: false
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: "📝 Additional Notes"
+      description: "Any additional information, error codes, or special considerations"
+    validations:
+      required: false

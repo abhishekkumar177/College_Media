@@ -206,6 +206,7 @@ college-media/
 │   │   └── posts.js
 │   ├── package.json
 │   ├── server.js
+│   ├── .env.example
 │   └── .env (create this file)
 ├── frontend/
 │   ├── src/
