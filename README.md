@@ -6,7 +6,9 @@
   <img src="https://img.shields.io/badge/MongoDB-7+-green?style=for-the-badge&logo=mongodb" alt="MongoDB Version" />
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License" />
   <img src="https://img.shields.io/badge/PRs-Welcome-orange?style=for-the-badge" alt="PRs Welcome" />
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=abhishekkumar177.College_Media&style=for-the-badge" alt="Visitor Count" />
 </div>
+
 
 <div align="center">
   <h3>🌟 A full-stack social media platform built for college students</h3>
