@@ -21,6 +21,7 @@
 
 - [✨ Features](#-features)
 - [🛠️ Tech Stack](#️-tech-stack)
+- [🏗️ Architecture](#️-architecture)
 - [🤖 Chatbot](#-chatbot)
 - [🚀 Quick Start](#-quick-start)
 - [📖 API Documentation](#-api-documentation)
@@ -89,6 +90,170 @@
   <img src="https://img.shields.io/badge/bcryptjs-000000?style=for-the-badge" alt="bcryptjs" />
   <img src="https://img.shields.io/badge/CORS-000000?style=for-the-badge" alt="CORS" />
 </div>
+
+---
+
+## 🏗️ Architecture
+
+<div align="center">
+  <h3>System Architecture Overview</h3>
+</div>
+
+```mermaid
+graph TB
+    %% User Layer
+    subgraph "👥 Users"
+        U[College Students]
+    end
+
+    %% Frontend Layer
+    subgraph "🎨 Frontend Layer"
+        subgraph "React Application"
+            A[App.jsx<br/>Main Component]
+            N[Navbar.jsx<br/>Navigation]
+            H[Hero.jsx<br/>Landing Page]
+            HP[Home.jsx<br/>Dashboard]
+            L[Login.jsx<br/>Authentication]
+            S[Signup.jsx<br/>Registration]
+            P[Profile.jsx<br/>User Profile]
+        end
+
+        subgraph "UI Components"
+            F[Features.jsx<br/>Feature Showcase]
+            T[Team.jsx<br/>Team Section]
+            FT[Footer.jsx<br/>Site Footer]
+            CTA[CTA.jsx<br/>Call to Action]
+            AB[About.jsx<br/>About Section]
+        end
+
+        subgraph "Social Features"
+            SF[SocialFeed.jsx<br/>Post Feed]
+            PC[PostCard.jsx<br/>Individual Posts]
+        end
+
+        subgraph "🤖 Chatbot System"
+            CW[ChatbotWidget.jsx<br/>Chat Interface]
+            CB[ChatBody.jsx<br/>Chat Messages]
+            CH[ChatHeader.jsx<br/>Chat Header]
+            CI[ChatInput.jsx<br/>Message Input]
+            CS[chat.service.js<br/>Chat Logic]
+        end
+
+        subgraph "🔄 State Management"
+            AC[AuthContext.jsx<br/>User Auth State]
+            CC[ChatContext.jsx<br/>Chat State]
+            UC[useChat.js<br/>Chat Hooks]
+            UCB[useChatbot.js<br/>Chatbot Hooks]
+        end
+    end
+
+    %% API Layer
+    subgraph "🔧 Backend API Layer"
+        subgraph "Express Server"
+            ES[server.js<br/>Main Server]
+            AM[authMiddleware.js<br/>JWT Auth]
+        end
+
+        subgraph "API Routes"
+            AR[auth.js<br/>Auth Routes<br/>POST /register<br/>POST /login]
+            PR[posts.js<br/>Post Routes<br/>GET /posts<br/>POST /posts<br/>PUT /posts/:id/like]
+        end
+
+        subgraph "Business Logic"
+            SE[sendEmail.js<br/>Email Service]
+        end
+    end
+
+    %% Data Layer
+    subgraph "🗄️ Data Layer"
+        subgraph "MongoDB Database"
+            UM[User Model<br/>User.js]
+            PM[Post Model<br/>Post.js]
+        end
+    end
+
+    %% External Services
+    subgraph "🌐 External Services"
+        MG[MongoDB Atlas<br/>Cloud Database]
+        EM[Email Service<br/>SMTP Provider]
+    end
+
+    %% Connections
+    U --> A
+    A --> N
+    A --> H
+    A --> HP
+    A --> L
+    A --> S
+    A --> P
+
+    HP --> SF
+    SF --> PC
+
+    A --> CW
+    CW --> CB
+    CW --> CH
+    CW --> CI
+    CI --> CS
+
+    AC --> A
+    CC --> CW
+    UC --> CC
+    UCB --> CW
+
+    A --> AR
+    A --> PR
+    AR --> AM
+    PR --> AM
+    AM --> ES
+
+    ES --> UM
+    ES --> PM
+    ES --> SE
+
+    UM --> MG
+    PM --> MG
+    SE --> EM
+
+    %% Styling
+    classDef frontend fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef backend fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef database fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef user fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+
+    class U user
+    class A,H,HP,L,S,P,N,F,T,FT,CTA,AB,SF,PC,CW,CB,CH,CI,CS,AC,CC,UC,UCB frontend
+    class ES,AM,AR,PR,SE backend
+    class UM,PM database
+    class MG,EM external
+```
+
+### 🏛️ Architecture Components
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Frontend** | React + Vite | User interface and client-side logic |
+| **Backend** | Node.js + Express | API server and business logic |
+| **Database** | MongoDB + Mongoose | Data storage and retrieval |
+| **Authentication** | JWT + bcryptjs | Secure user authentication |
+| **Chatbot** | Client-side Service | AI-powered user assistance |
+| **Email Service** | SMTP | User notifications and welcome emails |
+
+### 🔄 Data Flow
+
+1. **User Registration/Login** → Frontend → Auth API → JWT Token → Database
+2. **Post Creation** → Frontend → Posts API → Database → Real-time Update
+3. **Chatbot Interaction** → Frontend Service → Predefined Responses
+4. **Email Notifications** → Backend → SMTP Service → User Email
+
+### 🛡️ Security Architecture
+
+- **JWT Authentication** for API protection
+- **Password Hashing** with bcryptjs
+- **CORS Configuration** for cross-origin requests
+- **Input Validation** and sanitization
+- **Environment Variables** for sensitive data
 
 ---
 
