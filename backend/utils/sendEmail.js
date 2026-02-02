@@ -1,4 +1,10 @@
 const sendEmail = async ({ to, subject, html }) => {
+  // Skip email sending if credentials are not configured
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log("⚠️  Email skipped (credentials not configured):", to);
+    return;
+  }
+
   try {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.log('📧 Email not configured, skipping email to:', to);

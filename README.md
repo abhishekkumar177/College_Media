@@ -19,17 +19,32 @@
 
 ## 📋 Table of Contents
 
-- [✨ Features](#-features)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🏗️ Architecture](#️-architecture)
-- [🤖 Chatbot](#-chatbot)
-- [🚀 Quick Start](#-quick-start)
-- [📖 API Documentation](#-api-documentation)
-- [🔧 Environment Variables](#-environment-variables)
-- [🌐 Deployment](#-deployment)
-- [📁 Project Structure](#-project-structure)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+- [🎓 College Media](#-college-media)
+  - [📋 Table of Contents](#-table-of-contents)
+  - [✨ Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [🏗️ Architecture](#️-architecture)
+    - [🏛️ Architecture Components](#️-architecture-components)
+    - [🔄 Data Flow](#-data-flow)
+    - [🛡️ Security Architecture](#️-security-architecture)
+  - [🤖 Chatbot](#-chatbot)
+  - [🚀 Quick Start](#-quick-start)
+    - [Prerequisites](#prerequisites)
+    - [⚡ Quick Setup (Recommended)](#-quick-setup-recommended)
+  - [📖 API Documentation](#-api-documentation)
+    - [🔐 Authentication Endpoints](#-authentication-endpoints)
+    - [📝 Posts Endpoints](#-posts-endpoints)
+  - [🔧 Environment Variables](#-environment-variables)
+    - [Required Variables](#required-variables)
+    - [Optional Variables (Email)](#optional-variables-email)
+  - [🌐 Deployment](#-deployment)
+    - [Recommended Platforms](#recommended-platforms)
+    - [Production Checklist](#production-checklist)
+  - [📁 Project Structure](#-project-structure)
+  - [🤝 Contributing](#-contributing)
+    - [📋 How to Contribute](#-how-to-contribute)
+    - [📖 Contribution Guidelines](#-contribution-guidelines)
+  - [📄 License](#-license)
 
 ---
 
@@ -520,7 +535,10 @@ We love your input! We want to make contributing to this project as easy and tra
 - 💡 Suggest features and improvements
 - 📝 Follow our code style guidelines in [CODE_STYLE.md](CODE_STYLE.md)
 
----
+
+> 🚨 **ECWoC’26 Contribution Rules**:  
+> All contributions must follow the guidelines specified in [CONTRIBUTING.md](CONTRIBUTING.md), including issue labeling, PR deadlines, and code standards. Contributors will be acknowledged in the README and event dashboard.
+> 
 
 ## 📄 License
 
