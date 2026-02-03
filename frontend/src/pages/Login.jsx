@@ -41,7 +41,7 @@ export default function Login() {
       }
 
       login(data.token, data.user);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {

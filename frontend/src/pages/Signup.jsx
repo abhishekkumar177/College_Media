@@ -59,8 +59,26 @@ export default function Signup() {
         throw new Error(data.message || 'Signup failed');
       }
 
-      login(data.token, data.user);
-      navigate('/');
+      // After successful registration, log in the user
+      const loginResponse = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (loginResponse.ok) {
+        login(loginData.token, loginData.user);
+        navigate('/dashboard');
+      } else {
+        navigate('/login');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

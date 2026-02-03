@@ -1,38 +1,38 @@
 export default function PostCard({ post }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 w-full md:max-w-2xl mx-auto shadow-xs">
+    <div style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '12px', padding: '1.25rem', transition: 'all 0.2s' }}>
       {/* Header: Avatar, Name, Title, Timestamp */}
-      <div className="flex items-center mb-3">
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
         <img
           src={post.user.avatar}
           alt={post.user.name}
-          className="w-10 h-10 rounded-full mr-3"
+          style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '0.75rem' }}
         />
         <div>
-          <h3 className="font-semibold text-sm text-gray-900">{post.user.name}</h3>
-          <p className="text-xs text-gray-500">{post.user.title} • {post.timestamp}</p>
+          <h3 style={{ fontWeight: '600', fontSize: '14px', color: '#111827', marginBottom: '0.125rem' }}>{post.user.name}</h3>
+          <p style={{ fontSize: '12px', color: '#6B7280' }}>{post.user.title} • {post.timestamp}</p>
         </div>
       </div>
 
       {/* Content */}
-      <p className="text-sm text-gray-800 mb-3 leading-relaxed">{post.content}</p>
+      <p style={{ fontSize: '14px', color: '#374151', marginBottom: '1rem', lineHeight: '1.6' }}>{post.content}</p>
 
       {/* Engagement Stats */}
-      <div className="flex justify-between text-xs text-gray-500 mb-2">
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#6B7280', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid #E5E7EB' }}>
         <span>{post.likes} likes</span>
         <span>{post.comments} comments</span>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-around mt-2 border-t border-gray-100 pt-2">
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          👍 Like
+      <div style={{ display: 'flex', justifyContent: 'space-around', gap: '0.5rem' }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: '#6B7280', background: 'transparent', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#E5E7EB'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+          <span>👍</span> Like
         </button>
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          💬 Comment
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: '#6B7280', background: 'transparent', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#E5E7EB'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+          <span>💬</span> Comment
         </button>
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          🔗 Share
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: '#6B7280', background: 'transparent', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#E5E7EB'} onMouseOut={(e) => e.target.style.background = 'transparent'}>
+          <span>🔗</span> Share
         </button>
       </div>
     </div>
