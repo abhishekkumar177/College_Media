@@ -1,6 +1,6 @@
 // Posts API Service
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
 
 /**
  * Get authentication token from localStorage
@@ -43,21 +43,29 @@ export const getPosts = async (limit = 10, offset = 0) => {
  */
 export const createPost = async (postData) => {
   try {
+    const token = getAuthToken();
+    console.log('Token:', token ? 'Present' : 'Missing');
+    console.log('API URL:', `${API_URL}/posts`);
+    console.log('Post data:', postData);
+
     const response = await fetch(`${API_URL}/posts`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${getAuthToken()}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(postData),
     });
 
+    console.log('Response status:', response.status);
+    const data = await response.json();
+    console.log('Response data:', data);
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to create post');
+      throw new Error(data.message || `Failed to create post (${response.status})`);
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error('Error creating post:', error);
     throw error;

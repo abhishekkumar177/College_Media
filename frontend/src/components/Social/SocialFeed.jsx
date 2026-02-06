@@ -1,5 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import PostCard from './PostCard';
+import CreatePostForm from './CreatePostForm';
 import { AuthContext } from '../../context/AuthContext';
 import { getPosts } from './posts.service';
 
@@ -128,6 +129,10 @@ export default function SocialFeed() {
 
         <div style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Create Post Form */}
+            <CreatePostForm onPostCreated={fetchPosts} user={user} />
+            
+            {/* Posts List */}
             {posts.map((post) => (
               <PostCard 
                 key={post._id} 

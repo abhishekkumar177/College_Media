@@ -31,7 +31,7 @@ export default function Profile() {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/users/${id}`);
+      const response = await fetch(`http://localhost:3002/api/users/${id}`);
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -51,7 +51,7 @@ export default function Profile() {
     e.preventDefault();
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch(`http://localhost:3001/api/users/${id}`, {
+      const response = await fetch(`http://localhost:3002/api/users/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
