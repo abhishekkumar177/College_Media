@@ -47,12 +47,12 @@ export default function SocialFeed() {
     return (
       <section className="w-full">
         <div className="w-full">
-          <header style={{ padding: '1.5rem', borderBottom: '1px solid #E5E7EB' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#111827' }}>
+          <header style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', backgroundColor: 'var(--color-card-bg)' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
               Social Feed
             </h2>
           </header>
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#6B7280' }}>
+          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-card-bg)' }}>
             Loading posts...
           </div>
         </div>
@@ -64,19 +64,20 @@ export default function SocialFeed() {
     return (
       <section className="w-full">
         <div className="w-full">
-          <header style={{ padding: '1.5rem', borderBottom: '1px solid #E5E7EB' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#111827' }}>
+          <header style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', backgroundColor: 'var(--color-card-bg)' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
               Social Feed
             </h2>
           </header>
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
+          <div style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--color-card-bg)' }}>
             <div style={{
               padding: '1rem',
-              backgroundColor: '#FEE2E2',
-              color: '#DC2626',
+              backgroundColor: 'var(--color-error-light)',
+              color: 'var(--color-error)',
               borderRadius: '6px',
               fontSize: '14px',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              border: '1px solid var(--color-error)'
             }}>
               {error}
             </div>
@@ -84,13 +85,16 @@ export default function SocialFeed() {
               onClick={fetchPosts}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: '#3B82F6',
-                color: '#fff',
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '14px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all var(--transition-base)'
               }}
+              onMouseOver={(e) => e.target.style.backgroundColor = 'var(--color-primary-dark)'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'var(--color-primary)'}
             >
               Retry
             </button>
@@ -104,12 +108,12 @@ export default function SocialFeed() {
     return (
       <section className="w-full">
         <div className="w-full">
-          <header style={{ padding: '1.5rem', borderBottom: '1px solid #E5E7EB' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#111827' }}>
+          <header style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', backgroundColor: 'var(--color-card-bg)' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
               Social Feed
             </h2>
           </header>
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#9CA3AF' }}>
+          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-tertiary)', backgroundColor: 'var(--color-card-bg)' }}>
             No posts yet. Be the first to create a post!
           </div>
         </div>
@@ -121,13 +125,13 @@ export default function SocialFeed() {
     <section className="w-full">
       <div className="w-full">
         
-        <header style={{ padding: '1.5rem', borderBottom: '1px solid #E5E7EB' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '600', color: '#111827' }}>
+        <header style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', backgroundColor: 'var(--color-card-bg)' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
             Social Feed
           </h2>
         </header>
 
-        <div style={{ padding: '1.5rem' }}>
+        <div style={{ padding: '1.5rem', backgroundColor: 'var(--color-bg-primary)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Create Post Form */}
             <CreatePostForm onPostCreated={fetchPosts} user={user} />

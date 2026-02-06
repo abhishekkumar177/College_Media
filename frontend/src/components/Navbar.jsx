@@ -1,25 +1,17 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [theme, setTheme] = useState('light');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initial = stored || (prefersDark ? 'dark' : 'light');
-    setTheme(initial);
-    document.body.classList.remove('light', 'dark');
-    document.body.classList.add(initial);
-  }, []);
 
   // Close menu when route changes
   useEffect(() => {
@@ -35,14 +27,6 @@ export default function Navbar() {
       document.body.style.overflow = 'unset';
     }
   }, [isMenuOpen]);
-
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    document.body.classList.remove('light', 'dark');
-    document.body.classList.add(next);
-    localStorage.setItem('theme', next);
-  };
 
   const handleLogout = () => {
     logout();
@@ -85,15 +69,7 @@ export default function Navbar() {
 
           <ul>
             <li>
-              <button
-                className="theme-toggle"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
-                style={{ cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.2rem' }}
-              >
-                {theme === 'dark' ? '☀️' : '🌙'}
-              </button>
+              <ThemeToggle />
             </li>
             <li><a href="#features" onClick={() => setIsMenuOpen(false)}>Features</a></li>
             <li><a href="#about" onClick={() => setIsMenuOpen(false)}>About</a></li>

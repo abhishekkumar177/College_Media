@@ -75,8 +75,8 @@ export default function CommentItem({
       marginLeft: depth > 0 ? '2rem' : '0',
       marginBottom: '1rem',
       padding: '0.75rem',
-      backgroundColor: depth > 0 ? '#F9FAFB' : '#fff',
-      borderLeft: depth > 0 ? '3px solid #E5E7EB' : 'none',
+      backgroundColor: depth > 0 ? 'var(--color-bg-secondary)' : 'var(--color-card-bg)',
+      borderLeft: depth > 0 ? '3px solid var(--color-border-primary)' : 'none',
       borderRadius: '6px'
     }}>
       <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -95,11 +95,11 @@ export default function CommentItem({
         <div style={{ flex: 1 }}>
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <span style={{ fontWeight: '600', fontSize: '14px', color: '#111827' }}>
+            <span style={{ fontWeight: '600', fontSize: '14px', color: 'var(--color-text-primary)' }}>
               {comment.user.name}
             </span>
-            <span style={{ fontSize: '12px', color: '#9CA3AF' }}>•</span>
-            <span style={{ fontSize: '12px', color: '#6B7280' }}>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>•</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
               {formattedDate}
             </span>
             {isOwner && !isEditing && (
@@ -109,7 +109,7 @@ export default function CommentItem({
                   style={{
                     marginLeft: 'auto',
                     fontSize: '12px',
-                    color: '#3B82F6',
+                    color: 'var(--color-primary)',
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
@@ -122,7 +122,7 @@ export default function CommentItem({
                   onClick={handleDelete}
                   style={{
                     fontSize: '12px',
-                    color: '#DC2626',
+                    color: 'var(--color-error)',
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
@@ -148,7 +148,7 @@ export default function CommentItem({
                 onClick={() => setIsEditing(false)}
                 style={{
                   fontSize: '13px',
-                  color: '#6B7280',
+                  color: 'var(--color-text-secondary)',
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
@@ -161,7 +161,7 @@ export default function CommentItem({
           ) : (
             <p style={{
               fontSize: '14px',
-              color: '#374151',
+              color: 'var(--color-text-primary)',
               lineHeight: '1.5',
               marginBottom: '0.5rem',
               whiteSpace: 'pre-wrap',
@@ -181,7 +181,7 @@ export default function CommentItem({
                   alignItems: 'center',
                   gap: '0.25rem',
                   fontSize: '13px',
-                  color: isLiked ? '#3B82F6' : '#6B7280',
+                  color: isLiked ? 'var(--color-primary)' : 'var(--color-text-secondary)',
                   fontWeight: isLiked ? '600' : '400',
                   background: 'none',
                   border: 'none',
@@ -198,7 +198,7 @@ export default function CommentItem({
                   onClick={() => setShowReplyForm(!showReplyForm)}
                   style={{
                     fontSize: '13px',
-                    color: '#6B7280',
+                    color: 'var(--color-text-secondary)',
                     fontWeight: '500',
                     background: 'none',
                     border: 'none',
@@ -211,7 +211,7 @@ export default function CommentItem({
               )}
 
               {comment.replies?.length > 0 && (
-                <span style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-tertiary)' }}>
                   {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
                 </span>
               )}

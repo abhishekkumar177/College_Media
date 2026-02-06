@@ -9,7 +9,7 @@ export default function ChatBody() {
         flex: 1,
         padding: "16px",
         overflowY: "auto",
-        background: "#ffffff",
+        background: "var(--color-bg-primary)",
       }}
     >
       {messages.map((msg, i) => (
@@ -28,8 +28,8 @@ export default function ChatBody() {
               borderRadius: "18px",
               fontSize: "14px",
               lineHeight: "1.45",
-              background: msg.sender === "user" ? "#2563eb" : "#f1f5f9",
-              color: msg.sender === "user" ? "#ffffff" : "#111827",
+              background: msg.sender === "user" ? "var(--color-primary)" : "var(--color-bg-secondary)",
+              color: msg.sender === "user" ? "white" : "var(--color-text-primary)",
             }}
           >
             {msg.text}

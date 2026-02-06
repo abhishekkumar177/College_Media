@@ -79,11 +79,12 @@ export default function CreatePostForm({ onPostCreated, user }) {
 
   return (
     <div style={{
-      background: '#F9FAFB',
-      border: '1px solid #E5E7EB',
+      background: 'var(--color-card-bg)',
+      border: '1px solid var(--color-card-border)',
       borderRadius: '12px',
       padding: '1.25rem',
-      marginBottom: '1.5rem'
+      marginBottom: '1.5rem',
+      boxShadow: '0 1px 3px var(--color-card-shadow)'
     }}>
       <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
         <img
@@ -100,7 +101,7 @@ export default function CreatePostForm({ onPostCreated, user }) {
           <p style={{
             fontSize: '14px',
             fontWeight: '500',
-            color: '#111827',
+            color: 'var(--color-text-primary)',
             marginBottom: '0.5rem'
           }}>
             {user?.name || 'User'}
@@ -116,19 +117,20 @@ export default function CreatePostForm({ onPostCreated, user }) {
               width: '100%',
               minHeight: '80px',
               padding: '0.75rem',
-              border: '1px solid #E5E7EB',
+              border: '1px solid var(--color-input-border)',
               borderRadius: '8px',
               fontSize: '14px',
               fontFamily: 'inherit',
               resize: 'vertical',
-              backgroundColor: '#fff'
+              backgroundColor: 'var(--color-input-bg)',
+              color: 'var(--color-input-text)'
             }}
             maxLength={1000}
             disabled={isSubmitting}
           />
           <div style={{
             fontSize: '12px',
-            color: content.length > 900 ? '#DC2626' : '#6B7280',
+            color: content.length > 900 ? 'var(--color-error)' : 'var(--color-text-secondary)',
             marginTop: '0.5rem',
             marginBottom: '1rem'
           }}>
@@ -148,7 +150,7 @@ export default function CreatePostForm({ onPostCreated, user }) {
               maxHeight: '300px',
               objectFit: 'cover',
               borderRadius: '8px',
-              border: '1px solid #E5E7EB'
+              border: '1px solid var(--color-border-primary)'
             }}
           />
           <button
@@ -164,8 +166,8 @@ export default function CreatePostForm({ onPostCreated, user }) {
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              backgroundColor: '#111827',
-              color: '#fff',
+              backgroundColor: 'var(--color-text-primary)',
+              color: 'var(--color-bg-primary)',
               border: 'none',
               cursor: 'pointer',
               fontSize: '18px',
@@ -183,8 +185,8 @@ export default function CreatePostForm({ onPostCreated, user }) {
       {error && (
         <div style={{
           padding: '0.75rem',
-          backgroundColor: '#FEE2E2',
-          color: '#DC2626',
+          backgroundColor: 'var(--color-error-light)',
+          color: 'var(--color-error)',
           borderRadius: '6px',
           fontSize: '13px',
           marginBottom: '1rem'
@@ -199,14 +201,14 @@ export default function CreatePostForm({ onPostCreated, user }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: '0.75rem',
-        borderTop: '1px solid #E5E7EB'
+        borderTop: '1px solid var(--color-border-primary)'
       }}>
         <label style={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
           fontSize: '13px',
-          color: '#6B7280',
+          color: 'var(--color-text-secondary)',
           cursor: 'pointer',
           padding: '0.5rem 1rem'
         }}>
@@ -226,14 +228,14 @@ export default function CreatePostForm({ onPostCreated, user }) {
           disabled={isSubmitting || !content.trim()}
           style={{
             padding: '0.5rem 1.5rem',
-            backgroundColor: (!content.trim() || isSubmitting) ? '#E5E7EB' : '#3B82F6',
-            color: (!content.trim() || isSubmitting) ? '#9CA3AF' : '#fff',
+            backgroundColor: (!content.trim() || isSubmitting) ? 'var(--color-border-primary)' : 'var(--color-primary)',
+            color: (!content.trim() || isSubmitting) ? 'var(--color-text-tertiary)' : 'white',
             border: 'none',
             borderRadius: '6px',
             fontSize: '14px',
             fontWeight: '600',
             cursor: (!content.trim() || isSubmitting) ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s'
+            transition: 'all var(--transition-base)'
           }}
         >
           {isSubmitting ? 'Posting...' : 'Post'}

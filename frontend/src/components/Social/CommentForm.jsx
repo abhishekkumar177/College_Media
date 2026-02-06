@@ -47,13 +47,15 @@ export default function CommentForm({ onSubmit, placeholder = "Write a comment..
             width: '100%',
             minHeight: '60px',
             padding: '0.75rem',
-            border: '1px solid #E5E7EB',
+            border: '1px solid var(--color-input-border)',
             borderRadius: '8px',
             fontSize: '14px',
             resize: 'vertical',
             fontFamily: 'inherit',
-            backgroundColor: isSubmitting ? '#F9FAFB' : '#fff',
+            backgroundColor: isSubmitting ? 'var(--color-bg-secondary)' : 'var(--color-input-bg)',
+            color: 'var(--color-input-text)',
             opacity: isSubmitting ? 0.6 : 1,
+            transition: 'all var(--transition-base)'
           }}
           maxLength={500}
         />
@@ -65,7 +67,7 @@ export default function CommentForm({ onSubmit, placeholder = "Write a comment..
         }}>
           <span style={{
             fontSize: '12px',
-            color: text.length > 450 ? '#DC2626' : '#6B7280'
+            color: text.length > 450 ? 'var(--color-error)' : 'var(--color-text-secondary)'
           }}>
             {text.length}/500
           </span>
@@ -74,14 +76,14 @@ export default function CommentForm({ onSubmit, placeholder = "Write a comment..
             disabled={isSubmitting || !text.trim()}
             style={{
               padding: '0.5rem 1rem',
-              backgroundColor: (!text.trim() || isSubmitting) ? '#E5E7EB' : '#3B82F6',
-              color: (!text.trim() || isSubmitting) ? '#9CA3AF' : '#fff',
+              backgroundColor: (!text.trim() || isSubmitting) ? 'var(--color-border-primary)' : 'var(--color-primary)',
+              color: (!text.trim() || isSubmitting) ? 'var(--color-text-tertiary)' : 'white',
               border: 'none',
               borderRadius: '6px',
               fontSize: '14px',
               fontWeight: '500',
               cursor: (!text.trim() || isSubmitting) ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
+              transition: 'all var(--transition-base)',
             }}
           >
             {isSubmitting ? 'Posting...' : buttonText}
@@ -92,10 +94,11 @@ export default function CommentForm({ onSubmit, placeholder = "Write a comment..
         <div style={{
           marginTop: '0.5rem',
           padding: '0.5rem',
-          backgroundColor: '#FEE2E2',
-          color: '#DC2626',
+          backgroundColor: 'var(--color-error-light)',
+          color: 'var(--color-error)',
           borderRadius: '6px',
-          fontSize: '13px'
+          fontSize: '13px',
+          border: '1px solid var(--color-error)'
         }}>
           {error}
         </div>
