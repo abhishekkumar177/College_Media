@@ -1,155 +1,95 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-*/
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+  body {
+    @apply bg-slate-50 text-slate-900 transition-colors duration-300;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
   }
 }
 
-@layer utilities {
-  /* =========================
-     Variables (colors, spacing)
-  ========================= */
-  :root {
-    --bg-1: #f5f9ff;
-    --bg-2: #eef6ff;
-    --text: #0f172a;
-    --muted: #64748b;
-    --primary-600: #2563eb;
-    --primary-400: #38bdf8;
-    --accent: #4f46e5;
-    --success: #10b981;
-    --danger: #ef4444;
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --glass: rgba(255, 255, 255, 0.6);
-    --radius-lg: 1rem;
-    --transition: 0.18s ease;
+/* Pro tier entrance animation base */
+.pro-entrance {
+  opacity: 0;
+  filter: blur(16px);
+  transform: translateY(12px) scale(0.98);
+  will-change: transform, opacity, filter;
+}
+
+/* Custom utilities used in App.jsx */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.border-gradient-to-r {
+  background: linear-gradient(to right, #ec4899, #8b5cf6, #f97316);
+  border: 2px solid transparent;
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1);
   }
-
-  /* Dark theme variables */
-  body.dark {
-    --bg-1: #020617;
-    --bg-2: #061025;
-    --text: #e5e7eb;
-    --muted: #93c5fd;
-    --card-bg: rgba(15, 23, 42, 0.85);
-    --glass: rgba(255, 255, 255, 0.02);
+  50% {
+    transform: scale(1.2);
   }
 }
 
-/* =========================
-   Global Reset + Base
-========================= */
-* {
-  box-sizing: border-box;
+.animate-bounce {
+  animation: bounce 0.5s ease-in-out;
 }
-
-html {
-  scroll-behavior: smooth;
+/* Custom scrollbar for webkit */
+::-webkit-scrollbar {
+  width: 8px;
 }
-
-body {
-  margin: 0;
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial;
-  background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
-  color: var(--text);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  transition: background var(--transition), color var(--transition);
-}
-
-/* Accessibility */
-:focus {
-  outline: none;
-}
-
-:focus-visible {
-  outline: 3px solid rgba(99, 102, 241, 0.18);
-  outline-offset: 3px;
-}
-
-/* =========================
-   Containers
-========================= */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.25rem;
-}
-
-/* =========================
-   Utility classes
-========================= */
-.text-muted {
-  color: var(--muted);
-}
-
-.rounded-lg {
-  border-radius: var(--radius-lg);
-}
-
-.shadow-md {
-  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
-}
-
-/* =========================
-   Buttons
-========================= */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1rem;
-  border-radius: 999px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform var(--transition), box-shadow 0.18s ease,
-    opacity 0.15s ease;
-}
-
-.btn:active {
-  transform: translateY(1px);
-}
-
-.btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--primary-600),
-    var(--primary-400)
-  );
-  color: #fff;
-  box-shadow: 0 12px 36px rgba(37, 99, 235, 0.16);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 48px rgba(37, 99, 235, 0.22);
-}
-
-.btn-secondary {
+::-webkit-scrollbar-track {
   background: transparent;
-  border: 1px solid rgba(15, 23, 42, 0.15);
-  color: var(--text);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-body.dark .btn-secondary {
-  border-color: rgba(255, 255, 255, 0.15);
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* =========================
-   Navbar, Hero, Cards,
-   Auth, Footer, Dark mode
-   (UNCHANGED — SAFE)
-========================= */
-/* rest of your stylesheet continues exactly as-is */
+/* Now Live Badge Pulse Animation */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+  }
+}
+
+.badge-pulse {
+  animation: pulse-glow 2s infinite;
+}
