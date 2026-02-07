@@ -1,10 +1,13 @@
+
 import { useState } from 'react';
 import CommentSection from './CommentSection';
+import EditPostForm from './EditPostForm';
 
 export default function PostCard({ post, currentUserId }) {
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(post.comments || 0);
   const [likesCount, setLikesCount] = useState(post.likes || 0);
+  const [editing, setEditing] = useState(false);
 
   const handleCommentClick = () => {
     setShowComments(!showComments);
@@ -12,6 +15,19 @@ export default function PostCard({ post, currentUserId }) {
 
   const handleCommentCountChange = (newCount) => {
     setCommentCount(newCount);
+  };
+
+  const handleEditClick = () => {
+    setEditing(true);
+  };
+
+  const handleEditCancel = () => {
+    setEditing(false);
+  };
+
+  const handlePostUpdated = () => {
+    setEditing(false);
+    // Optionally, trigger a refresh in parent component
   };
 
   return (
@@ -29,8 +45,33 @@ export default function PostCard({ post, currentUserId }) {
         </div>
       </div>
 
-      {/* Content */}
-      <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', marginBottom: '1rem', lineHeight: '1.6' }}>{post.content}</p>
+
+      {/* Edit Mode or Content */}
+      {editing ? (
+        <EditPostForm post={post} onPostUpdated={handlePostUpdated} onCancel={handleEditCancel} />
+      ) : (
+        <>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', marginBottom: '1rem', lineHeight: '1.6' }}>{post.content}</p>
+          {/* Show Edit button if current user is the author */}
+          {currentUserId && post.user && currentUserId === post.user._id && (
+            <button
+              onClick={handleEditClick}
+              style={{
+                fontSize: '12px',
+                color: 'var(--color-primary)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                marginBottom: '1rem',
+                textDecoration: 'underline',
+                float: 'right'
+              }}
+            >
+              Edit
+            </button>
+          )}
+        </>
+      )}
 
       {/* Engagement Stats */}
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border-primary)' }}>

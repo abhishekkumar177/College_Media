@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function CreatePostForm({ onPostCreated, user }) {
   const [content, setContent] = useState('');
@@ -27,6 +28,23 @@ export default function CreatePostForm({ onPostCreated, user }) {
       setError('');
     }
   };
+
+  async function createPost(postData) {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:3002/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(postData),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Failed to create post');
+    }
+    return response.json();
+  }
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -232,4 +250,5 @@ export default function CreatePostForm({ onPostCreated, user }) {
         </div>
       </>
     );
-  }
+}
+
