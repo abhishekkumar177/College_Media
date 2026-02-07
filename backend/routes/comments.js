@@ -1,3 +1,4 @@
+
 import express from 'express';
 import Comment from '../models/Comment.js';
 import Post from '../models/Post.js';
@@ -20,6 +21,18 @@ const auth = (req, res, next) => {
     res.status(401).json({ message: 'Invalid token' });
   }
 };
+
+// Get all comments by the current user
+router.get('/my', auth, async (req, res) => {
+  try {
+    const comments = await Comment.find({ user: req.userId })
+      .populate('post', 'content')
+      .sort({ createdAt: -1 });
+    res.json({ comments });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Get all comments for a post (with nested replies)
 router.get('/post/:postId', auth, async (req, res) => {

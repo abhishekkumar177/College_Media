@@ -1,3 +1,27 @@
+/**
+ * Get all comments made by the current user
+ * @returns {Promise<Object>} Comments data
+ */
+export const getMyComments = async () => {
+  try {
+    const response = await fetch(`${API_URL}/comments/my`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch your comments');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching your comments:', error);
+    throw error;
+  }
+};
 // Comments API Service
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';

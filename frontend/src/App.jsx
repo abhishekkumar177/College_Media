@@ -6,7 +6,9 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+
 import Profile from "./pages/Profile";
+import CommentManagement from "./pages/CommentManagement";
 
 import ChatbotWidget from "./components/chatbot/ChatbotWidget";
 
@@ -28,6 +30,7 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/my-comments" element={<CommentManagement />} />
           </Routes>
 
           {/* Global Floating Chatbot */}
