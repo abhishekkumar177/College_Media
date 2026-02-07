@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
@@ -31,15 +32,15 @@ export default function Signup() {
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       return;
     }
-
-    setLoading(true);
 
     try {
       const response = await fetch('http://localhost:3002/api/auth/register', {
@@ -61,6 +62,7 @@ export default function Signup() {
         throw new Error(data.message || 'Signup failed');
       }
 
+      toast.success('Signup successful! Logging you in...');
       // After successful registration, log in the user
       const loginResponse = await fetch('http://localhost:3002/api/auth/login', {
         method: 'POST',
@@ -77,12 +79,14 @@ export default function Signup() {
 
       if (loginResponse.ok) {
         login(loginData.token, loginData.user);
+        toast.success('Logged in successfully!');
         navigate('/dashboard');
       } else {
-        navigate('/login');
+        throw new Error(loginData.message || 'Login after signup failed');
       }
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components/Navbar';
@@ -41,9 +42,11 @@ export default function Login() {
       }
 
       login(data.token, data.user);
+      toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
