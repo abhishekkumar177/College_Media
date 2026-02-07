@@ -290,6 +290,68 @@ export default function Dashboard() {
                 </button>
               </div>
 
+              {/* Search & Filter UI */}
+              <div style={{
+                background: 'var(--color-card-bg)',
+                borderRadius: '12px',
+                boxShadow: '0 1px 3px var(--color-card-shadow)',
+                border: '1px solid var(--color-border-primary)',
+                padding: '1.5rem',
+                marginBottom: '1.5rem',
+                display: 'flex',
+                gap: '1rem',
+                flexWrap: 'wrap',
+                alignItems: 'center'
+              }}>
+                <input
+                  type="text"
+                  placeholder="Search posts..."
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-input-border)',
+                    fontSize: '15px',
+                    background: 'var(--color-input-bg)',
+                    color: 'var(--color-input-text)'
+                  }}
+                />
+                <select style={{
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid var(--color-input-border)',
+                  fontSize: '15px',
+                  background: 'var(--color-input-bg)',
+                  color: 'var(--color-input-text)'
+                }}>
+                  <option value="">All Authors</option>
+                  <option value="ayaan">Ayaan</option>
+                  <option value="other">Other</option>
+                </select>
+                <input
+                  type="date"
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--color-input-border)',
+                    fontSize: '15px',
+                    background: 'var(--color-input-bg)',
+                    color: 'var(--color-input-text)'
+                  }}
+                />
+                <button style={{
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: 'var(--color-primary)',
+                  color: 'white',
+                  fontWeight: '600',
+                  fontSize: '15px',
+                  cursor: 'pointer',
+                  transition: 'background var(--transition-base)'
+                }}>Filter</button>
+              </div>
+
               {/* Social Feed */}
               <div style={{ 
                 background: 'var(--color-card-bg)', 
