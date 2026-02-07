@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import ThemeToggle from './ThemeToggle';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
@@ -151,6 +152,7 @@ export default function Navbar() {
               </>
             )}
           </ul>
+          <NotificationBell />
         </div>
       </div>
     </nav>

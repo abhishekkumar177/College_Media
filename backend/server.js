@@ -73,6 +73,10 @@ app.use("/api/chat", chatRoutes);
 import usersRouter from "./routes/users.js";
 app.use("/api/users", usersRouter);
 
+// Register the notifications API route
+import notificationsRouter from "./routes/notifications.js";
+app.use("/api/notifications", notificationsRouter);
+
 /* =========================
    HEALTH CHECK
 ========================= */
