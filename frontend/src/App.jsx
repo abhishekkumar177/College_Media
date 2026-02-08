@@ -18,28 +18,30 @@ import "./styles/theme.css";
 import "./styles/main.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          {/* App Routes */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/sample-profile" element={<SampleProfile />} />
-            <Route path="/my-comments" element={<CommentManagement />} />
-          </Routes>
+          <ErrorBoundary>
+            {/* App Routes */}
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/sample-profile" element={<SampleProfile />} />
+              <Route path="/my-comments" element={<CommentManagement />} />
+            </Routes>
 
-          {/* Global Floating Chatbot */}
-          <ChatbotWidget />
-          {/* Toast Notifications */}
-          <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+            {/* Global Floating Chatbot */}
+            <ChatbotWidget />
+            <ToastContainer />
+          </ErrorBoundary>
         </Router>
       </AuthProvider>
     </ThemeProvider>
