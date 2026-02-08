@@ -139,7 +139,7 @@ export default function Profile() {
       <div className="posts-section">
         <h2>Posts</h2>
         {posts.length > 0 ? (
-          posts.map((post) => <PostCard key={post._id} post={post} />)
+          posts.map((post) => <PostCard key={post._id} post={post} currentUserId={user._id} />)
         ) : (
           <p>No posts yet.</p>
         )}
