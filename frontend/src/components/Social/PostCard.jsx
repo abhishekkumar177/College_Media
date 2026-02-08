@@ -1,11 +1,31 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getCommentCount } from './comments.service';
 import CommentSection from './CommentSection';
 import EditPostForm from './EditPostForm';
 
 export default function PostCard({ post, currentUserId }) {
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(post.comments || 0);
+  const [loadingCount, setLoadingCount] = useState(true);
+    useEffect(() => {
+      let mounted = true;
+      async function fetchCount() {
+        setLoadingCount(true);
+        try {
+          const data = await getCommentCount(post._id || post.id);
+          if (mounted && data && typeof data.count === 'number') {
+            setCommentCount(data.count);
+          }
+        } catch (e) {
+          // fallback: keep previous count
+        } finally {
+          if (mounted) setLoadingCount(false);
+        }
+      }
+      fetchCount();
+      return () => { mounted = false; };
+    }, [post._id, post.id]);
   const [likesCount, setLikesCount] = useState(post.likes || 0);
   const [editing, setEditing] = useState(false);
 
@@ -74,9 +94,14 @@ export default function PostCard({ post, currentUserId }) {
       )}
 
       {/* Engagement Stats */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border-primary)' }}>
-        <span>{likesCount} likes</span>
-        <span>{commentCount} comments</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border-primary)' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 16 }}>👍</span> {likesCount} likes
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span style={{ fontSize: 16, color: 'var(--color-primary)' }}>💬</span>
+          {loadingCount ? <span style={{ fontStyle: 'italic', color: '#aaa' }}>...</span> : <b>{commentCount}</b>} comments
+        </span>
       </div>
 
       {/* Action Buttons */}

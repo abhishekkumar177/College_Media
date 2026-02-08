@@ -170,6 +170,34 @@ export default function Navbar() {
     );
   };
 
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const handleAvatarClick = () => {
+    setShowAvatarModal(true);
+  };
+  const handleAvatarUpload = async () => {
+    if (!avatarFile || !user?._id) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("avatar", avatarFile);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:3002/api/users/${user._id}/avatar`, {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        body: formData
+      });
+      if (res.ok) {
+        setShowAvatarModal(false);
+        window.location.reload();
+      }
+    } catch {}
+    setUploading(false);
+  };
   return (
     <>
       {/* NAVBAR */}
@@ -224,8 +252,22 @@ export default function Navbar() {
             <li><a href="#features" onClick={() => setIsMenuOpen(false)}>Features</a></li>
             <li><a href="#about" onClick={() => setIsMenuOpen(false)}>About</a></li>
             <li><a href="#team" onClick={() => setIsMenuOpen(false)}>Team</a></li>
+            <li>
+              <Link to="/sample-profile" onClick={() => setIsMenuOpen(false)} style={{ fontWeight: 500, color: '#1976d2' }}>
+                Sample Profile
+              </Link>
+            </li>
             {isAuthenticated ? (
-              <li style={{ position: 'relative' }}>
+              <li style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ cursor: 'pointer' }} onClick={handleAvatarClick}>
+                  {user?.avatar ? (
+                    <img src={`http://localhost:3002${user.avatar}`} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                  ) : (
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#e0e7ef', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 18, color: '#1976d2' }}>
+                      {user?.name ? user.name[0] : 'A'}
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
                   className="btn btn-primary"
@@ -283,6 +325,27 @@ export default function Navbar() {
                     >
                       Logout
                     </button>
+                  </div>
+                )}
+                {/* Avatar upload modal */}
+                {showAvatarModal && (
+                  <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: '#fff', padding: '2rem', borderRadius: '1rem', boxShadow: '0 4px 16px rgba(0,0,0,0.15)', minWidth: 320 }}>
+                      <h3>Update Profile Picture</h3>
+                      <input type="file" accept="image/*" onChange={e => {
+                        const file = e.target.files[0];
+                        setAvatarFile(file);
+                        if (file) setAvatarPreview(URL.createObjectURL(file));
+                        else setAvatarPreview("");
+                      }} />
+                      {avatarPreview && (
+                        <img src={avatarPreview} alt="Preview" style={{ width: 80, height: 80, borderRadius: '50%', margin: '1rem 0' }} />
+                      )}
+                      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <button className="btn btn-primary" disabled={uploading} onClick={handleAvatarUpload}>Upload</button>
+                        <button className="btn" onClick={() => setShowAvatarModal(false)}>Cancel</button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </li>

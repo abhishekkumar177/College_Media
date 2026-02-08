@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import path from "path";
+
 
 import authRoutes from "./routes/auth.js";
 import postsRoutes from "./routes/posts.js";
@@ -14,6 +16,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002;
+
+// Serve uploaded images
+app.use("/uploads", express.static(path.join(process.cwd(), "backend", "uploads")));
 
 /* =========================
    MIDDLEWARE

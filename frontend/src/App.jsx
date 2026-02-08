@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 
 import Profile from "./pages/Profile";
+import SampleProfile from "./pages/SampleProfile";
 import CommentManagement from "./pages/CommentManagement";
 
 import ChatbotWidget from "./components/chatbot/ChatbotWidget";
@@ -30,6 +31,8 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile/:id" element={<Profile />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/sample-profile" element={<SampleProfile />} />
             <Route path="/my-comments" element={<CommentManagement />} />
           </Routes>
 
