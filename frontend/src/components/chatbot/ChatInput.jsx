@@ -17,8 +17,8 @@ export default function ChatInput() {
       onSubmit={handleSubmit}
       style={{
         padding: "14px",
-        borderTop: "1px solid #e5e7eb",
-        background: "#ffffff",
+        borderTop: "1px solid var(--color-border-primary)",
+        background: "var(--color-card-bg)",
       }}
     >
       <div
@@ -28,8 +28,8 @@ export default function ChatInput() {
           gap: "6px",
           padding: "6px",
           borderRadius: "999px",
-          border: "1px solid #d1d5db",
-          background: "#ffffff",
+          border: "1px solid var(--color-input-border)",
+          background: "var(--color-input-bg)",
         }}
       >
         <input
@@ -44,7 +44,7 @@ export default function ChatInput() {
             border: "none",
             outline: "none",
             background: "transparent",
-            color: "#111827",
+            color: "var(--color-input-text)",
           }}
         />
 
@@ -54,14 +54,15 @@ export default function ChatInput() {
             width: "36px",
             height: "36px",
             borderRadius: "50%",
-            background: "#2563eb",
-            color: "#ffffff",
+            background: "var(--color-primary)",
+            color: "white",
             border: "none",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: "16px",
+            transition: "all var(--transition-base)"
           }}
         >
           ➤

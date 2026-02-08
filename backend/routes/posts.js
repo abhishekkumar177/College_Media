@@ -1,6 +1,6 @@
-const express = require('express');
-const Post = require('../models/Post');
-const jwt = require('jsonwebtoken');
+import express from 'express';
+import Post from '../models/Post.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ const auth = (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     req.userId = decoded.userId;
@@ -116,4 +116,4 @@ router.put('/:id/like', auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
