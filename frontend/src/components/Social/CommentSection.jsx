@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import CommentForm from './CommentForm';
 import CommentItem from './CommentItem';
-import { getComments, createComment, updateComment } from './comments.service';
+import { getComments, createComment, updateComment, replyToComment } from './comments.service';
 
 export default function CommentSection({ postId, initialCount = 0, currentUserId, onCommentCountChange }) {
   const [comments, setComments] = useState([]);
@@ -65,25 +65,18 @@ export default function CommentSection({ postId, initialCount = 0, currentUserId
 
   const handleReply = async (parentCommentId, text) => {
     try {
-      const result = await createComment({
-        postId,
-        text,
-        parentCommentId
-      });
-
+      const result = await replyToComment(parentCommentId, text);
       // Update comments with new reply
       setComments(comments.map(comment => {
         if (comment._id === parentCommentId) {
           return {
             ...comment,
-            replies: [...(comment.replies || []), result.comment]
+            replies: [...(comment.replies || []), result.reply]
           };
         }
         return comment;
       }));
-      
       setTotalComments(totalComments + 1);
-      
       if (onCommentCountChange) {
         onCommentCountChange(totalComments + 1);
       }

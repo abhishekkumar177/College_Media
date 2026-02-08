@@ -1,4 +1,30 @@
 /**
+ * Reply to a comment
+ * @param {string} commentId - The ID of the comment to reply to
+ * @param {string} text - The reply text
+ * @returns {Promise<Object>} Created reply
+ */
+export const replyToComment = async (commentId, text) => {
+  try {
+    const response = await fetch(`${API_URL}/comments/${commentId}/replies`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reply to comment');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error replying to comment:', error);
+    throw error;
+  }
+};
+/**
  * Get all comments made by the current user
  * @returns {Promise<Object>} Comments data
  */
