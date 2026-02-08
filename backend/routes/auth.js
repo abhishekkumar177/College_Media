@@ -1,3 +1,47 @@
+/* =========================
+   PASSWORD RESET
+========================= */
+// Request password reset (send email with token)
+router.post("/reset-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email required" });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    // Generate reset token
+    const resetToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    // Send email with reset link
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+    await sendEmail({
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Hello ${user.name},</p><p>Click <a href='${resetLink}'>here</a> to reset your password. This link expires in 1 hour.</p>`
+    });
+    res.json({ success: true, message: "Password reset email sent" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// Reset password (with token)
+router.post("/reset-password/confirm", async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) return res.status(400).json({ message: "Token and new password required" });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired token", error: error.message });
+  }
+});
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
