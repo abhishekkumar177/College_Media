@@ -103,7 +103,8 @@ const Hero = ({ variant = "home" }) => {
         )}
 
         {/* Description */}
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-10 font-normal leading-relaxed">
+        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10 font-normal leading-relaxed">
+
           {variant === "courses"
             ? "Hands-on, project-based courses designed to make you job-ready — not just certificate-ready."
             : "Connect with classmates, share campus moments, and build your network in a clean, distraction-free environment designed for the next generation."}
