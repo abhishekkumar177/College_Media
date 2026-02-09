@@ -120,9 +120,19 @@ const Hero = ({ variant = "home" }) => {
             {variant === "courses" ? "Explore Courses →" : "Join Your Campus →"}
           </button>
 
-          <button className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all active:scale-95">
+          <button
+            className="
+              px-6 py-3 rounded-full border
+              border-slate-300 text-slate-700
+              dark:border-white/40 dark:text-white
+              hover:bg-slate-100 dark:hover:bg-white/5
+              hover:border-slate-400 dark:hover:border-white/60
+              transition-colors duration-300
+            "
+          >
             View Demo
           </button>
+
         </div>
 
         {/* UI Mockup (Home only) */}
