@@ -167,6 +167,26 @@ nav {
   padding: 80px 0;
   text-align: center;
   position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(107, 70, 193, 0.4) 0%,
+    rgba(217, 70, 239, 0.3) 30%,
+    transparent 70%
+  );
+  filter: blur(100px);
+  z-index: 0;
+  pointer-events: none;
 }
 
 .badge {
@@ -178,12 +198,16 @@ nav {
   margin-bottom: 20px;
   font-weight: 600;
   color: #d946ef;
+  position: relative;
+  z-index: 1;
 }
 
 .hero h1 {
   font-size: 3rem;
   margin-bottom: 20px;
   line-height: 1.2;
+  position: relative;
+  z-index: 1;
 }
 
 .highlight {
@@ -199,6 +223,8 @@ nav {
   max-width: 800px;
   margin: 0 auto 40px;
   color: rgba(255, 255, 255, 0.8);
+  position: relative;
+  z-index: 1;
 }
 
 [data-theme="light"] .hero p {
@@ -210,6 +236,8 @@ nav {
   justify-content: center;
   gap: 20px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .btn-lg {
@@ -253,7 +281,9 @@ nav {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 15px;
   padding: 30px;
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
