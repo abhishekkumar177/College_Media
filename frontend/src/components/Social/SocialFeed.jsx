@@ -44,7 +44,7 @@ export default function SocialFeed() {
   return (
     <div className="max-w-2xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Social Feed</h2>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 space-y-4">
         {mockPosts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
