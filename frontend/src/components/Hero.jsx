@@ -81,14 +81,14 @@ const Hero = ({ variant = "home" }) => {
           {variant === "courses" ? (
             <>
               Learn{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400">
                 Industry-Ready Skills
               </span>
             </>
           ) : (
             <>
               The Social Network Built for{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400">
                 College Life
               </span>
             </>
