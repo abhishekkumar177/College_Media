@@ -18,13 +18,14 @@ export default function ChatbotWidget() {
             bottom: "88px",
             width: "360px",
             height: "520px",
-            background: "#ffffff",
+            background: "var(--color-card-bg)",
             borderRadius: "20px",
-            boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
+            boxShadow: "0 20px 40px var(--color-card-shadow)",
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
             zIndex: 10000,
+            border: "1px solid var(--color-card-border)"
           }}
         >
           <ChatHeader onClose={() => setOpen(false)} />
@@ -43,8 +44,8 @@ export default function ChatbotWidget() {
           width: "48px",
           height: "48px",
           borderRadius: "14px",
-          background: "#2563eb",
-          color: "#ffffff",
+          background: "var(--color-primary)",
+          color: "white",
           fontSize: "20px",
           border: "none",
           cursor: "pointer",
@@ -53,6 +54,7 @@ export default function ChatbotWidget() {
           justifyContent: "center",
           boxShadow: "0 6px 14px rgba(37,99,235,0.35)",
           zIndex: 10001,
+          transition: "all var(--transition-base)"
         }}
       >
         💬

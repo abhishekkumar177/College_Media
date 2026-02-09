@@ -4,15 +4,36 @@ Thank you for your interest in contributing to College Media! This document prov
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Branch Naming Conventions](#branch-naming-conventions)
-- [Commit Message Conventions](#commit-message-conventions)
-- [Pull Request Process](#pull-request-process)
-- [Code Style Guidelines](#code-style-guidelines)
-- [Testing](#testing)
-- [Reporting Issues](#reporting-issues)
-- [Code of Conduct](#code-of-conduct)
+- [Contributing to College Media](#contributing-to-college-media)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Development Setup](#development-setup)
+  - [Development Workflow](#development-workflow)
+  - [ECWoC’26 Contribution Guidelines](#ecwoc26-contribution-guidelines)
+  - [Branch Naming Conventions](#branch-naming-conventions)
+    - [Branch Types](#branch-types)
+    - [Examples](#examples)
+  - [Commit Message Conventions](#commit-message-conventions)
+    - [Commit Types](#commit-types)
+    - [Scope (Optional)](#scope-optional)
+    - [Examples](#examples-1)
+    - [Guidelines](#guidelines)
+  - [Pull Request Process](#pull-request-process)
+    - [Creating a Pull Request](#creating-a-pull-request)
+    - [PR Template](#pr-template)
+    - [Review Process](#review-process)
+    - [Review Guidelines](#review-guidelines)
+  - [Code Style Guidelines](#code-style-guidelines)
+    - [Linting](#linting)
+  - [Testing](#testing)
+    - [Frontend Testing](#frontend-testing)
+    - [Backend Testing](#backend-testing)
+    - [Manual Testing Checklist](#manual-testing-checklist)
+  - [Reporting Issues](#reporting-issues)
+    - [Bug Reports](#bug-reports)
+    - [Feature Requests](#feature-requests)
+  - [Code of Conduct](#code-of-conduct)
 
 ## Getting Started
 
@@ -76,6 +97,14 @@ Before contributing, ensure you have:
 6. **Push your branch** and create a pull request
 7. **Address review feedback** and make necessary changes
 8. **Merge** once approved
+
+ ## ECWoC’26 Contribution Guidelines
+1.  **Issue labeling**: Use `enhancement`, `bug`, `documentation`, or `feature-request`.
+2.  **PR submission**: Reference the issue number in your PR.
+3.  **Review deadlines**: Ensure PRs are submitted at least 24 hours before the milestone deadline.
+4.  **Code quality**: Maintain all code style, linting, and testing requirements.
+5.  **Acknowledgment**: All accepted contributions will be credited in the project README and event dashboard.
+
 
 ## Branch Naming Conventions
 

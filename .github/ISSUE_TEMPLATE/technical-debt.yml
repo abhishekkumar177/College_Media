@@ -1,0 +1,65 @@
+name: "🛠 Technical Task / Chore"
+description: Track refactoring, maintenance, or technical improvements
+title: "[TECH] "
+labels: ["chore", "maintenance"]
+assignees: []
+
+body:
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: GitHub username (optional)
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Briefly explain the technical maintenance required.
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: ⚠️ The Problem (Current State)
+      description: Describe the current messy implementation or outdated setup.
+      placeholder: e.g., We are currently using Redux with standard reducers which causes a lot of boilerplate code.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 The Solution (Proposed State)
+      description: How are we fixing it?
+      placeholder: e.g., Migrate the User store to Redux Toolkit (RTK) to reduce code lines and improve readability.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: 📉 Risk Level
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 📝 Checklist
+      options:
+        - label: Update dependencies
+        - label: Refactor related modules/files
+        - label: Test affected flows to ensure no regression
+        - label: Update documentation
+
+  - type: textarea
+    id: references
+    attributes:
+      label: 🔗 References
+      description: Links to documentation, StackOverflow, or legacy code

@@ -1,113 +1,174 @@
+/* =========================
+   PASSWORD RESET
+========================= */
+// Request password reset (send email with token)
+router.post("/reset-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email required" });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    // Generate reset token
+    const resetToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    // Send email with reset link
+    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`;
+    await sendEmail({
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Hello ${user.name},</p><p>Click <a href='${resetLink}'>here</a> to reset your password. This link expires in 1 hour.</p>`
+    });
+    res.json({ success: true, message: "Password reset email sent" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
 
+// Reset password (with token)
+router.post("/reset-password/confirm", async (req, res) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword) return res.status(400).json({ message: "Token and new password required" });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired token", error: error.message });
+  }
+});
+import express from "express";
 import bcrypt from "bcryptjs";
+import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
+
 dotenv.config();
 
+const router = express.Router();
 
+/* =========================
+   REGISTER
+========================= */
 
-
-// REGISTER
-export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "All fields required" });
-  }
-
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ message: "User already exists" });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  // Send Welcome Email
-  await sendEmail({
-    to: email,
-    subject: "Welcome to AlgoAI 🚀",
-    html: `
-      <h2>Hello ${name} 👋</h2>
-      <p>Welcome to <b>AlgoAI</b>.</p>
-      <p>You can now start using AI tools.</p>
-      <br/>
-      <p>— Team AlgoAI</p>
-    `,
-  });
-
-  res.status(201).json({
-    success: true,
-    message: "User registered & email sent",
-  });
-};
-
-
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+router.post("/register", async (req, res) => {
+router.post(
+  "/register",
+  [
+    body("name").notEmpty().withMessage("Name is required"),
+    body("username").notEmpty().withMessage("Username is required"),
+    body("email").isEmail().withMessage("Valid email required"),
+    body("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters")
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    const { name, username, email, password } = req.body;
+    try {
+      const userExists = await User.findOne({ $or: [ { email }, { username } ] });
+      if (userExists) {
+        if (userExists.email === email) {
+          return res.status(400).json({ message: "User with this email already exists" });
+        }
+        if (userExists.username === username) {
+          return res.status(400).json({ message: "Username already taken" });
+        }
+        return res.status(400).json({ message: "User already exists" });
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await User.create({ name, username, email, password: hashedPassword });
+      await sendEmail({
+        to: email,
+        subject: "Welcome to College Media 🚀",
+        html: `<h2>Hello ${name} 👋</h2><p>Welcome to <b>College Media</b>.</p><p>You can now start connecting with your college community.</p><br/><p>— Team College Media</p>`,
+      });
+      res.status(201).json({ success: true, message: "User registered & email sent" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error: error.message });
     }
-
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    res.json({
-      success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
   }
-};
+);
 
-
-export const logoutUser = (req, res) => {
+/* =========================
+   LOGIN
+========================= */
+router.post("/login", async (req, res) => {
+router.post(
+  "/login",
+  [
+    body("email").isEmail().withMessage("Valid email required"),
+    body("password").notEmpty().withMessage("Password is required")
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, password } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+      res.json({
+        success: true,
+        token,
+        user: {
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+          avatar: user.avatar,
+          role: user.role,
+        },
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  }
+);
+========================= */
+router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   });
 
-  res.json({ success: true, message: "Logged out successfully" });
-};
+  res.json({
+    success: true,
+    message: "Logged out successfully",
+  });
+});
 
+/* =========================
+   PROFILE
+========================= */
+router.get("/profile", async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    res.json({ success: true, user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-export const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.userId).select("-password");
-  res.json({ success: true, user });
-};
+export default router;
