@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-
+import '../components/Navbar';
 export default function Login() {
   const [formData, setFormData] = useState({
     email: '',
@@ -50,7 +50,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="auth-page min-h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 lg:px-12 py-6">
         <div className="flex items-center space-x-2">
@@ -59,18 +59,18 @@ export default function Login() {
           </div>
           <span className="text-lg font-semibold text-gray-900 tracking-wide">COLLEGE MEDIA</span>
         </div>
-        <Link to="/signup" className="text-sm text-gray-900 hover:text-gray-700 transition-colors border-2 border-gray-900 px-4 py-2 rounded-lg font-medium">
+        <Link to="/signup" className="auth-cta">
           Create an Account
         </Link>
       </div>
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-md border border-gray-200 p-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-10">Log in</h1>
+        <div className="auth-card w-full max-w-md p-10">
+          <h1 className="auth-title text-3xl font-bold mb-10">Log in</h1>
 
           {error && (
-            <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+            <div className="auth-error">
               {error}
             </div>
           )}
@@ -89,7 +89,7 @@ export default function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
+                className="auth-input"
               />
             </div>
 
@@ -107,18 +107,18 @@ export default function Login() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="8+ characters"
-                  className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 focus:border-transparent transition-all text-gray-900 placeholder-gray-400"
+                  className="auth-input"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600 hover:text-gray-900"
+                  className="auth-toggle"
                 >
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
               <div className="mt-2 text-right">
-                <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                <a href="#" className="auth-link">
                   Forgot password?
                 </a>
               </div>
@@ -128,7 +128,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-900 text-white py-3.5 px-4 rounded-full font-semibold hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center space-x-2 mt-8"
+              className="auth-btn auth-btn-primary"
             >
               <span>{loading ? 'Logging in...' : "Let's go"}</span>
               {!loading && (

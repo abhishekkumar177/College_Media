@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Sun } from 'lucide-react';
@@ -6,27 +6,32 @@ import { Sun } from 'lucide-react';
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
   const navigate = useNavigate();
 
+  // Initialize theme from localStorage or system preference
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initial = stored || (prefersDark ? 'dark' : 'light');
+    setTheme(initial);
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(initial);
   }, []);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(next);
+    localStorage.setItem('theme', next);
   };
 
   const handleLogout = () => {
     logout();
     navigate('/');
     setShowDropdown(false);
-  };
+  }; 
 
   return (
     <nav>
@@ -38,19 +43,20 @@ export default function Navbar() {
 
         <div className="nav-links">
           <ul>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#team">Team</a></li>
             <li>
               <button
+                className="theme-toggle"
                 onClick={toggleTheme}
-                className="btn btn-secondary"
-                style={{ padding: '8px', borderRadius: '50%', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                title="Toggle Theme"
+                aria-label="Toggle theme"
+                title={theme === 'dark' ? 'Switch to light' : 'Switch to dark'}
+                style={{ cursor: 'pointer', background: 'none', border: 'none', fontSize: '1.1rem' }}
               >
-                <Sun size={20} />
+                {theme === 'dark' ? '☀️' : '🌙'}
               </button>
             </li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#team">Team</a></li> 
             {isAuthenticated ? (
               <li style={{ position: 'relative' }}>
                 <button 

@@ -1,0 +1,59 @@
+name: "💅 UI/UX Improvement"
+description: Suggest a visual or user experience enhancement
+title: "[UI/UX] "
+labels: ["design", "enhancement"]
+assignees: []
+
+body:
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: GitHub username (optional)
+
+  - type: input
+    id: context
+    attributes:
+      label: Context
+      description: Where is this UI element located?
+      placeholder: e.g., "Profile Settings Page"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_experience
+    attributes:
+      label: ❌ Current Experience
+      description: Describe what feels off
+      placeholder: e.g., The submit button is grey on a grey background, making it hard to find.
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired_experience
+    attributes:
+      label: ✅ Desired Experience
+      description: Describe the improved experience
+      placeholder: e.g., Change the submit button to Primary Blue (#0055FF) and add a hover effect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: visuals
+    attributes:
+      label: 📸 Visual References
+      description: Add screenshots or Figma links
+      placeholder: |
+        Current: [Image]
+        Proposed: [Image or Figma Link]
+
+  - type: dropdown
+    id: responsiveness
+    attributes:
+      label: 📱 Responsiveness
+      options:
+        - Mobile
+        - Desktop
+        - Both
+    validations:
+      required: true

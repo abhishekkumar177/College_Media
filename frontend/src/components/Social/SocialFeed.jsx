@@ -86,65 +86,22 @@ export default function SocialFeed() {
   if (loading) return <div className="text-center py-8">Loading posts...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6 text-center">Social Feed</h2>
+    <section className="w-full flex justify-center">
+      <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+        
+        <header className="py-6 border-b border-gray-200">
+          <h2 className="text-2xl font-semibold text-gray-900 text-center">
+            Social Feed
+          </h2>
+        </header>
 
-      {/* Post Creation Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
-        <form onSubmit={handleSubmit}>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="What's on your mind?"
-            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="3"
-            required={!image}
-          />
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center">
-              <label className="cursor-pointer flex items-center text-gray-600 hover:text-gray-800">
-                <span className="mr-2">📷</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                {image ? image.name : 'Add Image'}
-              </label>
-              {image && (
-                <button
-                  type="button"
-                  onClick={() => setImage(null)}
-                  className="ml-2 text-red-500 hover:text-red-700"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={submitting || (!content.trim() && !image)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-            >
-              {submitting ? 'Posting...' : 'Post'}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="py-6 space-y-6">
+          {mockPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
 
-      {/* Posts List */}
-      <div className="flex flex-col gap-4 space-y-4">
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            No posts yet. Be the first to share something!
-          </div>
-        )}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,0 +1,68 @@
+name: "🚀 Feature Request"
+description: Propose a new feature or enhancement
+title: "[FEATURE] "
+labels: ["enhancement"]
+assignees: []
+
+body:
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: GitHub username (optional)
+
+  - type: textarea
+    id: user_story
+    attributes:
+      label: 📖 User Story
+      description: Describe the feature using user-story format
+      placeholder: |
+        As a [Role], I want to [Action], so that [Benefit/Value].
+        Example: As a user, I want to edit my comments, so that I can fix typos.
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: 🎯 Objective & Value
+      description: Why are we building this? What value does it provide?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: ✅ Acceptance Criteria (Definition of Done)
+      placeholder: |
+        - Criteria 1
+        - Criteria 2
+        - Criteria 3
+        - Criteria 4
+    validations:
+      required: true
+
+  - type: textarea
+    id: design
+    attributes:
+      label: 🎨 Design / UI Mockups
+      description: Link to Figma, Sketch, or attach screenshots
+
+  - type: checkboxes
+    id: technical
+    attributes:
+      label: ⚙️ Technical Considerations
+      options:
+        - label: Requires DB schema change
+        - label: Requires new API endpoint
+        - label: Has security implications
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: 🏷 Area
+      options:
+        - Frontend
+        - Backend
+        - Fullstack
+        - DevOps

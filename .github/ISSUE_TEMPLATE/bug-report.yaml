@@ -1,0 +1,90 @@
+name: "🐛 Bug Report"
+description: Report a problem to help us improve
+title: "[BUG] "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Explain the issue...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: criticality
+    attributes:
+      label: 🔴 Criticality
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical - Blocker
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 👣 Steps to Reproduce
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 🤔 Expected Behavior
+      placeholder: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 💥 Actual Behavior
+      placeholder: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: 📸 Screenshots / Video
+      description: Upload screenshots or recordings if possible.
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 💻 OS
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Android
+        - iOS
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: e.g. Chrome 120, Safari 17
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      placeholder: e.g. Desktop, iPhone 13
+
+  - type: input
+    id: related
+    attributes:
+      label: 🔗 Related Issues
+      placeholder: Closes #... / Related to #...

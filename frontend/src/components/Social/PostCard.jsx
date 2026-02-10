@@ -11,7 +11,7 @@ export default function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 w-full md:max-w-2xl mx-auto shadow-sm">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 w-full md:max-w-2xl mx-auto shadow-xs">
       {/* Header: Avatar, Name, Title, Timestamp */}
       <div className="flex items-center mb-3">
         <img

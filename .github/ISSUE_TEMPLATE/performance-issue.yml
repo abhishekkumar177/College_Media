@@ -1,0 +1,61 @@
+name: "🐌 Performance Issue"
+description: Report performance bottlenecks, slowdowns, or optimization opportunities
+title: "[PERF] "
+labels: ["performance"]
+assignees: []
+
+body:
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: GitHub username (optional)
+
+  - type: checkboxes
+    id: symptoms
+    attributes:
+      label: 🐌 Symptoms
+      options:
+        - label: Slow page load
+        - label: Laggy scrolling
+        - label: High CPU usage
+        - label: High memory usage
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: 📊 Metrics / Benchmarks
+      description: Provide measurable performance data
+      placeholder: |
+        Current Load Time: 4.5s
+        Target Load Time: < 1.5s
+        Lighthouse Score: 45/100
+    validations:
+      required: true
+
+  - type: input
+    id: area
+    attributes:
+      label: 📍 Affected Area
+      description: URL, page, or component name
+      placeholder: e.g., MainFeed.jsx or /dashboard
+
+  - type: checkboxes
+    id: investigation
+    attributes:
+      label: 🕵️ Investigation Notes
+      options:
+        - label: Excessive re-renders detected
+        - label: Large image sizes
+        - label: Unoptimized API calls
+        - label: Inefficient database query
+        - label: Blocking JavaScript execution
+
+  - type: textarea
+    id: optimization
+    attributes:
+      label: 🚀 Proposed Optimization
+      description: Suggested fix or improvement
+      placeholder: e.g., Implement virtual scrolling for the feed list
+    validations:
+      required: true
