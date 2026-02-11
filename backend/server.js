@@ -10,9 +10,6 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static('uploads'));
-
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/college-media')
   .then(() => console.log('MongoDB connected'))
@@ -21,7 +18,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/college-m
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
-app.use('/api/users', require('./routes/users'));
+// app.use('/api/users', require('./routes/users'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'College Media Backend Running' });

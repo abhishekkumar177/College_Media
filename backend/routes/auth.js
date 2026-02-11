@@ -1,16 +1,17 @@
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+const User = require("../models/User");
+const sendEmail = require("../utils/sendEmail");
 
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import User from "../models/User.js";
-import sendEmail from "../utils/sendEmail.js";
 dotenv.config();
 
-
+const router = express.Router();
 
 
 // REGISTER
-export const registerUser = async (req, res) => {
+router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -47,10 +48,10 @@ export const registerUser = async (req, res) => {
     success: true,
     message: "User registered & email sent",
   });
-};
+});
 
 
-export const loginUser = async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -84,6 +85,7 @@ export const loginUser = async (req, res) => {
 
     res.json({
       success: true,
+      token,
       user: {
         id: user._id,
         name: user.name,
@@ -93,10 +95,10 @@ export const loginUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
-};
+});
 
 
-export const logoutUser = (req, res) => {
+router.post("/logout", async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -104,10 +106,12 @@ export const logoutUser = (req, res) => {
   });
 
   res.json({ success: true, message: "Logged out successfully" });
-};
+});
 
 
-export const getUserProfile = async (req, res) => {
+router.get("/profile", async (req, res) => {
   const user = await User.findById(req.userId).select("-password");
   res.json({ success: true, user });
-};
+});
+
+module.exports = router;
