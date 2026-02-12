@@ -592,6 +592,16 @@ footer {
   }
 }
 
+/* ---------------------------
+   Glassmorphism Navbar
+---------------------------- */
+.navbar-glassmorphism {
+  background-color: rgba(10, 10, 30, 0.7);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 @media (max-width: 480px) {
   .hero {
     padding: 60px 0;
