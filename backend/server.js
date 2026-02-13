@@ -33,11 +33,10 @@ const authLimiter = rateLimit({
    message: { message: "Too many authentication attempts, please try again later." }
 });
 
-const createLimiter = rateLimit({
-   windowMs: 5 * 60 * 1000, // 5 minutes
-   max: 20, // limit each IP to 20 create requests per windowMs
-   message: { message: "Too many requests, please slow down." }
-});
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/posts', require('./routes/posts'));
+// app.use('/api/users', require('./routes/users'));
 
 /* =========================
    DATABASE CONNECTION

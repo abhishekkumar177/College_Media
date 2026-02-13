@@ -1,3 +1,5 @@
+const nodemailer = require("nodemailer");
+
 const sendEmail = async ({ to, subject, html }) => {
   // Skip email sending if credentials are not configured
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -29,10 +31,11 @@ const sendEmail = async ({ to, subject, html }) => {
       html,
     });
 
-    console.log('📧 Email sent to:', to);
+    console.log(" Email sent to:", to);
   } catch (error) {
-    console.error('❌ Email error:', error.message);
+    console.error(" Email error:", error.message);
+    throw error;
   }
 };
 
-export default sendEmail;
+module.exports = sendEmail;

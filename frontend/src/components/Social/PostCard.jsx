@@ -1,53 +1,78 @@
-
 import { useState, useEffect } from 'react';
-import { getCommentCount } from './comments.service';
-import CommentSection from './CommentSection';
-import EditPostForm from './EditPostForm';
 
-export default function PostCard({ post, currentUserId }) {
-  const [showComments, setShowComments] = useState(false);
-  const [commentCount, setCommentCount] = useState(post.comments || 0);
-  const [loadingCount, setLoadingCount] = useState(true);
-    useEffect(() => {
-      let mounted = true;
-      async function fetchCount() {
-        setLoadingCount(true);
-        try {
-          const data = await getCommentCount(post._id || post.id);
-          if (mounted && data && typeof data.count === 'number') {
-            setCommentCount(data.count);
-          }
-        } catch (e) {
-          // fallback: keep previous count
-        } finally {
-          if (mounted) setLoadingCount(false);
-        }
+export default function PostCard({ post }) {
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+
+  const formatTimestamp = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [post._id]);
+
+  const fetchComments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/posts/${post._id}/comments`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setComments(data);
       }
-      fetchCount();
-      return () => { mounted = false; };
-    }, [post._id, post.id]);
-  const [likesCount, setLikesCount] = useState(post.likes || 0);
-  const [editing, setEditing] = useState(false);
-
-  const handleCommentClick = () => {
-    setShowComments(!showComments);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
   };
 
-  const handleCommentCountChange = (newCount) => {
-    setCommentCount(newCount);
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/posts/${post._id}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ text: newComment }),
+      });
+      if (response.ok) {
+        const newCommentData = await response.json();
+        setComments([...comments, newCommentData]);
+        setNewComment('');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
   };
 
-  const handleEditClick = () => {
-    setEditing(true);
-  };
-
-  const handleEditCancel = () => {
-    setEditing(false);
-  };
-
-  const handlePostUpdated = () => {
-    setEditing(false);
-    // Optionally, trigger a refresh in parent component
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/posts/${post._id}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setComments(comments.filter(c => c._id !== commentId));
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
   };
 
   return (
@@ -55,13 +80,13 @@ export default function PostCard({ post, currentUserId }) {
       {/* Header: Avatar, Name, Title, Timestamp */}
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
         <img
-          src={post.user?.avatar || `https://ui-avatars.com/api/?name=${post.user?.name || 'User'}&background=random`}
-          alt={post.user?.name || 'User'}
-          style={{ width: '40px', height: '40px', borderRadius: '50%', marginRight: '0.75rem' }}
+          src={post.user.avatar || '/default-avatar.png'}
+          alt={post.user.name}
+          className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <h3 style={{ fontWeight: '600', fontSize: '14px', color: 'var(--color-text-primary)', marginBottom: '0.125rem' }}>{post.user?.name || 'Anonymous'}</h3>
-          <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>{post.user?.email || 'User'} • {post.timestamp}</p>
+          <h3 className="font-semibold text-sm text-gray-900">{post.user.name}</h3>
+          <p className="text-xs text-gray-500">{formatTimestamp(post.createdAt)}</p>
         </div>
       </div>
 
@@ -93,15 +118,19 @@ export default function PostCard({ post, currentUserId }) {
         </>
       )}
 
+      {/* Image */}
+      {post.image && (
+        <img
+          src={`http://localhost:5000${post.image}`}
+          alt="Post image"
+          className="w-full h-auto rounded-lg mb-3"
+        />
+      )}
+
       {/* Engagement Stats */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '0.75rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border-primary)' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ fontSize: 16 }}>👍</span> {likesCount} likes
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{ fontSize: 16, color: 'var(--color-primary)' }}>💬</span>
-          {loadingCount ? <span style={{ fontStyle: 'italic', color: '#aaa' }}>...</span> : <b>{commentCount}</b>} comments
-        </span>
+      <div className="flex justify-between text-xs text-gray-500 mb-2">
+        <span>{post.likes?.length || 0} likes</span>
+        <span>{post.comments?.length || 0} comments</span>
       </div>
 
       {/* Action Buttons */}
@@ -136,14 +165,49 @@ export default function PostCard({ post, currentUserId }) {
       </div>
 
       {/* Comments Section */}
-      {showComments && (
-        <CommentSection 
-          postId={post._id || post.id}
-          initialCount={commentCount}
-          currentUserId={currentUserId}
-          onCommentCountChange={handleCommentCountChange}
-        />
-      )}
+      <div className="mt-4 border-t border-gray-100 pt-4">
+        <div className="mb-3">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleAddComment}
+            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+          >
+            Comment
+          </button>
+        </div>
+        <div className="space-y-2">
+          {comments.map((comment) => (
+            <div key={comment._id} className="flex items-start space-x-2">
+              <img
+                src={comment.user.avatar || '/default-avatar.png'}
+                alt={comment.user.name}
+                className="w-6 h-6 rounded-full"
+              />
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <span className="font-semibold text-sm">{comment.user.name}</span>
+                  <span className="text-xs text-gray-500">{formatTimestamp(comment.date)}</span>
+                </div>
+                <p className="text-sm text-gray-800">{comment.text}</p>
+              </div>
+              {comment.user._id === user?.id && (
+                <button
+                  onClick={() => handleDeleteComment(comment._id)}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

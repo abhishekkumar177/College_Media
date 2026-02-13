@@ -4,6 +4,16 @@
   --secondary: #d946ef;
 }
 
+[data-theme="light"] {
+  --primary: #4c1d95;
+  --secondary: #c026d3;
+  --dark: #f8fafc;
+  --light: #1e293b;
+  --gray: #64748b;
+  --white: #0f172a;
+  --black: #f1f5f9;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -22,15 +32,9 @@ body {
   line-height: 1.6;
 }
 
-/* Homepage specific gradient background */
-[data-homepage="true"] {
-  background: linear-gradient(to bottom right, #1e1b4b, #3730a3, #1e1b4b);
-  color: white;
-}
-
-[data-theme="light"] [data-homepage="true"] {
+[data-theme="light"] body {
   background: linear-gradient(to bottom right, #f8fafc, #e2e8f0, #f8fafc);
-  color: #1e293b;
+  color: var(--black);
 }
 
 .container {
@@ -104,7 +108,7 @@ nav {
 }
 
 [data-theme="light"] .nav-links a:hover {
-  color: #1e293b;
+  color: var(--black);
 }
 
 /* Buttons */

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { Sun } from 'lucide-react';
 
 import { Menu as MenuIcon, Close as CloseIcon } from '@mui/icons-material';
 

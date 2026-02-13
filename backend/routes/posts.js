@@ -1,8 +1,23 @@
-import express from 'express';
-import Post from '../models/Post.js';
-import jwt from 'jsonwebtoken';
+const express = require('express');
+const Post = require('../models/Post');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
 
 const router = express.Router();
+
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // Middleware to verify token
 const auth = (req, res, next) => {
@@ -26,7 +41,7 @@ router.get('/', auth, async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = parseInt(req.query.offset) || 0;
     const posts = await Post.find()
-      .populate('user', 'name email')
+      .populate('user', 'name email avatar')
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(offset);
@@ -46,9 +61,10 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Create post
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, upload.single('image'), async (req, res) => {
   try {
-    const { content, image } = req.body;
+    const { content } = req.body;
+    const image = req.file ? `/uploads/${req.file.filename}` : '';
     const post = new Post({
       user: req.userId,
       content,
@@ -116,4 +132,64 @@ router.put('/:id/like', auth, async (req, res) => {
   }
 });
 
-export default router;
+// Get comments for a post
+router.get('/:id/comments', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate('comments.user', 'name email avatar');
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    res.json(post.comments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add a comment to a post
+router.post('/:id/comments', auth, async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const newComment = {
+      user: req.userId,
+      text,
+      date: new Date()
+    };
+    post.comments.push(newComment);
+    await post.save();
+    await post.populate('comments.user', 'name email avatar');
+    res.status(201).json(post.comments[post.comments.length - 1]);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete a comment from a post
+router.delete('/:id/comments/:commentId', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    const commentIndex = post.comments.findIndex(comment => comment._id.toString() === req.params.commentId);
+    if (commentIndex === -1) {
+      return res.status(404).json({ message: 'Comment not found' });
+    }
+    if (post.comments[commentIndex].user.toString() !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized to delete this comment' });
+    }
+    post.comments.splice(commentIndex, 1);
+    await post.save();
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+module.exports = router;

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { ThemeProvider } from "./context/ThemeContext";
+import { ChatProvider } from "./context/ChatContext";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -22,28 +22,20 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 export default function App() {
   return (
-    <ThemeProvider>
+    <ChatProvider>
       <AuthProvider>
         <Router>
-          <ErrorBoundary>
-            {/* App Routes */}
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/sample-profile" element={<SampleProfile />} />
-              <Route path="/my-comments" element={<CommentManagement />} />
-            </Routes>
+          {/* App Routes */}
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
 
-            {/* Global Floating Chatbot */}
-            <ChatbotWidget />
-            <ToastContainer />
-          </ErrorBoundary>
+          {/* Global Floating Chatbot */}
+          <ChatbotWidget />
         </Router>
       </AuthProvider>
-    </ThemeProvider>
+    </ChatProvider>
   );
 }
