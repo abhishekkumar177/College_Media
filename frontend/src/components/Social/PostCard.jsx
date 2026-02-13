@@ -76,9 +76,9 @@ export default function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 w-full md:max-w-2xl mx-auto shadow-xs">
+    <div style={{ background: 'var(--color-card-bg)', border: '1px solid var(--color-card-border)', borderRadius: '12px', padding: '1.25rem', transition: 'all var(--transition-base)', boxShadow: '0 1px 3px var(--color-card-shadow)' }}>
       {/* Header: Avatar, Name, Title, Timestamp */}
-      <div className="flex items-center mb-3">
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
         <img
           src={post.user.avatar || '/default-avatar.png'}
           alt={post.user.name}
@@ -90,8 +90,33 @@ export default function PostCard({ post }) {
         </div>
       </div>
 
-      {/* Content */}
-      <p className="text-sm text-gray-800 mb-3 leading-relaxed">{post.content}</p>
+
+      {/* Edit Mode or Content */}
+      {editing ? (
+        <EditPostForm post={post} onPostUpdated={handlePostUpdated} onCancel={handleEditCancel} />
+      ) : (
+        <>
+          <p style={{ fontSize: '14px', color: 'var(--color-text-primary)', marginBottom: '1rem', lineHeight: '1.6' }}>{post.content}</p>
+          {/* Show Edit button if current user is the author */}
+          {currentUserId && post.user && currentUserId === post.user._id && (
+            <button
+              onClick={handleEditClick}
+              style={{
+                fontSize: '12px',
+                color: 'var(--color-primary)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                marginBottom: '1rem',
+                textDecoration: 'underline',
+                float: 'right'
+              }}
+            >
+              Edit
+            </button>
+          )}
+        </>
+      )}
 
       {/* Image */}
       {post.image && (
@@ -109,15 +134,33 @@ export default function PostCard({ post }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-around mt-2 border-t border-gray-100 pt-2">
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          👍 Like
+      <div style={{ display: 'flex', justifyContent: 'space-around', gap: '0.5rem' }}>
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: 'var(--color-text-secondary)', background: 'transparent', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', transition: 'all var(--transition-base)' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-hover-bg)'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+          <span>👍</span> Like
         </button>
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          💬 Comment
+        <button 
+          onClick={handleCommentClick}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            fontSize: '13px', 
+            color: showComments ? 'var(--color-primary)' : 'var(--color-text-secondary)', 
+            background: 'transparent', 
+            border: 'none', 
+            padding: '0.5rem 1rem', 
+            borderRadius: '6px', 
+            cursor: 'pointer', 
+            transition: 'all var(--transition-base)',
+            fontWeight: showComments ? '600' : '400'
+          }} 
+          onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-hover-bg)'} 
+          onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+        >
+          <span>💬</span> Comment
         </button>
-        <button className="flex items-center text-sm text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors">
-          🔗 Share
+        <button style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '13px', color: 'var(--color-text-secondary)', background: 'transparent', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', transition: 'all var(--transition-base)' }} onMouseOver={(e) => e.currentTarget.style.background = 'var(--color-hover-bg)'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+          <span>🔗</span> Share
         </button>
       </div>
 

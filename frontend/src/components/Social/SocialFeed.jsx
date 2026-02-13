@@ -86,19 +86,34 @@ export default function SocialFeed() {
   if (loading) return <div className="text-center py-8">Loading posts...</div>;
 
   return (
-    <section className="w-full flex justify-center">
-      <div className="w-full max-w-3xl px-4 sm:px-6 lg:px-8">
+    <section className="w-full">
+      <div className="w-full">
         
-        <header className="py-6 border-b border-gray-200">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center">
+        <header style={{ padding: '1.5rem', borderBottom: '1px solid var(--color-border-primary)', backgroundColor: 'var(--color-card-bg)' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--color-text-primary)' }}>
             Social Feed
           </h2>
         </header>
 
-        <div className="py-6 space-y-6">
-          {mockPosts.map((post) => (
-            <PostCard key={post.id} post={post} />
-          ))}
+        <div style={{ padding: '1.5rem', backgroundColor: 'var(--color-bg-primary)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Create Post Form */}
+            <CreatePostForm onPostCreated={fetchPosts} user={user} />
+            
+            {/* Posts List */}
+            {posts.map((post) => (
+              <PostCard 
+                key={post._id} 
+                post={{
+                  ...post,
+                  timestamp: formatTimestamp(post.createdAt),
+                  likes: post.likes?.length || 0,
+                  comments: 0 // Will be updated by CommentSection
+                }} 
+                currentUserId={user?.id || user?._id}
+              />
+            ))}
+          </div>
         </div>
 
       </div>

@@ -1,10 +1,13 @@
 import { useState, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import ErrorMessage from '../components/ErrorMessage';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -31,24 +34,25 @@ export default function Signup() {
     // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
+      toast.error('Password must be at least 6 characters');
       return;
     }
 
-    setLoading(true);
-
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch('http://localhost:3002/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           name: formData.name,
+          username: formData.username,
           email: formData.email,
           password: formData.password,
           role: formData.role
@@ -61,10 +65,31 @@ export default function Signup() {
         throw new Error(data.message || 'Signup failed');
       }
 
-      login(data.token, data.user);
-      navigate('/');
+      toast.success('Signup successful! Logging you in...');
+      // After successful registration, log in the user
+      const loginResponse = await fetch('http://localhost:3002/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const loginData = await loginResponse.json();
+
+      if (loginResponse.ok) {
+        login(loginData.token, loginData.user);
+        toast.success('Logged in successfully!');
+        navigate('/dashboard');
+      } else {
+        throw new Error(loginData.message || 'Login after signup failed');
+      }
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Signup failed');
     } finally {
       setLoading(false);
     }
@@ -74,6 +99,7 @@ export default function Signup() {
     <div className="auth-page min-h-screen flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-6 lg:px-12 py-6">
+        <ErrorMessage message={error} visible={!!error} />
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center">
             <span className="text-white font-bold text-lg">C</span>
@@ -110,6 +136,23 @@ export default function Signup() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your name"
+                className="auth-input"
+              />
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Choose a username"
                 className="auth-input"
               />
             </div>
@@ -203,18 +246,36 @@ export default function Signup() {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="auth-btn auth-btn-primary"
-            >
-              <span>{loading ? 'Creating account...' : "Let's go"}</span>
-              {!loading && (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              )}
-            </button>
+<button
+  type="submit"
+  disabled={loading}
+  className="
+    auth-btn auth-btn-primary
+    transition-all duration-300 ease-in-out
+    hover:scale-105 hover:brightness-110
+    active:scale-95
+    focus-visible:ring-2 focus-visible:ring-indigo-400
+  "
+>
+  <span>{loading ? 'Creating account...' : "Let's go"}</span>
+
+  {!loading && (
+    <svg
+      className="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M13 7l5 5m0 0l-5 5m5-5H6"
+      />
+    </svg>
+  )}
+</button>
+
           </form>
         </div>
       </div>

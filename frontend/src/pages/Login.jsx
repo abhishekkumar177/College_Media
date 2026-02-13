@@ -1,8 +1,33 @@
 import { useState, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import '../components/Navbar';
+import ErrorMessage from '../components/ErrorMessage';
 export default function Login() {
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetLoading, setResetLoading] = useState(false);
+    const [resetMessage, setResetMessage] = useState('');
+    const handleResetSubmit = async (e) => {
+      e.preventDefault();
+      setResetLoading(true);
+      setResetMessage('');
+      try {
+        const response = await fetch('http://localhost:3002/api/auth/reset-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: resetEmail })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to send reset email');
+        setResetMessage('Password reset email sent! Check your inbox.');
+      } catch (err) {
+        setResetMessage(err.message);
+      } finally {
+        setResetLoading(false);
+      }
+    };
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -26,7 +51,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:3002/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -41,9 +66,11 @@ export default function Login() {
       }
 
       login(data.token, data.user);
-      navigate('/');
+      toast.success('Login successful!');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
+      toast.error(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -69,11 +96,7 @@ export default function Login() {
         <div className="auth-card w-full max-w-md p-10">
           <h1 className="auth-title text-3xl font-bold mb-10">Log in</h1>
 
-          {error && (
-            <div className="auth-error">
-              {error}
-            </div>
-          )}
+          <ErrorMessage message={error} visible={!!error} />
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
@@ -118,9 +141,22 @@ export default function Login() {
                 </button>
               </div>
               <div className="mt-2 text-right">
-                <a href="#" className="auth-link">
+                <button type="button" className="auth-link" style={{ background: 'none', border: 'none', color: '#1976d2', cursor: 'pointer', padding: 0 }} onClick={() => setShowResetModal(true)}>
                   Forgot password?
-                </a>
+                </button>
+                {showResetModal && (
+                  <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.2)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ background: '#fff', padding: '2rem', borderRadius: '1rem', boxShadow: '0 4px 16px rgba(0,0,0,0.15)', minWidth: 320 }}>
+                      <h3>Reset Password</h3>
+                      <form onSubmit={handleResetSubmit}>
+                        <input type="email" placeholder="Enter your email" value={resetEmail} onChange={e => setResetEmail(e.target.value)} required style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', borderRadius: '6px', border: '1px solid #ddd' }} />
+                        <button className="auth-btn auth-btn-primary" type="submit" disabled={resetLoading} style={{ marginRight: '1rem' }}>Send Reset Email</button>
+                        <button className="auth-btn" type="button" onClick={() => setShowResetModal(false)}>Cancel</button>
+                      </form>
+                      {resetMessage && <div style={{ marginTop: '1rem', color: resetMessage.includes('sent') ? 'green' : 'red' }}>{resetMessage}</div>}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

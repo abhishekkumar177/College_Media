@@ -9,7 +9,12 @@ import Footer from "../components/Footer";
 
 export default function Home() {
   return (
-    <>
+    <div style={{ 
+      background: 'linear-gradient(to bottom right, #1e1b4b, #3730a3, #1e1b4b)', 
+      color: 'white',
+      minHeight: '100vh'
+    }} 
+    data-homepage="true">
       <Navbar />
       <Hero />
       <SocialFeed />
@@ -18,6 +23,6 @@ export default function Home() {
       <Team />
       <CTA />
       <Footer />
-    </>
+    </div>
   );
 }
